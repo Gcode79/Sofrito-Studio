@@ -1,0 +1,1 @@
+# Client Templates\n\nPre-built templates for client deliverables: websites, emails, proposals, contracts, and presentations. Extracted from ad-hoc scripts to ensure consistency and reuse across client engagements.

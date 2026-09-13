@@ -1,0 +1,10 @@
+with open('C:/Users/josho/SofritoStudio/deploy/js/consent.min.js', encoding='utf-8') as f:
+    c = f.read()
+print('min.js length:', len(c))
+print('contains s.pinimg.com:', 's.pinimg.com' in c)
+print('contains pinimg:', 'pinimg' in c)
+print('contains pintrk load:', 'pintrk("load"' in c)
+print('contains pintrk page:', 'pintrk("page"' in c)
+print('contains googletagmanager:', 'googletagmanager' in c)
+print('contains analytics.google.com:', 'analytics.google.com' in c)
+print('contains www.google.com/g/collect:', 'www.google.com/g/collect' in c)
