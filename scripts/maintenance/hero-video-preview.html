@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hero Video — Component Preview (not live)</title>
+<style>
+  :root{
+    --ink:#2B2118; --cream:#FAF6EE; --cta:#C03D2A; --gold:#9A7318; --white:#FFFDF8;
+    --cream-dark:#F2EAD9; --ink-soft:#5C4F42;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--cream)}
+  .note{max-width:1000px;margin:18px auto 0;padding:0 20px;color:var(--ink-soft);font-size:.85rem;line-height:1.5}
+  .note b{color:var(--cta)}
+
+  /* ===== hero (mirrors deploy hero composition; video layer swapped in) ===== */
+  .hero{position:relative;overflow:hidden;color:var(--white);padding:96px 0 0;background:var(--ink)}
+  .hero .wrap{max-width:1000px;margin:0 auto;padding:0 20px;position:relative;z-index:2}
+  .hero-content-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:32px;align-items:center}
+
+  /* video layer (the drop-in replacement for .hero-bg) */
+  .hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+  .hero::before{content:'';position:absolute;inset:0;z-index:1;
+    background:linear-gradient(90deg,rgba(43,33,24,.74) 0%,rgba(43,33,24,.46) 40%,rgba(43,33,24,.06) 72%,rgba(43,33,24,0) 100%)}
+  .hero-brand{position:absolute;top:18px;right:20px;z-index:3;display:flex;align-items:center;gap:8px;color:var(--white);font-weight:700;font-size:.85rem;letter-spacing:.5px}
+  .hero-brand .dot{width:26px;height:26px;border-radius:6px;background:#C03D2A;display:grid;place-items:center;font-size:.7rem}
+
+  .hero-eyebrow{display:flex;align-items:center;gap:8px;font-weight:600;font-size:.8rem;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,253,248,.85)}
+  .hero h1{font-family:Fraunces,Georgia,serif;font-size:clamp(2rem,4.5vw,3.25rem);margin:14px 0 16px;max-width:640px}
+  .hero p.lead{color:rgba(255,253,248,.9);max-width:520px;line-height:1.55;margin:0 0 22px}
+  .actions{display:flex;gap:12px;flex-wrap:wrap}
+  .btn{display:inline-block;text-decoration:none;font-weight:700;border-radius:10px;padding:14px 22px}
+  .btn-primary{background:var(--cta);color:#fff}
+  .btn-ghost{border:1px solid rgba(255,255,255,.5);color:#fff}
+  .hero-trust{display:flex;gap:18px;margin:22px 0 0;color:rgba(255,253,248,.85);font-size:.85rem}
+  .hero-trust span{display:inline-flex;align-items:center;gap:6px}
+
+  /* product visual stays (fallback + product context) */
+  .hero-mockup img{max-width:100%;height:auto;display:block}
+
+  /* a11y controls + caption line */
+  .hero-controls{position:absolute;left:20px;bottom:16px;z-index:3;display:flex;align-items:center;gap:10px}
+  .hero-video-toggle{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:999px;padding:8px 14px;font-size:.8rem;font-weight:700;cursor:pointer}
+  .hero-video-toggle:focus-visible{outline:3px solid var(--gold)}
+  .hero-caption{color:rgba(255,253,248,.92);font-size:.78rem;background:rgba(43,33,24,.5);padding:5px 12px;border-radius:999px}
+
+  @media(max-width:960px){
+    .hero-content-grid{grid-template-columns:1fr;text-align:center}
+    .hero-copy .actions{justify-content:center}
+    .hero-mockup{order:-1;max-width:300px;margin:0 auto}
+    .hero-trust{justify-content:center}
+    .hero::before{background:linear-gradient(180deg,rgba(43,33,24,.6) 0%,rgba(43,33,24,.35) 45%,rgba(43,33,24,.75) 100%)}
+  }
+</style>
+</head>
+<body>
+<div class="note"><b>Preview only — not the live hero, not deployed.</b>
+This page renders the proposed video-hero component structure using footage that ALREADY
+exists on the site (<code>deploy/videos/cooking-demo.*</code> + <code>poster-hero.jpg</code>).
+It is a drop-in demonstration, not a final asset. Close it when done.</div>
+
+<section class="hero" id="hero">
+  <!-- ===== video layer (drop-in for the live .hero-bg div) ===== -->
+  <video class="hero-video" id="heroVideo"
+         poster="deploy/videos/poster-hero.jpg"
+         muted loop playsinline preload="metadata"
+         aria-label="Puerto Rican cooking — bilingual captions included"
+         aria-describedby="heroCaption">
+    <source src="deploy/videos/cooking-demo.webm" type="video/webm">
+    <source src="deploy/videos/cooking-demo-small.mp4" type="video/mp4">
+    <source src="deploy/videos/cooking-demo.mp4" type="video/mp4">
+    <track kind="captions" label="English" srclang="en" src="deploy/videos/captions-en.vtt" default>
+    <track kind="captions" label="Español" srclang="es" src="deploy/videos/captions-es.vtt">
+  </video>
+
+  <div class="hero-brand"><span class="dot">SS</span> Sofrito Studio</div>
+
+  <div class="wrap">
+    <div class="hero-content-grid">
+      <div class="hero-copy">
+        <div class="hero-eyebrow">&#128681; Cocina boricua, made simple</div>
+        <h1>Abuela's cooking, from the Ortiz kitchen to your cocina.</h1>
+        <p class="lead">30 authentic Puerto Rican recipes — bilingual, tested, and built for mainland kitchens.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="#products">Get La Mesa Boricua — $47</a>
+          <a class="btn btn-ghost" href="#starter">Start with 5 recipes for $9</a>
+        </div>
+        <div class="hero-trust">
+          <span>&#10003;&#65039; Tested in the Ortiz kitchen</span>
+          <span>&#10003;&#65039; Instant download</span>
+          <span>&#10003;&#65039; 30-day guarantee</span>
+        </div>
+      </div>
+      <div class="hero-mockup">
+        <img src="deploy/images/mockup-cookbook.svg" alt="Sofrito Studio preview on tablet" width="480" height="360">
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-controls">
+    <button class="hero-video-toggle" id="heroVideoToggle" aria-pressed="false">Play</button>
+    <span class="hero-caption" id="heroCaption">Muted · bilingual captions · plays on device (a11y)</span>
+  </div>
+</section>
+
+<script>
+  (function(){
+    var v = document.getElementById('heroVideo');
+    var t = document.getElementById('heroVideoToggle');
+    if(!v || !t) return;
+    // muted autoplay is policy-safe; ensure it starts where allowed
+    v.muted = true;
+    var tryPlay = v.play();
+    if(tryPlay) tryPlay.catch(function(){});
+    t.addEventListener('click', function(){
+      if(v.paused){ v.play(); t.textContent='Pause'; t.setAttribute('aria-pressed','true'); }
+      else { v.pause(); t.textContent='Play'; t.setAttribute('aria-pressed','false'); }
+    });
+    v.addEventListener('pause', function(){ t.textContent='Play'; t.setAttribute('aria-pressed','false'); });
+  })();
+</script>
+</body>
+</html>
