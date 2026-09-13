@@ -1,3 +1,14 @@
+// ═══ RETIRED — legacy record only (Decision D19, 2026-09-10; ops/decision-log.md) ═══
+// Do NOT render, develop, publish, or market this composition.
+// Why: (1) it pitches the RETIRED $9 Starter Kit + STARTER15 coupon — old-model
+//      resurrection, forbidden by pivot confinement;
+//      (2) Pixar-style 3D / cartoon / CGI visuals — banned by the Realistic Social
+//      Visual Standard;
+//      (3) diaspora-home-cook / bilingual-cookbook framing — off-pivot.
+// Superseded by the food-business-branding reel work in ../video-ads/.
+// The file is kept as a historical record; build output is untracked.
+// ════════════════════════════════════════════════════════════════════════════════════
+
 import { Composition } from "remotion";
 
 // "Abuela's iPad" — 3D Reel storyboard from marketing/general/video-concepts.md
@@ -5,7 +16,7 @@ import { Composition } from "remotion";
 // Character: Pixar-style young PR female home cook, bandana + PR-flag apron
 // Key props: glowing iPad (bilingual cookbook), glass sofrito jar, floating ingredients,
 // yellow CTA button, plate of arroz con pollo
-// Source storyboard: video-concepts.md lines 123-186 (Reference 8c + Companion 5)
+// Source storyboard: video-concepts.md lines 123-186 (Reference 8c + Companion 5) — RETIRED
 
 export const AbuelasIpadComp = () => {
   return (

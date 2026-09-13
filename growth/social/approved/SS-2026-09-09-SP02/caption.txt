@@ -1,0 +1,10 @@
+SP-02 Carousel — Website Clarity — Instagram Carousel (4:5, 1080x1350)
+CTA: Book a Sofrito Session → sofritostudio.com/session
+Hashtags: #FoodBusiness #RestaurantWebsite #BrandFoundation #SofritoStudio #WebsiteDesign #IndependentRestaurant #NextStep
+Alt text source file: alt-text.md (restaurant/studio/menu/editorial scenes — owner reviewing generic restaurant website beside printed menu, ceramic cup, receipt printer, warm kitchen light, realistic textures, no recognizable client identity)
+Copy source: copy.md (exact source; revisions only in source file; version tracked in Git)
+UTM tracking: ?utm_source=instagram&utm_medium=carousel&utm_campaign=sp02
+Status: DRAFT — AWAITING FOUNDER APPROVAL
+Publishing route: Manual — Instagram app / Meta Business Suite (posting route still undecided; confirm before scheduling/uploading)
+Asset sourcing: Route A — licensed stock (Pexels/Unsplash) — source URL to be selected/tracked in asset-register.md; no AI customization (credit block: $0.71, 402 errors)
+Image generation protocol: All backgrounds text-free (Path A); typography overlay deterministic (HTML/CSS or SVG); no image model rendering of URLs/brand/service/CTA/date/statistics/testimonials/fine print/hashtags/dense copy; headline max 12 words; body max 40 words/6 lines; checklist max 5 points/8 words; CTA max 8 words; text hierarchy (display/headline/subhead/body/micro) per `carousel-tokens.yml`; accessibility alt text provided per frame; quality check (PASS if score ≥4/5, FAIL if any character/spelling/contrast/readability/safe-zone/extra-text issue); all exports labeled DRAFT.

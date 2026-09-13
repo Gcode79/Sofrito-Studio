@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SS-2026-09-09-SP01 — Slide 01 — Hook: Your menu is doing too much.</title>
+<!-- Typography tokens: carousel-tokens.yml (Instagram 4:5, 1080x1350, 12-col grid, safe margins 96/88/120/88) -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,700&family=Inter:wght@400;600;700&display=swap');
+
+  :root {
+    --ink: #1D261E;
+    --paper: #F6F0E6;
+    --cream: #FFF9F0;
+    --red: #9E3F32;
+    --green: #334B36;
+    --accent: #D88B47;
+    --font-display: "Cormorant Garamond", Georgia, serif;
+    --font-body: "Inter", "Arial", sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1080px; height: 1350px;
+    background: #1a1a1a; /* placeholder for image load */
+    overflow: hidden;
+    position: relative;
+    font-family: var(--font-body);
+    color: var(--ink);
+  }
+
+  /* Background image layer (text-free per Path A — deterministic typography only) */
+  .bg-image {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center;
+    z-index: 1;
+    opacity: 0.92; /* slight reduction so overlay has presence without destroying image */
+  }
+
+  /* Dark gradient overlay for headline contrast (light panel opacity: 0.92 reference) */
+  .overlay-gradient {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(29,38,30,0.35) 0%, rgba(29,38,30,0.10) 50%, rgba(29,38,30,0.45) 100%);
+    z-index: 2;
+  }
+
+  /* Typography layer — deterministic overlay (never image-generated text for business-critical copy) */
+  .typography-layer {
+    position: relative; z-index: 10;
+    width: 1080px; height: 1350px;
+    padding: 96px 88px 120px 88px; /* safe margins per carousel-tokens.yml */
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+
+  /* Eyebrow (micro level) */
+  .eyebrow {
+    font-family: var(--font-body); font-weight: 600; font-size: 24px;
+    line-height: 1.15; letter-spacing: 0.01em; color: var(--accent);
+    text-transform: uppercase; text-align: left;
+    max-width: 720px; max-lines: 2;
+  }
+
+  /* Headline (headline level) */
+  .headline {
+    font-family: var(--font-display); font-weight: 700; font-style: italic;
+    font-size: 68px; line-height: 0.98; letter-spacing: -0.018em;
+    color: var(--cream); text-align: left;
+    max-width: 860px; max-lines: 4;
+    text-shadow: 0 2px 24px rgba(0,0,0,0.55); /* ensures readability on varied backgrounds */
+  }
+
+  /* Bottom CTA block (micro level) */
+  .cta-block {
+    font-family: var(--font-body); font-size: 24px; font-weight: 600; line-height: 1.15;
+    color: var(--cream); letter-spacing: 0.01em;
+    max-width: 860px; text-align: left;
+  }
+  .cta-block a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent); padding-bottom: 2px; }
+  .cta-block a:hover { color: var(--red); border-bottom-color: var(--red); }
+
+  /* Slide number (micro, consistent) */
+  .slide-marker {
+    position: absolute; bottom: 80px; right: 88px;
+    font-family: var(--font-body); font-weight: 600; font-size: 20px; color: rgba(246,240,230,0.65);
+    z-index: 10; letter-spacing: 0.01em;
+  }
+
+  /* Brand mark (optional, minimal — no logo unless founder provides approved logo) */
+  .brand-mark {
+    position: absolute; top: 96px; right: 88px;
+    font-family: var(--font-display); font-weight: 700; font-style: italic;
+    font-size: 18px; color: rgba(246,240,230,0.85); letter-spacing: -0.01em;
+    z-index: 10;
+  }
+
+  /* Negative space reserved for overlay — no readable text in image layer */
+  /* Note for designer: Image background has no text, logos, signage, watermarks, URLs, or readable copy. */
+</style>
+</head>
+<body>
+
+<!-- Background: licensed stock photography (Path A — text-free visual; typography added deterministically below) -->
+  <img class="bg-image" src="https://images.pexels.com/photos/313700/pexels-photo-313700.jpeg?cs=tinysrgb&w=1080&h=1350&fit=crop" alt="Refined dining table with menu — formal restaurant setting; licensed Pexels stock; photographer: solliefoto"/>
+
+<!-- Gradient overlay for text contrast (not decorative — functional readability) -->
+<div class="overlay-gradient"></div>
+
+<!-- Deterministic typography layer (Path A — exact copy from copy.md, never image-generated) -->
+<div class="typography-layer">
+  <div>
+    <!-- Eyebrow (micro) -->
+    <p class="eyebrow">Before you redesign anything</p>
+  </div>
+
+  <!-- Main headline (headline) -->
+  <h1 class="headline">Your menu is doing too much.</h1>
+
+  <!-- CTA / attribution (micro) -->
+  <div class="cta-block">
+    <p>Confused customers leave faster. <a href="https://sofritostudio.com/session?utm_source=instagram&utm_medium=carousel&utm_campaign=sp01">Book a session → sofritostudio.com/session</a></p>
+  </div>
+
+  <!-- Slide number (micro, consistent format) -->
+  <div class="slide-marker">01 / 07</div>
+  <div class="brand-mark">Sofrito Studio</div>
+</div>
+
+<!-- Note for manual editing / design-tool export:
+     Source image URL (licensed Pexels stock, commercial-use free):
+     https://images.pexels.com/photos/4921028/pexels-photo-4921028.jpeg (photographer: rdne)
+     Original download (high-res): https://images.pexels.com/photos/4921028/pexels-photo-4921028.jpeg?cs=srgb&dl=pexels-rdne-4921028.jpg&fm=jpg
+     Typography overlay source file: `carousel-tokens.yml` (this slide uses headline 92px / eyebrow 24px / CTA 22px; safe margins applied; colors from token file)
+     To edit manually: open this HTML in a browser, take screenshot or use design tool (Canva / Figma) with the same font family (`Cormorant Garamond` for display, `Inter` for body). Keep text exactly as shown — do not retype from memory. Verify spelling against exact_copy from `copy.md`.
+-->
+</body>
+</html>

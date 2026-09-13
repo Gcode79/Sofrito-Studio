@@ -17,6 +17,8 @@ Usage:
   python marketing/platforms/meta/post_to_meta.py --publish --platform instagram
 """
 
+import hmac
+import hashlib
 import os
 import sys
 import json
@@ -54,6 +56,16 @@ TOKEN = os.getenv("META_ACCESS_TOKEN", "").strip()
 PAGE_ID = os.getenv("META_PAGE_ID", "").strip()
 IG_ID = os.getenv("META_INSTAGRAM_ACCOUNT_ID", "").strip()
 PAGE_TOKEN = ""  # page-scoped token, resolved from /me/accounts when needed
+APP_SECRET = os.getenv("META_APP_SECRET", "").strip()
+
+
+def appsecret_proof(token):
+    """HMAC-SHA256 appsecret_proof for a token, keyed on META_APP_SECRET.
+    Returns '' when the app secret is not configured so the publisher keeps
+    working in local/dev setups that don't enforce the requirement."""
+    if not APP_SECRET or not token:
+        return ""
+    return hmac.new(APP_SECRET.encode(), token.encode(), hashlib.sha256).hexdigest()
 
 # The demo clip used as a stand-in until real faceless clips are uploaded.
 # The publisher refuses to post it as-is.
@@ -65,8 +77,8 @@ def local_video_path(video_url):
     """Resolve a /videos/<file>.mp4 URL to the local deploy file, or None."""
     if not video_url or not video_url.startswith("https://sofritostudio.com/videos/"):
         return None
-    rel = video_url.replace("https://sofritostudio.com/videos/", "")
-    if ".." in rel or "/" in rel:
+    rel = urllib.parse.unquote(video_url.replace("https://sofritostudio.com/videos/", ""))
+    if not rel or ".." in rel or "/" in rel or "\\" in rel:
         return None  # plain filename only (no traversal / subpaths)
     p = VIDEO_BASE / rel
     return p if p.is_file() else None
@@ -124,6 +136,9 @@ def auto_ready(posts):
 
 def graph(path, params) -> dict:
     params["access_token"] = TOKEN
+    proof = appsecret_proof(TOKEN)
+    if proof:
+        params["appsecret_proof"] = proof
     url = f"{API}/{path}?" + urllib.parse.urlencode(params)
     try:
         with urllib.request.urlopen(url, timeout=40) as r:
@@ -136,6 +151,9 @@ def graph_post(path, params) -> dict:
     """POST to the Graph API (used by IG media creation/publish endpoints —
     GET-only would return a list instead of creating a container)."""
     params["access_token"] = TOKEN
+    proof = appsecret_proof(TOKEN)
+    if proof:
+        params["appsecret_proof"] = proof
     body = urllib.parse.urlencode(params).encode()
     req = urllib.request.Request(f"{API}/{path}", data=body, method="POST")
     try:
@@ -198,6 +216,7 @@ def post_facebook(image_url, caption):
         return {"error": "no page token (could not resolve from /me/accounts)"}
     data = urllib.parse.urlencode({
         "url": image_url, "message": caption, "access_token": pt,
+        **({"appsecret_proof": appsecret_proof(pt)} if appsecret_proof(pt) else {}),
     }).encode()
     req = urllib.request.Request(f"{API}/{PAGE_ID}/feed", data=data)
     try:
@@ -245,6 +264,7 @@ def post_facebook_video(video_url, caption):
         return {"error": "no page token (could not resolve from /me/accounts)"}
     data = urllib.parse.urlencode({
         "file_url": video_url, "description": caption, "access_token": pt,
+        **({"appsecret_proof": appsecret_proof(pt)} if appsecret_proof(pt) else {}),
     }).encode()
     req = urllib.request.Request(f"{API}/{PAGE_ID}/videos", data=data)
     try:

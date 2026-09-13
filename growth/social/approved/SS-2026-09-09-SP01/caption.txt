@@ -1,0 +1,10 @@
+SP-01 Carousel — Menu Clarity — Instagram Carousel (4:5, 1080x1350)
+CTA: Book a Sofrito Session → sofritostudio.com/session
+Hashtags: #FoodBusiness #RestaurantBranding #MenuDesign #SofritoStudio #BrandFoundation #IndependentRestaurant #MenuClarity
+Alt text source file: alt-text.md (per slide descriptions — restaurant/prep/menu/editorial scenes, warm natural light, realistic textures, no recognizable client identity)
+Copy source: copy.md (exact source of truth; never retype manually; copy exact strings directly from source; revisions only in copy.md first; version tracked in Git)
+UTM tracking: ?utm_source=instagram&utm_medium=carousel&utm_campaign=sp01
+Status: DRAFT — AWAITING FOUNDER APPROVAL
+Publishing route: Manual — Instagram app / Meta Business Suite (posting route still undecided from earlier session; confirm with founder before scheduling/uploading)
+Asset sourcing: Route A — licensed stock (Pexels/Unsplash) — source URL to be selected and tracked in asset-register.md; no autonomous publishing/scheduling/account access; no AI image customization (credit block: $0.71 remaining, 402 errors)
+Image generation protocol applied: All background imagery is text-free (Path A); typography overlay added deterministically via HTML/CSS or SVG export (not image model); headline/text overlay uses approved typography tokens (`carousel-tokens.yml`); exact copy from `copy.md`; no image-generated business-critical text (URLs, brand/service names, CTAs, prices, dates, statistics, client names, testimonials, fine print, hashtags, dense carousel copy) — all text added via deterministic overlay layer only.

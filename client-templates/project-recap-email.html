@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Project recap — {{business_name}}</title></head>
+<body style="margin:0;background:#F9FAFB;font-family:Arial,Helvetica,sans-serif;color:#0F172A;">
+  <div style="max-width:600px;margin:0 auto;padding:24px;">
+    <p style="font-family:Georgia,serif;font-size:20px;color:#0F172A;margin:0 0 20px;">Sofrito<span style="color:#EA580C;">Studio</span></p>
+    <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:28px;">
+      <h1 style="font-family:Georgia,serif;font-size:21px;color:#0F172A;margin:0 0 8px;">Project recap — {{package}}</h1>
+      <p style="font-size:15px;line-height:1.6;color:#334155;margin:0 0 16px;">Here's where {{business_name}} stands on {{project_what}}: what shipped, and where the last payment sits. / Aquí está dónde quedó {{business_name}} en {{project_what}}.</p>
+
+      <div style="background:#F1F5F9;border-radius:8px;padding:16px;font-size:14px;color:#334155;">
+        <p style="margin:0 0 6px;"><strong style="color:#0F172A;">What shipped / Lo entregado</strong></p>
+        <ul style="margin:0;padding-left:18px;line-height:1.6;">{{delivered_items}}</ul>
+      </div>
+
+      <div style="background:#F1F5F9;border-radius:8px;padding:16px;font-size:14px;color:#334155;margin-top:12px;">
+        <p style="margin:0 0 6px;"><strong style="color:#0F172A;">Where your payments stand</strong> — each invoice triggers on a written event, and {{event_status}}.</p>
+        <table style="width:100%;margin:0;border-collapse:collapse;font-size:13px;">
+          <tr style="color:#94A3B8;text-align:left;"><th style="padding:6px 4px;">Invoice</th><th style="padding:6px 4px;">Trigger</th><th style="padding:6px 4px;">Status</th></tr>
+          <tr><td style="padding:6px 4px;">1 — 50%</td><td style="padding:6px 4px;">Agreement signed + questionnaire sent</td><td style="padding:6px 4px;">{{invoice1_status}}</td></tr>
+          <tr><td style="padding:6px 4px;">2 — 50%</td><td style="padding:6px 4px;">{{trigger_2}}: final delivery</td><td style="padding:6px 4px;"><strong>{{invoice2_status}}</strong></td></tr>
+        </table>
+        <p style="margin:10px 0 0;line-height:1.5;">{{trigger_note}} — sent only once the event above has truly happened and is in writing. Never on a feeling.</p>
+      </div>
+
+      <a href="{{siteUrl}}/services.html" style="display:inline-block;margin-top:20px;background:#EA580C;color:#FFFFFF;text-decoration:none;font-size:15px;font-weight:600;padding:12px 22px;border-radius:8px;">View the project / Ver el proyecto</a>
+    </div>
+    <p style="font-size:12px;color:#94A3B8;margin:20px 0 0;">Sofrito Studio — hello@sofritostudio.com · You can reply to this email whenever, it reaches a person.</p>
+  </div>
+</body>
+</html>

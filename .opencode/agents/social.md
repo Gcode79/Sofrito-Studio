@@ -426,3 +426,10 @@ Do not publish or access social accounts.
 - This agent is a drafting and planning agent only: it has no publishing, scheduling, DM, ad, or account-access permissions, and no ability to run commands. Every public-facing item stays Draft / Awaiting Founder Approval.
 - A separate publishing/scheduling agent (not defined yet) will get social-tool access only post-by-post after the founder approves each batch.
 - Research sources must be recorded in `research/social-sources.md`; statements labeled Verified / Inference / Assumption / Opinion.
+
+## References
+- Design tokens / scroll-viewport rules: ../../AGENTS.md (Sofrito Studio section, home-level file, kept after reorg).
+- Social visual standard (moved): ../../growth/social/SOCIAL-VISUAL-STANDARD.md.
+- Deploy SOP: ../../ops/sops/deploy.md.
+- Decision log / approval rules: ../../AGENTS.md (repo) + ../../ops/decision-log.md.
+- No publish/schedule/account access (drafting only).

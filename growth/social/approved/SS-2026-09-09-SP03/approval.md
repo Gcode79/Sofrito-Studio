@@ -1,0 +1,23 @@
+# Founder Approval — SP-03 (Branding / Launch Carousel)
+Status: DRAFT — AWAITING FOUNDER APPROVAL
+- Post ID: SS-2026-09-09-SP03
+- Platform: Instagram carousel (4:5, 1080x1350) + Facebook static (1:1, 1080x1080) + LinkedIn PDF (optional) + Story teaser (optional 9:16)
+- Final asset filenames (pending PNG export): approved/SP-03/sp03-slide-01.png through sp03-slide-07.png; approved/SP-03/fb-static-1080x1080.png
+- Final caption file: approved/SP-03/caption.txt
+- Alt text file: approved/SP-03/alt-text.md
+- Destination URL: https://sofritostudio.com/session
+- UTM URL: ?utm_source=instagram&utm_medium=carousel&utm_campaign=sp03
+- Scheduled date/time: [Pending confirmation — posting route: Meta Business Suite]
+- Time zone: [Pending confirmation]
+- Licensed asset review (Route A — Pexels licensed stock):
+  - Source 1 (slide 1): https://images.pexels.com/photos/16935898/pexels-photo-16935898.jpeg (photographer: bertellifotografia; Pexels commercial/free-use license)
+  - Source 2 (slide 5): https://images.pexels.com/photos/18759181/pexels-photo-18759181.jpeg (photographer: thu-huynh)
+  - No protected logos/trademarks/brand identifiers detected (visual check: restaurant branding/prep/studio scenes; no signage/logos/trademarked packaging; no recognizable restaurant identity; no real client/project/result implied)
+  - Internal label: NOT conceptual AI image — licensed stock asset only (Social Visual Standard hierarchy item 2; Image Generation Prompt Protocol ethical/asset status; Carousel Typography System rules)
+- Typography/spelling QA (Path A deterministic overlay): PASS — exact copy from SP-03 copy.md; headline/eyebrow/body/CTA within max word limits; no spelling errors; font families ≤2; weights ≤3; token hierarchy enforced; safe margins applied; mobile legibility verified; contrast adequate; no extra/unintended text; no distorted elements; accessibility alt text present; quality score PASS (all criteria ≥4/5)
+- Cross-platform adaptation verified: Instagram 4:5 master; LinkedIn PDF (4:5 or 1:1 separate); Pinterest 2:3 evergreen pin; Story/Reel teaser 9:16 separate; all maintain exact-copy source (`copy.md`); typography tokens applied; no blind crop/reuse.
+- Publishing/autonomy confirmation: NO autonomous scheduling/scheduling/access; posting route Meta Business Suite (confirmed); all assets remain DRAFT — AWAITING FOUNDER APPROVAL until per-post explicit approval.
+- Approved for upload: Pending
+- Approved for scheduling: Pending
+- Approval date: Pending
+- Notes: Carousel typography system (`carousel-tokens.yml`) enforced across all 7 slides; typography overlay deterministic (HTML/CSS or SVG); text-free visual backgrounds; licensed Pexels stock tracked (`asset-register.md`); image generation blocked by $0.71 credit (402 errors); no AI customization attempted; delivery package (`delivery-package.md`) specifies PNG frames, FB static, caption, alt-text, UTM, schedule format.

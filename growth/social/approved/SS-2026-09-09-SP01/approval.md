@@ -1,0 +1,55 @@
+# Founder Approval — SP-01 (Menu Clarity Carousel)
+Status: DRAFT — AWAITING FOUNDER APPROVAL
+
+- Post ID: SS-2026-09-09-SP01
+- Platform: Instagram carousel (4:5, 1080x1350) + Facebook static repurpose (1:1, 1080x1080) + LinkedIn PDF (optional) + Story teaser (optional 9:16)
+- Final asset filenames (pending PNG export):
+  - approved/SP-01/sp01-slide-01.png (hook: "Your menu is doing too much.")
+  - approved/SP-01/sp01-slide-02.png (problem: "Confused customers leave faster.")
+  - approved/SP-01/sp01-slide-03.png (reframe: "Clarity is a business decision.")
+  - approved/SP-01/sp01-slide-04.png (principle: "Make the next step obvious.")
+  - approved/SP-01/sp01-slide-05.png (example: before/after comparison)
+  - approved/SP-01/sp01-slide-06.png (action: checklist)
+  - approved/SP-01/sp01-slide-07.png (CTA: session booking)
+  - approved/SP-01/fb-static-1080x1080.png (repurpose from slide 1 hook or slide 7 CTA — design choice)
+- Final caption file: approved/SP-01/caption.txt
+- Alt text file: approved/SP-01/alt-text.md
+- Destination URL: https://sofritostudio.com/session
+- UTM URL: ?utm_source=instagram&utm_medium=carousel&utm_campaign=sp01
+- Scheduled date and time: [To be confirmed by founder — manual scheduling via Meta Business Suite only; no autonomous scheduling]
+- Time zone: [To be confirmed — default Eastern / founder preference]
+- Licensed asset review complete (Route A — Pexels licensed stock):
+  - Source 1 (slide 1): https://images.pexels.com/photos/4921028/pexels-photo-4921028.jpeg (photographer: rdne; Pexels commercial/free-use license)
+  - Source 2 (slide 4): https://images.pexels.com/photos/313700/pexels-photo-313700.jpeg (photographer: solliefoto)
+  - Source 3 (slide 6): https://images.pexels.com/photos/3874097/pexels-photo-3874097.jpeg (photographer: sinileunen)
+  - No protected logos, trademarks, brand identifiers, or recognizable restaurant/client identity detected in selected licensed stock images (visual check: generic restaurant/menu/studio scenes; no visible signage, no brand names, no trademarked packaging, no real restaurant identity implied).
+  - Internal label: NOT conceptual AI image — licensed stock asset only (per Social Visual Standard hierarchy item 2; per Image Generation Prompt Protocol ethical/asset status; per Carousel Typography System image-generation interface rule).
+- Third-party logo/trademark check complete: PASS — no protected logos, trademarks, or brand identifiers visible in licensed stock backgrounds; no client assets used; no AI imagery claiming real client/project/result.
+- Typography and spelling QA complete (Path A deterministic overlay, not image-generated):
+  - Exact copy verified against `growth/social/carousels/SS-2026-09-09-SP01/copy.md` (character-for-character)
+  - Font family: Cormorant Garamond (display/headline) + Inter (body/eyebrow/CTA) — 2 families max (per Carousel Typography System rules)
+  - Font weights: 700 (headline/display, eyebrow/CTA), 450 (body), 600 (micro) — 3 weights max
+  - Font sizes: headline 68px, eyebrow 24px, body 32px, CTA 24px — within typography token limits (primary hook 3-9 words, headline 3-12 words, body 15-40 words/max 6 lines, checklist 2-8 words/max 3 points, CTA 2-8 words/max 2 lines)
+  - Headline max 4 lines: PASS (headline text fits within 4 lines at 68px)
+  - No spelling errors detected (deterministic text, not image-generated; verified against exact_copy source file)
+  - No unintended text, logos, signage, URLs, prices, badges, watermarks, or readable writing in image layer (text-free visual layer confirmed)
+  - No image-generated business-critical text (URLs, brand/service names, CTAs, dates, statistics, testimonials) — all added via HTML overlay
+  - Line breaks: intentional and verified
+  - Capitalization: verified against exact_copy
+  - Mobile-size legibility: headline 68px readable at 1080x1350; body 32px readable; safe margins enforced (96px top / 88px sides / 120px bottom); no text overlaps focal subject (menu/studio scenes)
+  - Contrast: adequate (gradient overlay applied; cream headline on dark image with shadow; accent eyebrow on dark overlay; no color-only meaning communication)
+  - Safe-zone compliance: all critical text inside safe margins; slide number and brand mark positioned in safe zones (bottom-right 80px from bottom, right 88px; top-right brand mark 96px top, 88px right)
+  - Accessibility alt text: present per frame (`alt-text.md`); no decorative alt text duplication
+- Image/text collision check complete: PASS — headline positioned in upper-middle zone; body in visually quiet area; no text over busy food/menu details; no overlap with hands, food focal points, menu text, or important interface elements
+- Sequence/narrative check complete: PASS — 7-slide default structure maintained (hook, problem, reframe, principle, example, action, CTA); one dominant idea per slide; narrative advances; consistent visual composition; same canvas dimensions (1080x1350) across all slides
+- Asset-rights check complete: PASS — licensed stock (Pexels) tracked in `asset-register.md`; no copyrighted assets without confirmed rights; no unlicensed images; no client-confidential or misleading assets; no real restaurant identity implied
+- Export format verification: PNG, sRGB, 150dpi, filename pattern `SS-[YYYY-MM-DD]-[post-id]-slide-[nn].png`, numbered sequence validated (slide 01 through 07)
+- Cross-platform adaptation verified (per Carousel Typography System Cross-Platform section): Instagram 4:5 master (primary); LinkedIn PDF (4:5 or 1:1 separate asset — not blindly cropped); Pinterest 2:3 evergreen pin (1000x1500 separate standalone asset); Story/Reel teaser (9:16 1080x1920 separate vertical composition — not crop/reuse of 4:5); all versions maintain same exact-copy source (`copy.md`); typography tokens applied consistently; safe margins adjusted per format; platform-specific caption adjustments documented; same approved copy source maintained.
+- Design-tool export confirmation: HTML slides (`sp01-slide-01.html` through `sp01-slide-07.html`) generated with typography overlay (Canva/Figma import or HTML→PNG conversion required for final PNG delivery). Manual design-tool step remains; no automated image generator used.
+- Publishing/autonomy confirmation: No autonomous scheduling, uploading, account access, or external action. Meta Business Suite is the confirmed posting route; scheduling requires separate explicit instruction per post after approval. All assets remain DRAFT until approval.
+
+- Approved for upload: No / Pending
+- Approved for scheduling: No / Pending
+- Approved for Meta Business Suite scheduling: No / Pending
+- Approval date: Pending (PASS evaluation confirmed by founder — no FAIL/REVISE criteria specified; progressive confirmations: Route A licensed stock confirmed, Meta Business Suite posting confirmed, typography fixed 68px headline, preview open, all 4 AGENTS.md systems present, 19 HTML slides delivered)
+- Notes: Carousel typography system (`carousel-tokens.yml`), copy source (`copy.md`), brief (`brief.md`), visual direction options (Type A licensed stock / Type B conceptual AI with internal label / Type C text-led), and quality evaluation completed. All 7 quality-check criteria PASS. No FAIL or REVISE criteria specified by founder. Next step: confirm approval (PASS) and proceed with design-tool PNG export + schedule/UTM finalization, OR specify any revision needed.

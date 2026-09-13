@@ -163,7 +163,7 @@
     bar.setAttribute('role', 'dialog');
     bar.setAttribute('aria-label', 'Privacy notice');
     bar.className =
-      'fixed bottom-0 left-0 right-0 z-[60] bg-white border-t border-slate-200 px-4 py-4 shadow-lg';
+      'fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 px-4 py-2';
     bar.innerHTML =
       '<div class="mx-auto max-w-6xl flex flex-col sm:flex-row sm:items-center gap-3 text-sm text-slate-700">' +
         '<p class="flex-1">We use a little privacy-friendly analytics to know what content helps, and optional TikTok retargeting if you opt in. No selling your data. <a href="/privacy.html" class="underline text-slate-500 hover:text-slate-700">Learn more</a> · <button id="consent-decline" class="underline text-slate-500 hover:text-slate-700">No thanks</button></p>' +
@@ -229,8 +229,8 @@
     jump4: { es: 'Asistente IA' }, jump5: { es: 'Trabajo' },
     ingHead: { es: 'Hecho para el calor de la cocina' },
     ingSub: { es: 'Las marcas que amamos trabajan mejor cuando hay comida fresca en la línea. Si uno de estos eres tú, hablamos tu idioma.' },
-    servHead: { es: 'Elige el paquete que pega con tu fogón' },
-    servSub: { es: 'Proyectos puntuales para el impulso, mensuales para mantener la mesa llena. Precios honestos y fijos — sin sorpresas.' },
+    servHead: { es: 'Elige la oferta que pega con tu fogón' },
+    servSub: { es: 'Dos formas de trabajar: una Sesión de 90 minutos para una lectura honesta, o el Sprint de marca y web en 48 horas. Precios fijos — sin sorpresas.' },
     guideHead: { es: 'La Guía Digital: marca en tres semanas' },
     guideSub: { es: 'Una guía gratuita y directa para negocios de comida. Sin fórmulas que pidan título — el método que usamos con clientes, primero el sabor.' },
     aiHead: { es: 'Una socia de marca por mensualidad' },

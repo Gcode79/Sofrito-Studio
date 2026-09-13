@@ -392,7 +392,8 @@
       "image_url": "https://sofritostudio.com/images/pins/rec-pastelillos-pin.png",
       "caption": "Weeknight arroz con pollo, one pot, under an hour 🇵🇷\n\nhttps://sofritostudio.com/products/la-mesa-boricua-sales.html",
       "posted": false,
-      "fail_count": 2
+      "fail_count": 2,
+      "skipped": true
     },
     {
       "id": "fb-019",
@@ -401,7 +402,8 @@
       "image_url": "https://sofritostudio.com/images/rec-pastelillos.jpg",
       "caption": "Weeknight arroz con pollo, one pot, under an hour — https://sofritostudio.com/products/la-mesa-boricua-sales.html",
       "posted": false,
-      "fail_count": 2
+      "fail_count": 2,
+      "skipped": true
     },
     {
       "id": "ig-020",
@@ -410,7 +412,8 @@
       "image_url": "https://sofritostudio.com/images/pins/rec-tembleque-pin.png",
       "caption": "Mainland ingredient swaps — cook boricua anywhere 🇵🇷\n\nhttps://sofritostudio.com/products/starter-kit.html",
       "posted": false,
-      "fail_count": 1
+      "fail_count": 1,
+      "skipped": true
     },
     {
       "id": "fb-020",
@@ -419,7 +422,8 @@
       "image_url": "https://sofritostudio.com/images/rec-tembleque.jpg",
       "caption": "Mainland ingredient swaps — cook boricua anywhere — https://sofritostudio.com/products/starter-kit.html",
       "posted": false,
-      "fail_count": 1
+      "fail_count": 1,
+      "skipped": true
     },
     {
       "id": "ig-021",
@@ -427,7 +431,8 @@
       "datetime": "2026-09-10T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/pins/rec-tostones-pin.png",
       "caption": "Nochebuena planning — the timeline that saves the table 🇵🇷\n\nhttps://sofritostudio.com/products/full-table.html",
-      "posted": false
+      "posted": false,
+      "skipped": true
     },
     {
       "id": "fb-021",
@@ -435,7 +440,8 @@
       "datetime": "2026-09-10T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/rec-tostones.jpg",
       "caption": "Nochebuena planning — the timeline that saves the table — https://sofritostudio.com/products/full-table.html",
-      "posted": false
+      "posted": false,
+      "skipped": true
     },
     {
       "id": "ig-022",
@@ -443,7 +449,8 @@
       "datetime": "2026-09-11T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/pins/pernil-course-pin.png",
       "caption": "Coquito & postres — the sweet side of the island 🇵🇷\n\nhttps://sofritostudio.com/products/coquito-guide.html",
-      "posted": false
+      "posted": false,
+      "skipped": true
     },
     {
       "id": "fb-022",
@@ -451,7 +458,8 @@
       "datetime": "2026-09-11T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/pernil-course.jpg",
       "caption": "Coquito & postres — the sweet side of the island — https://sofritostudio.com/products/coquito-guide.html",
-      "posted": false
+      "posted": false,
+      "skipped": true
     },
     {
       "id": "ig-023",
@@ -459,7 +467,8 @@
       "datetime": "2026-09-12T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/pins/rec-alcapurrias-pin.png",
       "caption": "Kitchen systems & meal-prep — boricua all week 🇵🇷\n\nhttps://sofritostudio.com/products/kitchen-bundle.html",
-      "posted": false
+      "posted": false,
+      "skipped": true
     },
     {
       "id": "fb-023",
@@ -467,7 +476,8 @@
       "datetime": "2026-09-12T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/rec-alcapurrias.jpg",
       "caption": "Kitchen systems & meal-prep — boricua all week — https://sofritostudio.com/products/kitchen-bundle.html",
-      "posted": false
+      "posted": false,
+      "skipped": true
     },
     {
       "id": "ig-015-ny",
@@ -1702,6 +1712,164 @@
       "image_url": "https://sofritostudio.com/images/rec-habichuelas.jpg",
       "caption": "Mainland ingredient swaps — cook boricua anywhere — https://sofritostudio.com/products/starter-kit.html",
       "posted": false
+    },
+    {
+      "id": "ig-101",
+      "platform": "instagram",
+      "kind": "video",
+      "datetime": "2026-09-12T21:00:00+00:00",
+      "video_url": "https://sofritostudio.com/videos/Google%20Flow%20-%20Sep%2011%20-%2016-34_CTA_1080x1920.mp4",
+      "image_url": "https://sofritostudio.com/images/pins/cta-b01-cover-01.png",
+      "caption": "Your food business is one clear message away.\nSofrito Studio builds brand foundations, websites, and menus for independent restaurants, cafés, food trucks, and specialty-food businesses.\nSee how we work → sofritostudio.com (link in bio)\nHashtags: #FoodBusiness #RestaurantBranding #SofritoStudio #IndependentRestaurant #MenuClarity #BrandFoundation\nLink: https://sofritostudio.com/?utm_source=instagram&utm_medium=video&utm_campaign=cta_b01",
+      "posted": false,
+      "note": "CTA-2026-09-11-B01 · Brand Foundations — Video 01 | utm_campaign=cta_b01",
+      "skipped": false,
+      "ready": true,
+      "fail_count": 5
+    },
+    {
+      "id": "fb-101",
+      "platform": "facebook",
+      "kind": "video",
+      "datetime": "2026-09-12T21:00:00+00:00",
+      "video_url": "https://sofritostudio.com/videos/Google%20Flow%20-%20Sep%2011%20-%2016-34_CTA_1080x1920.mp4",
+      "image_url": "https://sofritostudio.com/images/pins/cta-b01-cover-01.png",
+      "caption": "Independent restaurant or café owner? Unclear positioning quietly costs you customers.\nSofrito Studio: clear brand foundations, websites, and menus for food businesses.\nSee the current services → https://sofritostudio.com/?utm_source=facebook&utm_medium=video&utm_campaign=cta_b01",
+      "posted": true,
+      "note": "CTA-2026-09-11-B01 · Brand Foundations — Video 01 | utm_campaign=cta_b01",
+      "skipped": false,
+      "ready": true,
+      "fail_count": 0
+    },
+    {
+      "id": "ig-102",
+      "platform": "instagram",
+      "kind": "video",
+      "datetime": "2026-09-13T21:00:00+00:00",
+      "video_url": "https://sofritostudio.com/videos/Google%20Flow%20-%20Sep%2011%20-%2016-34_2_CTA_1080x1920.mp4",
+      "image_url": "https://sofritostudio.com/images/pins/cta-b01-cover-02.png",
+      "caption": "Your food business is one clear message away.\nSofrito Studio builds brand foundations, websites, and menus for independent restaurants, cafés, food trucks, and specialty-food businesses.\nSee how we work → sofritostudio.com (link in bio)\nHashtags: #FoodBusiness #RestaurantBranding #SofritoStudio #IndependentRestaurant #MenuClarity #BrandFoundation\nLink: https://sofritostudio.com/?utm_source=instagram&utm_medium=video&utm_campaign=cta_b01",
+      "posted": false,
+      "note": "CTA-2026-09-11-B01 · Brand Foundations — Video 02 | utm_campaign=cta_b01",
+      "skipped": false,
+      "ready": true
+    },
+    {
+      "id": "fb-102",
+      "platform": "facebook",
+      "kind": "video",
+      "datetime": "2026-09-13T21:00:00+00:00",
+      "video_url": "https://sofritostudio.com/videos/Google%20Flow%20-%20Sep%2011%20-%2016-34_2_CTA_1080x1920.mp4",
+      "image_url": "https://sofritostudio.com/images/pins/cta-b01-cover-02.png",
+      "caption": "Independent restaurant or café owner? Unclear positioning quietly costs you customers.\nSofrito Studio: clear brand foundations, websites, and menus for food businesses.\nSee the current services → https://sofritostudio.com/?utm_source=facebook&utm_medium=video&utm_campaign=cta_b01",
+      "posted": false,
+      "note": "CTA-2026-09-11-B01 · Brand Foundations — Video 02 | utm_campaign=cta_b01",
+      "skipped": false,
+      "ready": true
+    },
+    {
+      "id": "ig-103",
+      "platform": "instagram",
+      "kind": "video",
+      "datetime": "2026-09-14T21:00:00+00:00",
+      "video_url": "https://sofritostudio.com/videos/Google%20Flow%20-%20Sep%2011%20-%2016-34_3_CTA_1080x1920.mp4",
+      "image_url": "https://sofritostudio.com/images/pins/cta-b01-cover-03.png",
+      "caption": "Your food business is one clear message away.\nSofrito Studio builds brand foundations, websites, and menus for independent restaurants, cafés, food trucks, and specialty-food businesses.\nSee how we work → sofritostudio.com (link in bio)\nHashtags: #FoodBusiness #RestaurantBranding #SofritoStudio #IndependentRestaurant #MenuClarity #BrandFoundation\nLink: https://sofritostudio.com/?utm_source=instagram&utm_medium=video&utm_campaign=cta_b01",
+      "posted": false,
+      "note": "CTA-2026-09-11-B01 · Brand Foundations — Video 03 | utm_campaign=cta_b01",
+      "skipped": false,
+      "ready": true
+    },
+    {
+      "id": "fb-103",
+      "platform": "facebook",
+      "kind": "video",
+      "datetime": "2026-09-14T21:00:00+00:00",
+      "video_url": "https://sofritostudio.com/videos/Google%20Flow%20-%20Sep%2011%20-%2016-34_3_CTA_1080x1920.mp4",
+      "image_url": "https://sofritostudio.com/images/pins/cta-b01-cover-03.png",
+      "caption": "Independent restaurant or café owner? Unclear positioning quietly costs you customers.\nSofrito Studio: clear brand foundations, websites, and menus for food businesses.\nSee the current services → https://sofritostudio.com/?utm_source=facebook&utm_medium=video&utm_campaign=cta_b01",
+      "posted": false,
+      "note": "CTA-2026-09-11-B01 · Brand Foundations — Video 03 | utm_campaign=cta_b01",
+      "skipped": false,
+      "ready": true
+    },
+    {
+      "id": "ig-104",
+      "platform": "instagram",
+      "kind": "video",
+      "datetime": "2026-09-15T21:00:00+00:00",
+      "video_url": "https://sofritostudio.com/videos/Google%20Flow%20-%20Sep%2011%20-%2016-34_4_CTA_1080x1920.mp4",
+      "image_url": "https://sofritostudio.com/images/pins/cta-b01-cover-04.png",
+      "caption": "Your food business is one clear message away.\nSofrito Studio builds brand foundations, websites, and menus for independent restaurants, cafés, food trucks, and specialty-food businesses.\nSee how we work → sofritostudio.com (link in bio)\nHashtags: #FoodBusiness #RestaurantBranding #SofritoStudio #IndependentRestaurant #MenuClarity #BrandFoundation\nLink: https://sofritostudio.com/?utm_source=instagram&utm_medium=video&utm_campaign=cta_b01",
+      "posted": false,
+      "note": "CTA-2026-09-11-B01 · Brand Foundations — Video 04 | utm_campaign=cta_b01",
+      "skipped": false,
+      "ready": true
+    },
+    {
+      "id": "fb-104",
+      "platform": "facebook",
+      "kind": "video",
+      "datetime": "2026-09-15T21:00:00+00:00",
+      "video_url": "https://sofritostudio.com/videos/Google%20Flow%20-%20Sep%2011%20-%2016-34_4_CTA_1080x1920.mp4",
+      "image_url": "https://sofritostudio.com/images/pins/cta-b01-cover-04.png",
+      "caption": "Independent restaurant or café owner? Unclear positioning quietly costs you customers.\nSofrito Studio: clear brand foundations, websites, and menus for food businesses.\nSee the current services → https://sofritostudio.com/?utm_source=facebook&utm_medium=video&utm_campaign=cta_b01",
+      "posted": false,
+      "note": "CTA-2026-09-11-B01 · Brand Foundations — Video 04 | utm_campaign=cta_b01",
+      "skipped": false,
+      "ready": true
+    },
+    {
+      "id": "ig-105",
+      "platform": "instagram",
+      "kind": "video",
+      "datetime": "2026-09-16T21:00:00+00:00",
+      "video_url": "https://sofritostudio.com/videos/Google%20Flow%20-%20Sep%2011%20-%2016-34_5_CTA_1080x1920.mp4",
+      "image_url": "https://sofritostudio.com/images/pins/cta-b01-cover-05.png",
+      "caption": "Your food business is one clear message away.\nSofrito Studio builds brand foundations, websites, and menus for independent restaurants, cafés, food trucks, and specialty-food businesses.\nSee how we work → sofritostudio.com (link in bio)\nHashtags: #FoodBusiness #RestaurantBranding #SofritoStudio #IndependentRestaurant #MenuClarity #BrandFoundation\nLink: https://sofritostudio.com/?utm_source=instagram&utm_medium=video&utm_campaign=cta_b01",
+      "posted": false,
+      "note": "CTA-2026-09-11-B01 · Brand Foundations — Video 05 | utm_campaign=cta_b01",
+      "skipped": false,
+      "ready": true
+    },
+    {
+      "id": "fb-105",
+      "platform": "facebook",
+      "kind": "video",
+      "datetime": "2026-09-16T21:00:00+00:00",
+      "video_url": "https://sofritostudio.com/videos/Google%20Flow%20-%20Sep%2011%20-%2016-34_5_CTA_1080x1920.mp4",
+      "image_url": "https://sofritostudio.com/images/pins/cta-b01-cover-05.png",
+      "caption": "Independent restaurant or café owner? Unclear positioning quietly costs you customers.\nSofrito Studio: clear brand foundations, websites, and menus for food businesses.\nSee the current services → https://sofritostudio.com/?utm_source=facebook&utm_medium=video&utm_campaign=cta_b01",
+      "posted": false,
+      "note": "CTA-2026-09-11-B01 · Brand Foundations — Video 05 | utm_campaign=cta_b01",
+      "skipped": false,
+      "ready": true
+    },
+    {
+      "id": "ig-106",
+      "platform": "instagram",
+      "kind": "video",
+      "datetime": "2026-09-17T21:00:00+00:00",
+      "video_url": "https://sofritostudio.com/videos/Google%20Flow%20-%20Sep%2011%20-%2016-34_6_CTA_1080x1920.mp4",
+      "image_url": "https://sofritostudio.com/images/pins/cta-b01-cover-06.png",
+      "caption": "Your food business is one clear message away.\nSofrito Studio builds brand foundations, websites, and menus for independent restaurants, cafés, food trucks, and specialty-food businesses.\nSee how we work → sofritostudio.com (link in bio)\nHashtags: #FoodBusiness #RestaurantBranding #SofritoStudio #IndependentRestaurant #MenuClarity #BrandFoundation\nLink: https://sofritostudio.com/?utm_source=instagram&utm_medium=video&utm_campaign=cta_b01",
+      "posted": false,
+      "note": "CTA-2026-09-11-B01 · Brand Foundations — Video 06 | utm_campaign=cta_b01",
+      "skipped": false,
+      "ready": true
+    },
+    {
+      "id": "fb-106",
+      "platform": "facebook",
+      "kind": "video",
+      "datetime": "2026-09-17T21:00:00+00:00",
+      "video_url": "https://sofritostudio.com/videos/Google%20Flow%20-%20Sep%2011%20-%2016-34_6_CTA_1080x1920.mp4",
+      "image_url": "https://sofritostudio.com/images/pins/cta-b01-cover-06.png",
+      "caption": "Independent restaurant or café owner? Unclear positioning quietly costs you customers.\nSofrito Studio: clear brand foundations, websites, and menus for food businesses.\nSee the current services → https://sofritostudio.com/?utm_source=facebook&utm_medium=video&utm_campaign=cta_b01",
+      "posted": false,
+      "note": "CTA-2026-09-11-B01 · Brand Foundations — Video 06 | utm_campaign=cta_b01",
+      "skipped": false,
+      "ready": true
     }
   ]
 }

@@ -33,13 +33,8 @@ kv "site/positioning" "Your food has a story. We make sure people taste it befor
 kv "site/config" '{"email":"hello@sofritostudio.com","socials":{"instagram":"https://instagram.com/sofritostudio"},"session_url":null,"booking_url":null}'
 
 echo "=== packages ==="
-kv "packages/sofrito"       '{"name":"The Sofrito","category":"project","description":"Brand Identity","price_cents":250000,"billing":"one_time","cta":"Start a brand"}'
-kv "packages/plato"         '{"name":"The Plato","category":"project","description":"Brand + Website","price_cents":500000,"billing":"one_time","cta":"Start a project"}'
-kv "packages/la-mesa"       '{"name":"La Mesa","category":"project","description":"Full Brand Launch","price_cents":750000,"billing":"one_time","cta":"Book La Mesa"}'
-kv "packages/essentials"    '{"name":"Essentials","category":"retainer","description":"Content Retainer","price_cents":150000,"billing":"monthly","cta":"Keep the table full"}'
-kv "packages/growth"        '{"name":"Growth","category":"retainer","description":"Content Retainer","price_cents":250000,"billing":"monthly","cta":"Grow like it matters"}'
-kv "packages/fractional"    '{"name":"Fractional","category":"retainer","description":"Brand Director Retainer","price_cents":400000,"billing":"monthly","cta":"Put a brand director on your side"}'
 kv "packages/session"       '{"name":"Sofrito Session","category":"session","description":"1:1 brand session","price_cents":40000,"billing":"one_time","cta":"Book a Sofrito Session"}'
+kv "packages/sprint"        '{"name":"Brand & Web Sprint","category":"project","description":"Brand + website in 48 hours","price_cents":99700,"billing":"one_time","cta":"Start the Sprint"}'
 
 echo "=== feature flags ==="
 kv "features/lead-capture"       "on"

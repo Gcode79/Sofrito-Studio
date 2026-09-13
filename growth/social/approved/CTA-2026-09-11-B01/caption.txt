@@ -1,0 +1,37 @@
+CTA-2026-09-11-B01 — 6 Brand-Bar Video Ads (sofritostudio.com CTA)
+Platform: Instagram + Facebook + Pinterest (9:16 Reels / full-bleed video, 1080x1920); TikTok SKIPPED (founder decision 2026-09-12)
+CTA: Visit sofritostudio.com (clickable link in caption/bio per platform; the video's CTA bar is display-only — not tappable inside the clip)
+Hashtags: #FoodBusiness #RestaurantBranding #MenuDesign #SofritoStudio #BrandFoundation #IndependentRestaurant #RestaurantMarketing #FoodTruck #CafeOwner
+Alt text source file: alt-text.md (per-video descriptions)
+Copy source: THIS FILE (caption.txt) is the exact-copy source of truth for the CTA ad captions; never retype from memory; revisions made here first; version tracked in Git
+UTM tracking: per-platform links below (clickable caption/bio link only — never ask an image/video model to render a URL)
+Status: ✅ APPROVED by founder 2026-09-11 (option 1); publishing route AMENDED by founder 2026-09-12 → automated queue publish, 6 unique videos (business-model duplicate of Video 06 dropped from scope), IG + FB + Pinterest only (TikTok skipped).
+Publishing route: Automated — post_to_meta.py (IG + FB Reels) + post_to_pinterest.py (9:16 video pins); 6 unique videos; queued daily 21:00 UTC, 2026-09-12 → 2026-09-17 (6 days). Queue: 12 entries (ig-101…ig-106, fb-101…fb-106) in marketing/content/queue.json; 6 pins (cta-b01-cover-01…06) in marketing/platforms/pinterest/pins.json. Requires deploy (npx wrangler deploy) + valid .env tokens before first due time.
+Asset sourcing: Original producer-owned CTA renders (6 unique: base + _2…_6; business-model render == duplicate of _6, retained but un-referenced) + deterministic FFmpeg CTA bar (Path A) — approved 2026-09-11; see asset-register.md
+Image generation protocol applied: Video CTA bar rendered deterministically (arialbd.ttf `sofritostudio.com`); no image-model text; no fabricated scenes, clients, venues, or results claimed in captions
+
+--- Per-platform exact copy (source of truth) ---
+
+[Instagram — Reel caption]
+Your food business is one clear message away.
+Sofrito Studio builds brand foundations, websites, and menus for independent restaurants, cafés, food trucks, and specialty-food businesses.
+See how we work → sofritostudio.com (link in bio)
+Hashtags: #FoodBusiness #RestaurantBranding #SofritoStudio #IndependentRestaurant #MenuClarity #BrandFoundation
+Link: https://sofritostudio.com/?utm_source=instagram&utm_medium=video&utm_campaign=cta_b01
+
+[Facebook — Reel caption]
+Independent restaurant or café owner? Unclear positioning quietly costs you customers.
+Sofrito Studio: clear brand foundations, websites, and menus for food businesses.
+See the current services → https://sofritostudio.com/?utm_source=facebook&utm_medium=video&utm_campaign=cta_b01
+
+[Pinterest — full-bleed 9:16 video pin caption]
+Save this for your next brand review: brand foundations for food businesses.
+Sofrito Studio helps restaurants, cafés, food trucks, and specialty-food brands get clearer positioning, menus, and websites.
+Visit sofritostudio.com
+Link: https://sofritostudio.com/?utm_source=pinterest&utm_medium=video&utm_campaign=cta_b01
+
+[TikTok — Reel caption — SKIPPED 2026-09-12 per founder decision; NOT in scope, do not publish]
+Your menu is doing too much.
+Sofrito Studio keeps food-business branding clear. Visit sofritostudio.com
+Hashtags: #FoodBusiness #RestaurantOwner #Branding #SofritoStudio
+Link: https://sofritostudio.com/?utm_source=tiktok&utm_medium=video&utm_campaign=cta_b01

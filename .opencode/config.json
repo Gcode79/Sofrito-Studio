@@ -1,0 +1,1 @@
+{"$schema":"https://opencode.ai/config.json","mcp":{"zapier":{"type":"remote","url":"https://mcp.zapier.com/mcp","enabled":true},"gooseworks":{"type":"remote","url":"https://mcp.gooseworks.ai/mcp","enabled":true},"calendly":{"enabled":true},"cloudflare":{"enabled":true}},"deployment":{"target":"cloudflare","compatibility_flags":["nodejs_compat"]}}

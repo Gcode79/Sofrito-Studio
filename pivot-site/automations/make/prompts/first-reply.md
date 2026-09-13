@@ -22,5 +22,5 @@ this week — [90-min free session, /session]. Pick a time here: [calendar link]
 
 Notes:
 - Replying inside the 24h window is the single biggest conversion lever.
-- If the lead has score > 70 or mentioned a budget of $2500+, book the session.
+- If the lead has score > 70 or described a concrete project, book the session.
 - If they asked a question, answer the question first, then talk.

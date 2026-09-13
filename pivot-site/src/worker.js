@@ -133,13 +133,8 @@ async function scoreLead(env, lead) {
 }
 
 const PACKAGE_FALLBACK = {
-  sofrito: { name: 'The Sofrito', description: 'Brand Identity', price_cents: 250000, billing: 'one_time' },
-  plato: { name: 'The Plato', description: 'Brand + Website', price_cents: 500000, billing: 'one_time' },
-  'la-mesa': { name: 'La Mesa', description: 'Full Brand Launch', price_cents: 750000, billing: 'one_time' },
-  essentials: { name: 'Essentials', description: 'Content Retainer', price_cents: 150000, billing: 'monthly' },
-  growth: { name: 'Growth', description: 'Content Retainer', price_cents: 250000, billing: 'monthly' },
-  fractional: { name: 'Fractional', description: 'Brand Director Retainer', price_cents: 400000, billing: 'monthly' },
   session: { name: 'Sofrito Session', description: '1:1 brand session', price_cents: 40000, billing: 'one_time' },
+  sprint: { name: 'Brand & Web Sprint', description: 'Brand + website in 48 hours', price_cents: 99700, billing: 'one_time' },
 };
 
 // ------------------------------------------------------------
@@ -528,17 +523,19 @@ async function handleRevenue(env) {
 //   is set. GET /api/invoice-status : the founder's morning view
 //   (same row-set the Sheets mirror reads).
 // ------------------------------------------------------------
+const SESSION_CENTS = 40000;
 const MILESTONES = [
-  { key: 'deposit', label: 'Deposit', pct: 0.5 },
-  { key: 'milestone_25', label: 'Milestone 25%', pct: 0.25 },
-  { key: 'final_25', label: 'Final 25%', pct: 0.25 },
+  { key: 'session', label: 'Sofrito Session', cents: SESSION_CENTS },
+  { key: 'final', label: 'Final balance', cents: null },
 ];
 const MILESTONE_LABELS = Object.fromEntries(MILESTONES.map((m) => [m.key, m.label]));
 
+// Two-offer schedule: the $400 Sofrito Session is charged up front and
+// credits toward the Sprint; the final balance is whatever remains
+// (Sprint = 99700 - 40000 = 59700, billed before launch).
 const splitMilestoneAmounts = (priceCents) => {
-  const deposit = Math.round(priceCents * 0.5);
-  const milestone = Math.round(priceCents * 0.25);
-  return { deposit, milestone_25: milestone, final_25: priceCents - deposit - milestone };
+  const session = Math.min(priceCents, SESSION_CENTS);
+  return { session, final: priceCents - session };
 };
 
 async function stripeRequest(env, method, path, form) {
@@ -608,7 +605,7 @@ async function handleInvoiceTrigger(request, env, ctx) {
   const milestone = String(body.milestone || '').trim();
   const note = String(body.note || '').trim();
   if (!projectId) return fail('project_id required', 422);
-  if (!MILESTONES.some((m) => m.key === milestone)) return fail('milestone must be deposit|milestone_25|final_25', 422);
+  if (!MILESTONES.some((m) => m.key === milestone)) return fail('milestone must be session|final', 422);
 
   const project = await env.DB.prepare(
     `SELECT p.id, p.name, p.package_name, p.price_cents, p.status, p.lead_id, l.email AS client_email
@@ -626,8 +623,7 @@ async function handleInvoiceTrigger(request, env, ctx) {
 
   const amountCents = splitMilestoneAmounts(priceCents)[milestone];
   const invoiceId = uuid();
-  const stamp =
-    milestone === 'milestone_25' ? 'approval_confirmed_at' : milestone === 'final_25' ? 'files_delivered_at' : null;
+  const stamp = milestone === 'final' ? 'files_delivered_at' : null;
   const stampVal = stamp ? nowIso() : null;
 
   // Upsert. UNIQUE(project_id, milestone) = the trigger is binary:
@@ -1264,6 +1260,10 @@ export default {
     const assetUrl = new URL(request.url);
     if ((request.method === 'GET' || request.method === 'HEAD') && assetUrl.pathname === '/') {
       const req = new Request(assetUrl.origin + '/index.html', request);
+      return env.ASSETS.fetch(req);
+    }
+    if ((request.method === 'GET' || request.method === 'HEAD') && assetUrl.pathname === '/sprint') {
+      const req = new Request(assetUrl.origin + '/sprint.html', request);
       return env.ASSETS.fetch(req);
     }
 

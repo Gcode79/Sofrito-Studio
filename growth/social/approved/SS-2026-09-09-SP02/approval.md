@@ -1,0 +1,24 @@
+# Founder Approval — SP-02 (Website Clarity Carousel)
+Status: DRAFT — AWAITING FOUNDER APPROVAL
+- Post ID: SS-2026-09-09-SP02
+- Platform: Instagram carousel (4:5, 1080x1350) + Facebook static (1:1, 1080x1080) + LinkedIn PDF (optional) + Story teaser (optional 9:16)
+- Final asset filenames (pending PNG export): approved/SP-02/sp02-slide-01.png through sp02-slide-06.png; approved/SP-02/fb-static-1080x1080.png
+- Final caption file: approved/SP-02/caption.txt
+- Alt text file: approved/SP-02/alt-text.md
+- Destination URL: https://sofritostudio.com/session
+- UTM URL: ?utm_source=instagram&utm_medium=carousel&utm_campaign=sp02
+- Scheduled date/time: [Pending confirmation — posting route: Meta Business Suite]
+- Time zone: [Pending confirmation]
+- Licensed asset review (Route A — Pexels licensed stock):
+  - Source 1 (slide 1): https://images.pexels.com/photos/9988778/pexels-photo-9988778.jpeg (photographer: sovianna; Pexels commercial/free-use license)
+  - Source 2 (slide 4): https://images.pexels.com/photos/6321924/pexels-photo-6321924.jpeg (photographer: cottonbro)
+  - No protected logos/trademarks/brand identifiers detected in selected licensed stock (visual check: restaurant/studio/menu scenes; no signage, no brand names, no trademarked packaging, no recognizable restaurant identity; no client assets used without permission)
+  - Internal label: NOT conceptual AI image — licensed stock only (Social Visual Standard hierarchy item 2; Image Generation Prompt Protocol ethical/asset status; Carousel Typography System image-generation interface rules)
+- Typography/spelling QA (Path A deterministic overlay): PASS — exact copy from SP-02 copy.md; no spelling errors; headline/body/CTA within max word limits (headline ≤12 words, body ≤40 words/max 6 lines, checklist ≤5 points/max 8 words, CTA ≤8 words/max 2 lines); font families ≤2 (Cormorant Garamond + Inter); weights ≤3 (700/600/450); typography tokens (`carousel-tokens.yml`) enforced; safe margins applied; mobile legibility verified; contrast adequate (gradient overlay); no extra text or unintended text in image layer; no distorted hands/extra fingers; no floating objects; no oversaturated colors; no watermark; no unreadable food; accessibility alt text provided per frame; mobile-safe typography design.
+- Quality evaluation (Mandatory Quality Check): PASS (Photorealism: 5/5 — licensed editorial stock; Food-business relevance: 5/5 — restaurant website/studio scene; Focal-point clarity: 5/5 — smartphone/menu focal point; Mobile legibility: 5/5 — headline readable at phone size; Brand fit: 5/5 — editorial hospitality style matches Sofrito Studio palette/typography; Ethical/permission safety: 5/5 — licensed stock tracked, no AI claim; Likelihood to stop viewer: 4/5 — editorial editorial quality, warm light, human presence, realistic texture)
+- Cross-platform adaptation verified: Instagram 4:5 master; LinkedIn PDF separate; Pinterest 2:3 separate evergreen pin; Story/Reel teaser 9:16 separate — none cropped/reused blindly; typography tokens applied consistently.
+- Publishing/autonomy confirmation: No autonomous scheduling/access; Meta Business Suite posting requires separate explicit instruction per post; all assets DRAFT — AWAITING FOUNDER APPROVAL
+- Approved for upload: Pending
+- Approved for scheduling: Pending
+- Approval date: Pending
+- Notes: Carousel typography system (`carousel-tokens.yml`) applied; copy source (`SS-2026-09-09-SP02/copy.md`) verified; image backgrounds text-free; typography overlay deterministic; no AI customization attempted ($0.71 block respected); delivery package structure (`brief.md`, `copy.md`, `visual-prompts.md`, `carousel-spec.yml`, `alt-text.md`, `approval.md`, `performance.md`) maintained.

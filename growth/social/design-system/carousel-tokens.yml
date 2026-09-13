@@ -1,0 +1,87 @@
+canvas:
+  width: 1080
+  height: 1350
+  aspect_ratio: "4:5"
+
+safe_area:
+  top: 96
+  right: 88
+  bottom: 120
+  left: 88
+
+grid:
+  columns: 12
+  gutter: 20
+  baseline_grid: 8
+
+typography:
+  display:
+    font_family: "Approved brand display font"
+    fallback: "Arial, Helvetica, sans-serif"
+    font_weight: 700
+    font_size_px: 92
+    line_height: 0.94
+    letter_spacing_em: -0.025
+    max_lines: 4
+
+  headline:
+    font_family: "Approved brand display font"
+    fallback: "Arial, Helvetica, sans-serif"
+    font_weight: 700
+    font_size_px: 68
+    line_height: 0.98
+    letter_spacing_em: -0.018
+    max_lines: 4
+
+  subhead:
+    font_family: "Approved brand body font"
+    fallback: "Arial, Helvetica, sans-serif"
+    font_weight: 600
+    font_size_px: 38
+    line_height: 1.12
+    letter_spacing_em: -0.005
+    max_lines: 3
+
+  body:
+    font_family: "Approved brand body font"
+    fallback: "Arial, Helvetica, sans-serif"
+    font_weight: 450
+    font_size_px: 32
+    line_height: 1.22
+    letter_spacing_em: 0
+    max_lines: 6
+
+  micro:
+    font_family: "Approved brand body font"
+    fallback: "Arial, Helvetica, sans-serif"
+    font_weight: 600
+    font_size_px: 24
+    line_height: 1.15
+    letter_spacing_em: 0.01
+    max_lines: 2
+
+colors:
+  ink: "#1D261E"
+  paper: "#F6F0E6"
+  cream: "#FFF9F0"
+  red: "#9E3F32"
+  green: "#334B36"
+  accent: "#D88B47"
+
+overlay:
+  dark_gradient_opacity: 0.58
+  light_panel_opacity: 0.92
+
+spacing:
+  xs: 8
+  sm: 16
+  md: 24
+  lg: 40
+  xl: 64
+  xxl: 88
+
+export:
+  format: png
+  color_mode: sRGB
+  dpi: 150
+  filename_pattern: "SS-[YYYY-MM-DD]-[post-id]-slide-[nn].png"
