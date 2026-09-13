@@ -412,7 +412,11 @@
       "image_url": "https://sofritostudio.com/images/pins/rec-tembleque-pin.png",
       "caption": "Mainland ingredient swaps — cook boricua anywhere 🇵🇷\n\nhttps://sofritostudio.com/products/starter-kit.html",
       "posted": false,
+<<<<<<< HEAD
       "fail_count": 1,
+=======
+      "fail_count": 2,
+>>>>>>> e398d5c99670b22253115b6fce0238398596891b
       "skipped": true
     },
     {
@@ -422,7 +426,11 @@
       "image_url": "https://sofritostudio.com/images/rec-tembleque.jpg",
       "caption": "Mainland ingredient swaps — cook boricua anywhere — https://sofritostudio.com/products/starter-kit.html",
       "posted": false,
+<<<<<<< HEAD
       "fail_count": 1,
+=======
+      "fail_count": 2,
+>>>>>>> e398d5c99670b22253115b6fce0238398596891b
       "skipped": true
     },
     {
@@ -432,6 +440,10 @@
       "image_url": "https://sofritostudio.com/images/pins/rec-tostones-pin.png",
       "caption": "Nochebuena planning — the timeline that saves the table 🇵🇷\n\nhttps://sofritostudio.com/products/full-table.html",
       "posted": false,
+<<<<<<< HEAD
+=======
+      "fail_count": 2,
+>>>>>>> e398d5c99670b22253115b6fce0238398596891b
       "skipped": true
     },
     {
@@ -441,6 +453,10 @@
       "image_url": "https://sofritostudio.com/images/rec-tostones.jpg",
       "caption": "Nochebuena planning — the timeline that saves the table — https://sofritostudio.com/products/full-table.html",
       "posted": false,
+<<<<<<< HEAD
+=======
+      "fail_count": 2,
+>>>>>>> e398d5c99670b22253115b6fce0238398596891b
       "skipped": true
     },
     {
@@ -450,7 +466,11 @@
       "image_url": "https://sofritostudio.com/images/pins/pernil-course-pin.png",
       "caption": "Coquito & postres — the sweet side of the island 🇵🇷\n\nhttps://sofritostudio.com/products/coquito-guide.html",
       "posted": false,
+<<<<<<< HEAD
       "skipped": true
+=======
+      "fail_count": 2
+>>>>>>> e398d5c99670b22253115b6fce0238398596891b
     },
     {
       "id": "fb-022",
@@ -459,7 +479,11 @@
       "image_url": "https://sofritostudio.com/images/pernil-course.jpg",
       "caption": "Coquito & postres — the sweet side of the island — https://sofritostudio.com/products/coquito-guide.html",
       "posted": false,
+<<<<<<< HEAD
       "skipped": true
+=======
+      "fail_count": 2
+>>>>>>> e398d5c99670b22253115b6fce0238398596891b
     },
     {
       "id": "ig-023",
@@ -468,7 +492,11 @@
       "image_url": "https://sofritostudio.com/images/pins/rec-alcapurrias-pin.png",
       "caption": "Kitchen systems & meal-prep — boricua all week 🇵🇷\n\nhttps://sofritostudio.com/products/kitchen-bundle.html",
       "posted": false,
+<<<<<<< HEAD
       "skipped": true
+=======
+      "fail_count": 1
+>>>>>>> e398d5c99670b22253115b6fce0238398596891b
     },
     {
       "id": "fb-023",
@@ -477,7 +505,11 @@
       "image_url": "https://sofritostudio.com/images/rec-alcapurrias.jpg",
       "caption": "Kitchen systems & meal-prep — boricua all week — https://sofritostudio.com/products/kitchen-bundle.html",
       "posted": false,
+<<<<<<< HEAD
       "skipped": true
+=======
+      "fail_count": 1
+>>>>>>> e398d5c99670b22253115b6fce0238398596891b
     },
     {
       "id": "ig-015-ny",
