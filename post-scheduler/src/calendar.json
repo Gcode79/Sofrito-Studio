@@ -1,0 +1,13 @@
+[
+  {
+    "id": "post-001",
+    "date": "2026-10-15",
+    "platform": "twitter",
+    "type": "image",
+    "assetUrl": "https://example.com/launch.jpg",
+    "copy": "🚀 New product launch! Check it out.",
+    "utm": "utm_source=twitter&utm_medium=social&utm_campaign=launch",
+    "status": "pending",
+    "retryCount": 0
+  }
+]

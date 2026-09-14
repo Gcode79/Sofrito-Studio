@@ -1,0 +1,23 @@
+name = "sofrito-post-scheduler"
+compatibility_date = "2024-09-13"
+main = "src/scheduler.js"
+
+# KV binding for metrics and calendar
+[[kv_namespaces]]
+binding = "POST_METRICS"
+# The ID will be filled after you create the KV namespace via `wrangler kv:namespace create "POST_METRICS"`
+# id = "<KV_ID>"
+
+# Cron triggers – hourly scheduler and nightly analytics
+[[triggers]]
+type = "cron"
+cron = "0 * * * *"   # every hour at minute 0 – runs scheduler
+
+[[triggers]]
+type = "cron"
+cron = "0 2 * * *"   # nightly at 02:00 UTC – runs analytics worker
+script = "src/analytics.js"
+
+# Environment variables (optional – set your Slack webhook URL here if you want alerts)
+[vars]
+SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/XXXXX/XXXXX/XXXXX"
