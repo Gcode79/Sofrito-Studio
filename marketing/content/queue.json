@@ -468,7 +468,8 @@
       "image_url": "https://sofritostudio.com/images/pins/rec-alcapurrias-pin.png",
       "caption": "Kitchen systems & meal-prep — boricua all week 🇵🇷\n\nhttps://sofritostudio.com/products/kitchen-bundle.html",
       "posted": false,
-      "fail_count": 1
+      "fail_count": 1,
+      "skipped": true
     },
     {
       "id": "fb-023",
@@ -477,7 +478,8 @@
       "image_url": "https://sofritostudio.com/images/rec-alcapurrias.jpg",
       "caption": "Kitchen systems & meal-prep — boricua all week — https://sofritostudio.com/products/kitchen-bundle.html",
       "posted": false,
-      "fail_count": 1
+      "fail_count": 1,
+      "skipped": true
     },
     {
       "id": "ig-015-ny",
@@ -535,7 +537,8 @@
       "datetime": "2026-09-13T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/pins/rec-arroz-gandules-pin.png",
       "caption": "Family table storytelling — tradition on the plate 🇵🇷\n\nhttps://sofritostudio.com/products/starter-kit.html",
-      "posted": false
+      "posted": false,
+      "fail_count": 1
     },
     {
       "id": "fb-024",
@@ -543,7 +546,8 @@
       "datetime": "2026-09-13T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/rec-arroz-gandules.jpg",
       "caption": "Family table storytelling — tradition on the plate — https://sofritostudio.com/products/starter-kit.html",
-      "posted": false
+      "posted": false,
+      "fail_count": 1
     },
     {
       "id": "ig-025",
