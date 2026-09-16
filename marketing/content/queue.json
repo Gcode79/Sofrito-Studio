@@ -538,7 +538,8 @@
       "image_url": "https://sofritostudio.com/images/pins/rec-arroz-gandules-pin.png",
       "caption": "Family table storytelling — tradition on the plate 🇵🇷\n\nhttps://sofritostudio.com/products/starter-kit.html",
       "posted": false,
-      "fail_count": 1
+      "fail_count": 1,
+      "skipped": true
     },
     {
       "id": "fb-024",
@@ -547,7 +548,8 @@
       "image_url": "https://sofritostudio.com/images/rec-arroz-gandules.jpg",
       "caption": "Family table storytelling — tradition on the plate — https://sofritostudio.com/products/starter-kit.html",
       "posted": false,
-      "fail_count": 1
+      "fail_count": 1,
+      "skipped": true
     },
     {
       "id": "ig-025",
@@ -555,7 +557,8 @@
       "datetime": "2026-09-14T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/pins/rec-arroz-pin.png",
       "caption": "Sofrito batch day — the base every dish builds on 🇵🇷\n\nhttps://sofritostudio.com/products/starter-kit.html",
-      "posted": false
+      "posted": false,
+      "fail_count": 1
     },
     {
       "id": "fb-025",
@@ -563,7 +566,8 @@
       "datetime": "2026-09-14T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/rec-arroz.jpg",
       "caption": "Sofrito batch day — the base every dish builds on — https://sofritostudio.com/products/starter-kit.html",
-      "posted": false
+      "posted": false,
+      "fail_count": 1
     },
     {
       "id": "ig-026",
@@ -1727,7 +1731,7 @@
       "caption": "Your food business is one clear message away.\nSofrito Studio builds brand foundations, websites, and menus for independent restaurants, cafés, food trucks, and specialty-food businesses.\nSee how we work → sofritostudio.com (link in bio)\nHashtags: #FoodBusiness #RestaurantBranding #SofritoStudio #IndependentRestaurant #MenuClarity #BrandFoundation\nLink: https://sofritostudio.com/?utm_source=instagram&utm_medium=video&utm_campaign=cta_b01",
       "posted": false,
       "note": "CTA-2026-09-11-B01 · Brand Foundations — Video 01 | utm_campaign=cta_b01",
-      "skipped": false,
+      "skipped": true,
       "ready": true
     },
     {
@@ -1740,7 +1744,7 @@
       "caption": "Independent restaurant or café owner? Unclear positioning quietly costs you customers.\nSofrito Studio: clear brand foundations, websites, and menus for food businesses.\nSee the current services → https://sofritostudio.com/?utm_source=facebook&utm_medium=video&utm_campaign=cta_b01",
       "posted": false,
       "note": "CTA-2026-09-11-B01 · Brand Foundations — Video 01 | utm_campaign=cta_b01",
-      "skipped": false,
+      "skipped": true,
       "ready": true
     },
     {
