@@ -638,7 +638,8 @@
       "image_url": "https://sofritostudio.com/images/pins/rec-pastelillos-pin.png",
       "caption": "Coquito & postres — the sweet side of the island 🇵🇷\n\nhttps://sofritostudio.com/products/coquito-guide.html",
       "posted": false,
-      "fail_count": 1
+      "fail_count": 1,
+      "skipped": true
     },
     {
       "id": "fb-029",
@@ -647,7 +648,8 @@
       "image_url": "https://sofritostudio.com/images/rec-pastelillos.jpg",
       "caption": "Coquito & postres — the sweet side of the island — https://sofritostudio.com/products/coquito-guide.html",
       "posted": false,
-      "fail_count": 1
+      "fail_count": 1,
+      "skipped": true
     },
     {
       "id": "ig-030",
@@ -655,7 +657,8 @@
       "datetime": "2026-09-19T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/pins/rec-tembleque-pin.png",
       "caption": "Kitchen systems & meal-prep — boricua all week 🇵🇷\n\nhttps://sofritostudio.com/products/kitchen-bundle.html",
-      "posted": false
+      "posted": false,
+      "fail_count": 1
     },
     {
       "id": "fb-030",
@@ -663,7 +666,8 @@
       "datetime": "2026-09-19T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/rec-tembleque.jpg",
       "caption": "Kitchen systems & meal-prep — boricua all week — https://sofritostudio.com/products/kitchen-bundle.html",
-      "posted": false
+      "posted": false,
+      "fail_count": 1
     },
     {
       "id": "ig-031",
@@ -671,7 +675,8 @@
       "datetime": "2026-09-20T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/pins/rec-tostones-pin.png",
       "caption": "Family table storytelling — tradition on the plate 🇵🇷\n\nhttps://sofritostudio.com/products/starter-kit.html",
-      "posted": false
+      "posted": false,
+      "fail_count": 1
     },
     {
       "id": "fb-031",
@@ -679,7 +684,8 @@
       "datetime": "2026-09-20T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/rec-tostones.jpg",
       "caption": "Family table storytelling — tradition on the plate — https://sofritostudio.com/products/starter-kit.html",
-      "posted": false
+      "posted": false,
+      "fail_count": 1
     },
     {
       "id": "ig-032",
@@ -1877,7 +1883,7 @@
       "caption": "Your food business is one clear message away.\nSofrito Studio builds brand foundations, websites, and menus for independent restaurants, cafés, food trucks, and specialty-food businesses.\nSee how we work → sofritostudio.com (link in bio)\nHashtags: #FoodBusiness #RestaurantBranding #SofritoStudio #IndependentRestaurant #MenuClarity #BrandFoundation\nLink: https://sofritostudio.com/?utm_source=instagram&utm_medium=video&utm_campaign=cta_b01",
       "posted": false,
       "note": "CTA-2026-09-11-B01 · Brand Foundations — Video 06 | utm_campaign=cta_b01",
-      "skipped": false,
+      "skipped": true,
       "ready": true
     },
     {
@@ -1890,7 +1896,7 @@
       "caption": "Independent restaurant or café owner? Unclear positioning quietly costs you customers.\nSofrito Studio: clear brand foundations, websites, and menus for food businesses.\nSee the current services → https://sofritostudio.com/?utm_source=facebook&utm_medium=video&utm_campaign=cta_b01",
       "posted": false,
       "note": "CTA-2026-09-11-B01 · Brand Foundations — Video 06 | utm_campaign=cta_b01",
-      "skipped": false,
+      "skipped": true,
       "ready": true
     }
   ]
