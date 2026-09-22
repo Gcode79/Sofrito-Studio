@@ -658,7 +658,8 @@
       "image_url": "https://sofritostudio.com/images/pins/rec-tembleque-pin.png",
       "caption": "Kitchen systems & meal-prep — boricua all week 🇵🇷\n\nhttps://sofritostudio.com/products/kitchen-bundle.html",
       "posted": false,
-      "fail_count": 1
+      "fail_count": 1,
+      "skipped": true
     },
     {
       "id": "fb-030",
@@ -667,7 +668,8 @@
       "image_url": "https://sofritostudio.com/images/rec-tembleque.jpg",
       "caption": "Kitchen systems & meal-prep — boricua all week — https://sofritostudio.com/products/kitchen-bundle.html",
       "posted": false,
-      "fail_count": 1
+      "fail_count": 1,
+      "skipped": true
     },
     {
       "id": "ig-031",
@@ -676,7 +678,7 @@
       "image_url": "https://sofritostudio.com/images/pins/rec-tostones-pin.png",
       "caption": "Family table storytelling — tradition on the plate 🇵🇷\n\nhttps://sofritostudio.com/products/starter-kit.html",
       "posted": false,
-      "fail_count": 1
+      "fail_count": 2
     },
     {
       "id": "fb-031",
@@ -685,7 +687,7 @@
       "image_url": "https://sofritostudio.com/images/rec-tostones.jpg",
       "caption": "Family table storytelling — tradition on the plate — https://sofritostudio.com/products/starter-kit.html",
       "posted": false,
-      "fail_count": 1
+      "fail_count": 2
     },
     {
       "id": "ig-032",
@@ -693,7 +695,8 @@
       "datetime": "2026-09-21T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/pins/pernil-course-pin.png",
       "caption": "Sofrito batch day — the base every dish builds on 🇵🇷\n\nhttps://sofritostudio.com/products/starter-kit.html",
-      "posted": false
+      "posted": false,
+      "fail_count": 1
     },
     {
       "id": "fb-032",
@@ -701,7 +704,8 @@
       "datetime": "2026-09-21T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/pernil-course.jpg",
       "caption": "Sofrito batch day — the base every dish builds on — https://sofritostudio.com/products/starter-kit.html",
-      "posted": false
+      "posted": false,
+      "fail_count": 1
     },
     {
       "id": "ig-033",
