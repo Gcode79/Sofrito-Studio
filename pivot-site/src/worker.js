@@ -1007,18 +1007,26 @@ async function handleInvoiceTrigger(request, env, ctx) {
     .bind(invoiceId, nowIso(), project.id, milestone, amountCents, note || null, stamp === 'approval_confirmed_at' ? stampVal : null, stamp === 'files_delivered_at' ? stampVal : null)
     .run();
 
+  const canonical = await env.DB.prepare(
+    `SELECT id FROM invoices WHERE project_id = ? AND milestone = ?`
+  )
+    .bind(project.id, milestone)
+    .first();
+  if (!canonical) return fail('invoice row not found after upsert', 500);
+
+  const isNewInvoice = canonical.id === invoiceId;
   const stripe = { attempted: false };
-  if (env.STRIPE_API_KEY) {
+  if (isNewInvoice && env.STRIPE_API_KEY) {
     try {
       const created = await createAndSendStripeInvoice(env, {
         customerEmail: project.client_email,
         customerName: project.name,
         description: `${MILESTONE_LABELS[milestone]} — ${project.package_name || 'Sofrito Studio'}`,
-        meta: { invoice_id: invoiceId, project_id: project.id, milestone },
+        meta: { invoice_id: canonical.id, project_id: project.id, milestone },
         line: { description: MILESTONE_LABELS[milestone], amountCents },
       });
       await env.DB.prepare(`UPDATE invoices SET status = 'sent', sent_at = ?, stripe_invoice_id = ? WHERE id = ?`)
-        .bind(nowIso(), created.id, invoiceId)
+        .bind(nowIso(), created.id, canonical.id)
         .run();
       stripe.attempted = true;
       stripe.ok = true;
@@ -1030,11 +1038,18 @@ async function handleInvoiceTrigger(request, env, ctx) {
       stripe.ok = false;
       stripe.error = e.message;
     }
+  } else if (isNewInvoice) {
+    stripe.warning = 'STRIPE_API_KEY not set — trigger recorded, no invoice sent.';
   } else {
-    stripe.warning = 'STRIPE_API_KEY not set — trigger recorded, no invoice sent. Set the secret, then re-trigger this milestone.';
+    stripe.skipped = 'already_exists';
   }
 
-  const finalRow = await env.DB.prepare(`SELECT * FROM invoices WHERE id = ?`).bind(invoiceId).first();
+  const finalRow = await env.DB.prepare(
+    `SELECT * FROM invoices WHERE project_id = ? AND milestone = ?`
+  )
+    .bind(project.id, milestone)
+    .first();
+  if (!finalRow) return fail('invoice row not found after upsert', 500);
 
   ctx.waitUntil(
     Promise.all([
@@ -1061,7 +1076,7 @@ async function handleInvoiceTrigger(request, env, ctx) {
         template: 'invoice-trigger-notify.html',
         subject: `[Milestone] ${MILESTONE_LABELS[milestone]} — ${project.name} ($${(amountCents / 100).toFixed(2)})`,
         data: { invoice: finalRow, project, milestone_label: MILESTONE_LABELS[milestone], amount_dollars: (amountCents / 100).toFixed(2) },
-        lead_id: `invoice-${invoiceId}`,
+        lead_id: `invoice-${finalRow.id}`,
       }),
     ])
   );
@@ -1080,31 +1095,32 @@ async function insertRevenue(env, ctx, row, lead = null) {
     )
       .bind(uuid(), nowIso(), row.occurred_at, row.source, row.source_id, row.project_id || null, row.amount_cents, row.currency || 'usd', row.description || null, row.metadata ? JSON.stringify(row.metadata) : null, row.paid === false ? 0 : 1)
       .run();
-    const paidAt = new Date(row.occurred_at).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-    ctx.waitUntil(
-      enqueueEmail(env, {
-        kind: 'email',
-        to: env.NOTIFICATION_EMAIL || '',
-        template: 'revenue-notify.html',
-        subject: `Payment logged: $${(row.amount_cents / 100).toFixed(2)}${lead?.name ? ` — ${lead.name}` : ''}`,
-        data: {
-          amount: (row.amount_cents / 100).toFixed(2),
-          source: row.source,
-          description: row.description || '',
-          lead_id: row.project_id || '',
-          name: lead?.name || '',
-          email: lead?.email || '',
-          paid_at: paidAt,
-          session_id: row.session_id || '',
-        },
-        lead_id: 'revenue',
-      })
-    );
-    return true;
   } catch (e) {
     if (String(e.message).includes('UNIQUE')) return false;
-    throw e;
+    console.error('revenue insert failed', row.source, row.source_id, e.message);
   }
+
+  const paidAt = new Date(row.occurred_at).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  ctx.waitUntil(
+    enqueueEmail(env, {
+      kind: 'email',
+      to: env.NOTIFICATION_EMAIL || '',
+      template: 'revenue-notify.html',
+      subject: `Payment logged: $${(row.amount_cents / 100).toFixed(2)}${lead?.name ? ` — ${lead.name}` : ''}`,
+      data: {
+        amount: (row.amount_cents / 100).toFixed(2),
+        source: row.source,
+        description: row.description || '',
+        lead_id: row.project_id || '',
+        name: lead?.name || '',
+        email: lead?.email || '',
+        paid_at: paidAt,
+        session_id: row.session_id || '',
+      },
+      lead_id: 'revenue',
+    })
+  );
+  return true;
 }
 
 async function handleCheckoutExpired(env, ctx, event) {
@@ -1149,6 +1165,7 @@ async function handleStripeWebhook(request, env, ctx) {
   const signed = `${ts}.${raw}`;
   const expected = await hmacSha256(secret, signed);
   if (!safeEqual(expected, v1)) return fail('invalid signature', 401);
+  if (Math.abs(Date.now() / 1000 - Number(ts)) > 300) return fail('stale signature', 401);
 
   const event = JSON.parse(raw);
   if (event.type === 'checkout.session.expired') {
@@ -1767,7 +1784,6 @@ async function runSessionAutomations(env) {
     LEFT JOIN leads l ON l.id = b.lead_id
     WHERE b.status = 'active' AND b.scheduled_for IS NOT NULL
       AND julianday(b.scheduled_for) <= julianday('now', '-30 days')
-      AND julianday(b.scheduled_for) >= julianday('now', '-31 days')
     ORDER BY b.scheduled_for ASC`;
   const day30Bookings = await env.DB.prepare(day30Query).all();
   for (const booking of day30Bookings.results || []) {
@@ -2059,7 +2075,11 @@ export default {
           return handleInvoiceTrigger(request, env, ctx);
         }
 
-        if (p === '/api/flow/generate' && request.method === 'POST') return handleFlowGenerate(request, env);
+        if (p === '/api/flow/generate' && request.method === 'POST') {
+          const g = adm();
+          if (g) return g;
+          return handleFlowGenerate(request, env);
+        }
 
         if (p === '/api/stripe-webhook' && request.method === 'POST')
           return handleStripeWebhook(request, env, ctx);

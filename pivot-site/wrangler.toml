@@ -71,12 +71,14 @@ queue = "sofrito-webhooks"
 
 [[queues.consumers]]
 queue = "sofrito-emails"
+dead_letter_queue = "sofrito-emails-dlq"
 max_batch_size = 10
 max_batch_timeout = 5
 max_retries = 3
 
 [[queues.consumers]]
 queue = "sofrito-webhooks"
+dead_letter_queue = "sofrito-webhooks-dlq"
 max_batch_size = 10
 max_batch_timeout = 5
 max_retries = 3
