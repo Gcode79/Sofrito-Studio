@@ -1,161 +1,585 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The $997 Brand & Web Sprint — Sofrito Studio</title>
-  <meta name="description" content="A $997 high-speed brand and web design sprint for independent food businesses — 48-hour delivery, fixed price, no monthly fees." />
-  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
-  <link rel="stylesheet" href="/assets/css/site.css" />
-  <link rel="canonical" href="https://sofritostudio.com/sprint" />
-  <script>window.SITE = { lang: 'en', api: '/api' };</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sofrito Studio – The Sprint</title>
+    <meta name="description" content="Sofrito Studio builds brand identities and one-page websites for independent food businesses. Start with a $400 Sofrito Session, credited in full toward the $997 Brand &amp; Web Sprint when booked within 30 days.">
+    <meta property="og:title" content="Sofrito Studio – The Sprint">
+    <meta property="og:description" content="Brand identities and one-page websites for independent food businesses. Start with a $400 Sofrito Session, credited in full toward the $997 Brand &amp; Web Sprint when booked within 30 days.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sofritostudio.com/sprint.html">
+    <meta property="og:image" content="https://sofritostudio.com/image-5.webp">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Sofrito Studio – The Sprint">
+    <meta name="twitter:description" content="Brand identities and one-page websites for independent food businesses. Start with a $400 Sofrito Session, credited in full toward the $997 Brand &amp; Web Sprint when booked within 30 days.">
+    <meta name="twitter:image" content="https://sofritostudio.com/image-5.webp">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .text-chrome {
+            background: linear-gradient(180deg, #ffffff 0%, #71717a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 20s linear infinite;
+        }
+    </style>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
-<body class="bg-gray-50 font-sans text-slate-700 leading-relaxed min-h-screen">
-
-  <!-- ===== Sticky top nav ===== -->
-  <header class="sticky top-0 z-40 bg-gray-50/90 backdrop-blur border-b border-slate-200">
-    <nav class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between" aria-label="Main">
-      <a href="/" class="flex items-center gap-3 font-serif tracking-tight text-slate-900 text-xl sm:text-2xl">
-        <img src="/assets/logo.svg" alt="Sofrito Studio swirl logo" width="44" height="44" class="w-11 h-11 shrink-0 rounded-full object-contain" />
-        <span>Sofrito<span class="text-orange-600">Studio</span></span>
-      </a>
-      <div class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-700">
-        <a href="/work.html" class="hover:text-orange-600 transition">Work</a>
-        <a href="/faq.html" class="hover:text-orange-600 transition">FAQ</a>
-      </div>
-      <div class="flex items-center gap-3">
-        <button id="lang-toggle" class="text-xs font-semibold px-2 py-1 rounded-md border border-slate-300 text-slate-700 hover:border-orange-600 hover:text-orange-600 transition" aria-label="Switch language">ES</button>
-        <a href="/contact.html" class="hidden sm:inline-flex items-center rounded-md bg-orange-600 hover:bg-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 transition">Start a brand</a>
-      </div>
+<body class="bg-zinc-950 text-zinc-50 antialiased">
+    <!-- Global Navigation -->
+    <header>
+    <nav aria-label="Main navigation" class="fixed top-0 w-full z-50 glass-panel border-b-0 border-white/10">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="/" class="flex items-center gap-2">
+                <img src="/assets/SofritoStudio-logo-transparent.png" alt="Sofrito Studio" class="h-9 w-auto rounded-sm" loading="eager">
+                <span class="text-white font-bold tracking-widest uppercase text-sm">SOFRITO STUDIO</span>
+            </a>
+            <div class="hidden md:flex space-x-8 text-xs tracking-widest uppercase font-semibold text-zinc-400">
+                <a href="#sprint" class="hover:text-orange-500 transition-colors">The Sprint</a>
+                <a href="#process" class="hover:text-orange-500 transition-colors">Process</a>
+                <a href="#book-now" class="hover:text-orange-500 transition-colors">Book Your Sofrito Session</a>
+            </div>
+            <a href="#book-now" class="bg-orange-600 text-white text-xs font-bold uppercase tracking-widest px-5 py-3 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors">
+                Book Your Sofrito Session
+            </a>
+        </div>
     </nav>
-  </header>
+    </header>
 
-  <!-- ===== Sprint Hero ===== -->
-  <main class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-    <section class="min-h-[85vh] flex flex-col justify-center py-16 sm:py-20 bg-gradient-to-b from-orange-50/60 via-gray-50 to-gray-50">
-      <div class="max-w-[640px]">
-        <h1 class="font-serif tracking-tight text-slate-900 text-4xl sm:text-5xl lg:text-6xl leading-tight">
-          Your food has a story. <span class="text-orange-600">We make them taste it</span> before the first bite.
-        </h1>
-        <p class="mt-6 text-lg text-slate-600">Stop losing orders to an ugly Linktree. Get a professional brand identity and a blazing-fast, mobile-ready website launched in just 48 hours.</p>
-        <div class="mt-8 flex flex-col sm:flex-row gap-3">
-          <a href="https://calendly.com/j-ortiz1148/sofrito-strategy-session" class="inline-flex items-center justify-center rounded-md bg-orange-600 hover:bg-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:opacity-50 text-white text-base font-semibold px-6 py-3 transition">Book Your Strategy Session ($400)</a>
+    <main>
+    <!-- Hero Section -->
+    <section class="pt-40 pb-20 px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div>
+            <div class="text-orange-500 text-xs font-bold tracking-widest uppercase mb-6">Brand Foundations for Food Businesses</div>
+            <h1 class="text-6xl md:text-7xl font-bold tracking-tighter text-chrome leading-[1.1] mb-8">
+                From Direction to Launch<br>in 48 Hours.
+            </h1>
+            <p class="text-xl text-zinc-400 mb-10 max-w-2xl leading-relaxed">
+                We build clear brand identities and one-page websites for independent food businesses at one fixed price.
+            </p>
+            <a href="#book-now" class="inline-block bg-orange-600 text-white font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
+                Book Your Sofrito Session
+            </a>
+            <p class="text-sm text-zinc-500 mt-4">Your $400 Sofrito Session is credited in full toward your $997 Brand &amp; Web Sprint when you book within 30 days.</p>
+
+            <div class="grid grid-cols-3 gap-6 mt-16 pt-8 border-t border-white/10">
+                <div>
+                    <div class="text-zinc-500 text-[10px] tracking-widest uppercase mb-1">Turnaround</div>
+                    <div class="text-white font-bold text-sm">48H FROM DIRECTION</div>
+                </div>
+                <div>
+                    <div class="text-zinc-500 text-[10px] tracking-widest uppercase mb-1">Investment</div>
+                    <div class="text-white font-bold text-sm">$997 FLAT</div>
+                </div>
+                <div>
+                    <div class="text-zinc-500 text-[10px] tracking-widest uppercase mb-1">Built For</div>
+                    <div class="text-white font-bold text-sm">INDEPENDENT FOOD</div>
+                </div>
+            </div>
         </div>
-      </div>
-    </section>
-
-    <!-- ===== Problem / Agitation ===== -->
-    <section class="py-16 sm:py-20 border-t border-slate-200">
-      <h2 class="font-serif tracking-tight text-slate-900 text-3xl sm:text-4xl">You cook. You hustle. You shouldn't be fighting with website builders.</h2>
-      <p class="mt-4 max-w-2xl text-slate-600">We see it all the time. Amazing local food, incredible flavors, but an online presence that relies on messy Instagram DMs, broken links, and zero brand consistency. Your customers want to order from you, find your truck, and see your menu without a headache. We fix that, fast. Direct talk, no jargon, just a brand that works.</p>
-    </section>
-
-    <!-- ===== Deliverables ===== -->
-    <section class="py-16 sm:py-20 border-t border-slate-200">
-      <h2 class="font-serif tracking-tight text-slate-900 text-3xl sm:text-4xl">The Deliverables: What You Get for $997</h2>
-      <div class="mt-8 grid gap-6 lg:grid-cols-2">
-        <article class="rounded-xl bg-white ring-1 ring-slate-200 shadow-sm p-6 flex flex-col">
-          <img src="/assets/logo.svg" alt="" width="32" height="32" class="mb-3 shrink-0 rounded-full" aria-hidden="true" />
-          <h3 class="font-serif text-xl text-slate-900">The Core Brand Identity</h3>
-          <ul class="mt-3 list-disc pl-5 space-y-1 text-sm text-slate-600">
-            <li>Primary &amp; Secondary Logo Design</li>
-            <li>Custom Color Palette &amp; Typography Guidelines</li>
-            <li>"Brand in a Box" Asset Folder (Ready for social, print, and merch)</li>
-          </ul>
-        </article>
-        <article class="rounded-xl bg-white ring-1 ring-slate-200 shadow-sm p-6 flex flex-col">
-          <img src="/assets/logo.svg" alt="" width="32" height="32" class="mb-3 shrink-0 rounded-full" aria-hidden="true" />
-          <h3 class="font-serif text-xl text-slate-900">The 1-Page Engine (Website)</h3>
-          <ul class="mt-3 list-disc pl-5 space-y-1 text-sm text-slate-600">
-            <li>Lightning-fast, mobile-optimized landing page</li>
-            <li>Digital menu integration &amp; ordering links</li>
-            <li>Hours, location, and Google Maps sync</li>
-            <li>Zero monthly hosting fees (We build it on infrastructure that scales for free).</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <!-- ===== Process ===== -->
-    <section class="py-16 sm:py-20 border-t border-slate-200">
-      <h2 class="font-serif tracking-tight text-slate-900 text-3xl sm:text-4xl">The Process: 3 Steps to Launch</h2>
-      <div class="mt-8 grid gap-6 sm:grid-cols-3">
-        <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-sm p-6">
-          <h3 class="font-serif text-xl text-slate-900">Step 1: The Taste Test (Paid Discovery)</h3>
-          <p class="mt-2 text-sm text-slate-600">You book a $400 Sofrito Session. We get on a 90-minute call to map out your exact vibe, target audience, and menu structure. (This $400 credits directly toward your final project).</p>
+        <div class="relative h-[600px] w-full">
+            <img src="/image-5.webp" alt="Chrome and Sauce" fetchpriority="high" class="w-full h-full object-cover rounded-sm">
+            <div class="absolute bottom-4 left-4 glass-panel px-4 py-2 text-[10px] tracking-widest uppercase text-white font-bold">
+                FIG. 01 — CHROME / SAUCE
+            </div>
         </div>
-        <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-sm p-6">
-          <h3 class="font-serif text-xl text-slate-900">Step 2: The 48-Hour Sprint</h3>
-          <p class="mt-2 text-sm text-slate-600">You go back to the kitchen; we go to the studio. Using our streamlined framework, we design your logo suite and build your live website in two days.</p>
+    </section>
+
+    <!-- Animated Marquee Banner -->
+    <div class="w-full overflow-hidden border-y border-white/10 bg-zinc-900/50 py-4">
+        <div class="flex items-center whitespace-nowrap text-xs text-zinc-500 tracking-widest animate-marquee uppercase font-bold">
+            CARIBBEAN FUTURE // BUILT WITH PRECISION // 48-HOUR BRAND SPRINT // INDEPENDENT FOOD // ONE FIXED PRICE // FOOD, CULTURE, HEAT // CARIBBEAN FUTURE //
         </div>
-        <div class="rounded-xl bg-white ring-1 ring-slate-200 shadow-sm p-6">
-          <h3 class="font-serif text-xl text-slate-900">Step 3: Hand-Off &amp; Launch</h3>
-          <p class="mt-2 text-sm text-slate-600">We do one round of precise revisions, connect your custom domain, and hand over the keys. You are ready to take orders.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== Pricing & CTA ===== -->
-    <section class="py-16 sm:py-20 border-t border-slate-200">
-      <div class="rounded-2xl bg-white ring-1 ring-slate-200 shadow-md px-6 py-12 text-center">
-        <h2 class="font-serif tracking-tight text-slate-900 text-3xl sm:text-4xl">Fixed prices. Honest scope.</h2>
-        <p class="mx-auto mt-3 max-w-xl text-lg text-slate-600">Start with a $400 Strategy Session. If you love the direction, pay the remaining $597 and we launch your brand in 48 hours.</p>
-        <p class="mt-6 text-5xl font-bold text-orange-600">$997 Flat Rate</p>
-        <a href="https://calendly.com/j-ortiz1148/sofrito-strategy-session" class="mt-6 inline-flex items-center justify-center rounded-md bg-orange-600 hover:bg-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:opacity-50 text-white text-base font-semibold px-8 py-4 transition">Start Your Brand Sprint</a>
-      </div>
-    </section>
-
-    <!-- ===== FAQ ===== -->
-    <section class="py-16 sm:py-20 border-t border-slate-200">
-      <h2 class="font-serif tracking-tight text-slate-900 text-3xl sm:text-4xl">Common Questions</h2>
-      <div class="mt-8 space-y-3 max-w-3xl">
-        <details class="rounded-lg bg-white ring-1 ring-slate-200 px-4">
-          <summary class="cursor-pointer py-3 font-semibold text-slate-900 hover:text-orange-700 transition">Are there monthly hosting fees?</summary>
-          <p class="pb-3 text-sm text-slate-600">No. We build on modern, edge-network tech (Cloudflare) that keeps your 1-page site lightning fast and completely free to host. You only pay for your domain name (usually $12/year).</p>
-        </details>
-        <details class="rounded-lg bg-white ring-1 ring-slate-200 px-4">
-          <summary class="cursor-pointer py-3 font-semibold text-slate-900 hover:text-orange-700 transition">Can I update my menu later?</summary>
-          <p class="pb-3 text-sm text-slate-600">Yes. We can set up a simple Google Sheet or provide a monthly "Site Care" package if you want us to handle seasonal updates for you.</p>
-        </details>
-        <details class="rounded-lg bg-white ring-1 ring-slate-200 px-4">
-          <summary class="cursor-pointer py-3 font-semibold text-slate-900 hover:text-orange-700 transition">What if I already have a logo?</summary>
-          <p class="pb-3 text-sm text-slate-600">We will refine it, modernize it for web use, and build the site around it.</p>
-        </details>
-      </div>
-    </section>
-  </main>
-
-  <!-- ===== Footer (swirl applied) ===== -->
-  <footer class="border-t border-slate-200 bg-white">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-start justify-between gap-6 text-sm text-slate-600">
-      <a href="/" class="flex items-center gap-2 font-serif tracking-tight text-slate-900 text-base sm:text-lg hover:text-orange-700 transition">
-        <img src="/assets/logo.svg" alt="Sofrito Studio swirl" width="28" height="28" class="w-7 h-7 shrink-0 rounded-full object-contain" aria-hidden="true" />
-        <span>Sofrito<span class="text-orange-600">Studio</span></span>
-      </a>
-      <nav class="flex gap-6" aria-label="Footer">
-        <a href="/work.html" class="hover:text-orange-700 transition">Work</a>
-        <a href="/about.html" class="hover:text-orange-700 transition">About</a>
-        <a href="/services.html" class="hover:text-orange-700 transition">Services</a>
-        <a href="/blog/index.html" class="hover:text-orange-700 transition">Journal</a>
-        <a href="/faq.html" class="hover:text-orange-700 transition">FAQ</a>
-        <a href="/contact.html" class="hover:text-orange-700 transition">Contact</a>
-      </nav>
-      <p class="text-slate-400"><span id="site-email">hello@sofritostudio.com</span></p>
-      <nav class="flex gap-4 mt-2" aria-label="Social links">
-        <a href="https://instagram.com/sofritostudio" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-orange-600 transition" aria-label="Instagram">Instagram</a>
-        <a href="https://facebook.com/sofritostudio" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-orange-600 transition" aria-label="Facebook">Facebook</a>
-        <a href="https://pinterest.com/sofritostudio" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-orange-600 transition" aria-label="Pinterest">Pinterest</a>
-        <a href="https://tiktok.com/@sofritostudio" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-orange-600 transition" aria-label="TikTok">TikTok</a>
-      </nav>
     </div>
-  </footer>
 
-  <div class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-t border-slate-200 px-4 py-3">
-    <a href="/contact.html" class="inline-flex w-full items-center justify-center rounded-md bg-orange-600 hover:bg-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-3 transition">
-      Find the right starting point
-    </a>
-  </div>
+    <section aria-label="The problem" class="py-32 px-6 max-w-7xl mx-auto">
+        <h2 class="text-5xl font-bold tracking-tighter text-white font-serif mb-8">Make your food business easier to recognize online.</h2>
+        <ul class="space-y-4 text-zinc-400 text-lg leading-relaxed max-w-3xl">
+            <li>Customers may see your Instagram and menu before they taste the food.</li>
+            <li>A clear online presence helps explain your menu, hours, location, and ordering options.</li>
+            <li>A current brand and website make it easier for customers to understand what you offer.</li>
+        </ul>
+    </section>
+    <!-- Portfolio Scoreboard -->
+    <section class="py-32 px-6 max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <div class="text-orange-500 text-xs font-bold tracking-widest uppercase mb-6">Scoreboard</div>
+            <h2 class="text-5xl font-bold tracking-tighter text-white mb-4">Shipped. Not Promised.</h2>
+            <p class="text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">Three launches. Zero surprises. Each one shipped in a 48-hour sprint for a different flavor of independent food.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass-panel p-8 hover:border-orange-500/30 transition-colors">
+                <div class="text-orange-500 text-[10px] tracking-widest uppercase mb-3 font-bold">CASE 01 — Food Truck</div>
+                <h3 class="text-xl font-bold text-white mb-2">Smoke &amp; Steel</h3>
+                <p class="text-zinc-400 text-sm leading-relaxed mb-4">Mobile BBQ trailer → single-page site with live location tracking, menu, and online ordering links.</p>
+                <div class="flex items-center gap-3 text-xs text-zinc-500 font-mono">
+                    <span>48H</span>
+                    <span>·</span>
+                    <span>$997</span>
+                    <span>·</span>
+                    <span>LAUNCHED</span>
+                </div>
+            </div>
+            <div class="glass-panel p-8 hover:border-orange-500/30 transition-colors">
+                <div class="text-orange-500 text-[10px] tracking-widest uppercase mb-3 font-bold">CASE 02 — CPG</div>
+                <h3 class="text-xl font-bold text-white mb-2">Mama&#39;s Sofrito</h3>
+                <p class="text-zinc-400 text-sm leading-relaxed mb-4">Small-batch sauce brand → brand identity suite + storefront with wholesale inquiry flow and retail locator.</p>
+                <div class="flex items-center gap-3 text-xs text-zinc-500 font-mono">
+                    <span>48H</span>
+                    <span>·</span>
+                    <span>$997</span>
+                    <span>·</span>
+                    <span>LAUNCHED</span>
+                </div>
+            </div>
+            <div class="glass-panel p-8 hover:border-orange-500/30 transition-colors">
+                <div class="text-orange-500 text-[10px] tracking-widest uppercase mb-3 font-bold">CASE 03 — Restaurant</div>
+                <h3 class="text-xl font-bold text-white mb-2">Cocina de Fuego</h3>
+                <p class="text-zinc-400 text-sm leading-relaxed mb-4">Island-cuisine restaurant → identity + site with reservations, catering inquiries, and full mobile speed.</p>
+                <div class="flex items-center gap-3 text-xs text-zinc-500 font-mono">
+                    <span>48H</span>
+                    <span>·</span>
+                    <span>$997</span>
+                    <span>·</span>
+                    <span>LAUNCHED</span>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <script src="/js/site.js" defer></script>
+    <!-- Chapter 01: The Sprint -->
+    <section id="sprint" class="py-32 px-6 max-w-7xl mx-auto">
+        <div class="text-orange-500 text-xs font-bold tracking-widest uppercase mb-6">Chapter 01 — The Sprint</div>
+        <h2 class="text-5xl font-bold tracking-tighter text-white mb-6">Your next chapter, served fast.</h2>
+        <p class="text-xl text-zinc-400 max-w-2xl mb-16 leading-relaxed">
+            For restaurants, food trucks, makers, and food brands that have outgrown the DIY look. We turn your flavor, story, and menu into a brand people remember—and a site that turns browsers into guests.
+        </p>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="glass-panel p-10">
+                <div class="text-orange-500 text-sm font-mono mb-4">01</div>
+                <h3 class="text-2xl text-white font-bold mb-2">FOUNDATION</h3>
+                <h4 class="text-zinc-400 mb-6">Core Brand Identity</h4>
+                <p class="text-sm text-zinc-500 uppercase tracking-widest">Logo Suite <br> Color Palette <br> Typography <br> Voice</p>
+            </div>
+            <div class="glass-panel p-10">
+                <div class="text-orange-500 text-sm font-mono mb-4">02</div>
+                <h3 class="text-2xl text-white font-bold mb-2">DIGITAL CORE</h3>
+                <h4 class="text-zinc-400 mb-6">One-Page Engine</h4>
+                <p class="text-sm text-zinc-500 uppercase tracking-widest">Menu &amp; Ordering Links <br> Hours &amp; Location <br> Map <br> Mobile-First Speed</p>
+            </div>
+            <div class="glass-panel p-10">
+                <div class="text-orange-500 text-sm font-mono mb-4">03</div>
+                <h3 class="text-2xl text-white font-bold mb-2">BRAND IN A BOX</h3>
+                <h4 class="text-zinc-400 mb-6">Launch-Ready Assets</h4>
+                <p class="text-sm text-zinc-500 uppercase tracking-widest">Social Essentials <br> Print Essentials <br> Merch Essentials <br> Brand in a Box</p>
+            </div>
+            <div class="glass-panel p-10">
+                <div class="text-orange-500 text-sm font-mono mb-4">04</div>
+                <h3 class="text-2xl text-white font-bold mb-2">ZERO FRICTION</h3>
+                <h4 class="text-zinc-400 mb-6">Clear Handoff</h4>
+                <p class="text-sm text-zinc-500 uppercase tracking-widest">Two Refinement Rounds <br> Live Site <br> Organized Assets <br> Ready to Use</p>
+            </div>
+        </div>
+
+        <div class="relative h-[400px] w-full mt-12">
+            <img src="/image-4.webp" alt="Volcanic Stone" loading="lazy" decoding="async" class="w-full h-full object-cover rounded-sm">
+            <div class="absolute bottom-4 left-4 glass-panel px-4 py-2">
+                <div class="text-[10px] tracking-widest uppercase text-white font-bold mb-1">FIG. 02 — VOLCANIC STONE</div>
+                <div class="text-xs text-zinc-400">Chrome, stone, glass, and sauce — a material palette borrowed from the island, built for the future.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing & Process -->
+    <section id="process" class="py-32 px-6 bg-zinc-900 border-y border-white/5">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
+
+            <!-- Pricing -->
+            <div>
+                <div class="relative h-[300px] w-full mb-12">
+                    <img src="/image-2.webp" alt="Amber Glass" loading="lazy" decoding="async" class="w-full h-full object-cover rounded-sm">
+                    <div class="absolute bottom-4 left-4 glass-panel px-4 py-2 text-[10px] tracking-widest uppercase text-white font-bold">
+                        FIG. 03 — AMBER GLASS
+                    </div>
+                </div>
+                <h2 class="text-4xl font-bold tracking-tighter text-white mb-4">WHAT THE $997 SPRINT INCLUDES</h2>
+                <div class="text-5xl font-mono text-orange-500 mb-6">$997</div>
+                <p class="text-zinc-400 mb-8 leading-relaxed">
+                    One brand identity and one one-page website. Monthly hosting is separate.
+                </p>
+                <div class="space-y-4 text-sm text-zinc-300 font-medium">
+                    <div class="flex gap-4"><span class="text-orange-500">&#10022;</span> Start with your $400 Sofrito Session, credited in full toward the $997 Brand &amp; Web Sprint</div>
+                    <div class="flex gap-4"><span class="text-orange-500">&#10022;</span> Book the Session within 30 days to apply the credit</div>
+                    <div class="flex gap-4"><span class="text-orange-500">&#10022;</span> Remaining $597 is due before launch</div>
+                    <div class="flex gap-4"><span class="text-orange-500">&#10022;</span> 48-hour turnaround after direction is set</div>
+                </div>
+            </div>
+
+            <!-- Process -->
+            <div>
+                <div class="text-orange-500 text-xs font-bold tracking-widest uppercase mb-6">ONE SPRINT. ONE INVOICE. DONE.</div>
+                <h2 class="text-4xl font-bold tracking-tighter text-white mb-12">THREE STEPS. NO MYSTERY.</h2>
+
+                <div class="space-y-12">
+                    <div class="flex gap-8">
+                        <div class="text-2xl font-mono text-zinc-600">01</div>
+                        <div>
+                            <h3 class="text-xl text-white font-bold mb-2 uppercase">01 / TASTE</h3>
+                            <div class="text-orange-400 text-sm mb-3 font-bold">Find the flavor truth.</div>
+                            <p class="text-zinc-400">We use a 45-minute Sofrito Session to understand your menu, story, audience, and competition.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-8">
+                        <div class="text-2xl font-mono text-zinc-600">02</div>
+                        <div>
+                            <h3 class="text-xl text-white font-bold mb-2 uppercase">02 / PLATE</h3>
+                            <div class="text-orange-400 text-sm mb-3 font-bold">Build the system.</div>
+                            <p class="text-zinc-400">Identity and website come together into one considered experience, with two refinement rounds.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-8">
+                        <div class="text-2xl font-mono text-zinc-600">03</div>
+                        <div>
+                            <h3 class="text-xl text-white font-bold mb-2 uppercase">03 / SERVE</h3>
+                            <div class="text-orange-400 text-sm mb-3 font-bold">Launch with confidence.</div>
+                            <p class="text-zinc-400">The site goes live and the client receives launch-ready assets plus 30 days of support.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 px-6 max-w-3xl mx-auto">
+        <div class="border border-white/10 rounded-lg px-6 py-10 md:px-10 md:py-12 bg-zinc-900/30">
+            <blockquote class="font-serif text-xl md:text-2xl text-zinc-300 leading-relaxed space-y-5">
+                <p>"I'm Puerto Rican, from New York. In my family, the first thing you hear when you walk through the door isn't "hello" — it's "are you hungry? Because I just cooked."</p>
+                <p>My mom worked two jobs. But no matter what, we came home after school to a cooked meal. That's how love looks in our culture. Not said — served.</p>
+                <p>That turned into a passion I had to learn myself. And somewhere along the way I saw it clearly: the people who cook like that — the food trucks, the corner spots, the ones feeding their neighborhoods — they put all their love into the food and none of it into how the world sees them.</p>
+                <p>That's the gap I close. Your food already says "I love you." Your brand should say it too.</p>
+                <p>I'm the sofrito — the base underneath everything that makes the whole dish work.</p>
+            </blockquote>
+            <p class="mt-6 text-sm text-orange-500 font-sans font-semibold">— Joshua Ortiz, founder</p>
+        </div>
+    </section>
+
+    <section class="founder-proof py-16 px-6 max-w-3xl mx-auto">
+  <h2 class="text-4xl font-bold tracking-tighter text-white font-serif mb-6">Founder-built product.</h2>
+  <p class="text-lg text-zinc-400 leading-relaxed mb-4">I designed and built Mise, a working client portal for creative studios with secure sign-in and a dark-mode interface.</p>
+  <p class="text-lg text-zinc-400 leading-relaxed mb-8">We use the same hands and process to build your Brand &amp; Web Sprint.</p>
+  <img src="mise-proof-1.png" alt="Mise landing page: 'The client portal for creative studios,' dark-mode design with app preview" class="w-full rounded-lg border border-white/10 shadow-lg mb-6">
+  <img src="mise-proof-2.png" alt="Close-up of the Mise app interface" class="w-full rounded-lg border border-white/10 shadow-lg">
+</section>
+
+    <section aria-label="FAQ" class="py-16 px-6 max-w-3xl mx-auto">
+        <h2 class="text-4xl font-bold tracking-tighter text-white font-serif mb-8">FAQ</h2>
+        <div class="space-y-4">
+            <details class="glass-panel p-6">
+                <summary class="font-bold text-white cursor-pointer hover:text-orange-500 transition-colors">Q: Is the $400 refundable?</summary>
+                <p class="mt-3 text-zinc-400">A: The Sofrito Session is refundable if it is not worth it. Contact us to request a refund.</p>
+            </details>
+            <details class="glass-panel p-6">
+                <summary class="font-bold text-white cursor-pointer hover:text-orange-500 transition-colors">Q: How fast is "48 hours"?</summary>
+                <p class="mt-3 text-zinc-400">A: Your Sofrito Session sets the direction. We then build and launch the site within 48 hours.</p>
+            </details>
+            <details class="glass-panel p-6">
+                <summary class="font-bold text-white cursor-pointer hover:text-orange-500 transition-colors">Q: What do I need to bring?</summary>
+                <p class="mt-3 text-zinc-400">A: Your menu, your story, and any photos or branding you already have. We'll tell you exactly what's needed on the session.</p>
+            </details>
+            <details class="glass-panel p-6">
+                <summary class="font-bold text-white cursor-pointer hover:text-orange-500 transition-colors">Q: What happens after I pay?</summary>
+                <p class="mt-3 text-zinc-400">A: Pick your Sofrito Session time right after payment. We set the direction on the call, then build and launch within 48 hours.</p>
+            </details>
+        </div>
+    </section>
+    <!-- Lead Capture — Glassmorphic Container -->
+    <section id="book-now" class="py-32 px-6 max-w-3xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-5xl font-bold tracking-tighter text-chrome mb-4">Book your Sofrito Session now — $400, credited in full toward your $997 sprint.</h2>
+            <p class="text-xl text-zinc-400">Choose your 45-minute Session time after payment.</p>
+        </div>
+
+        <div class="glass-panel p-8 md:p-12">
+            <div id="form-container">
+                <form id="lead-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Name <span class="text-orange-500">*</span></label>
+                            <input type="text" id="name" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Email <span class="text-orange-500">*</span></label>
+                            <input type="email" id="email" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors" required>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Business Name <span class="text-orange-500">*</span></label>
+                            <input type="text" id="business_name" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Cell Phone <span class="text-orange-500">*</span></label>
+                            <input type="tel" id="phone" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Business Type <span class="text-orange-500">*</span></label>
+                        <select id="business_type" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors appearance-none" required>
+                            <option value="" class="bg-zinc-900">Select...</option>
+                            <option value="food_truck" class="bg-zinc-900">Food Truck</option>
+                            <option value="restaurant" class="bg-zinc-900">Restaurant</option>
+                            <option value="cpg" class="bg-zinc-900">Specialty CPG / Goods</option>
+                            <option value="other" class="bg-zinc-900">Other</option>
+                        </select>
+                        <p id="business-type-pitch" class="text-sm text-orange-400/90 mt-3 hidden"></p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Message (Optional)</label>
+                        <textarea id="message" rows="3" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors"></textarea>
+                    </div>
+                    <div class="cf-turnstile" data-sitekey="0x4AAAAAAFAfcfVLJKtjbuO8" data-callback="turnstileCallback"></div>
+                    <div id="form-error" class="hidden text-red-600 text-sm mt-3 text-center" aria-live="polite"></div>
+                    <div class="text-xs text-zinc-500 text-center mt-4">Secure Stripe checkout · Your $400 Sofrito Session is credited in full toward the $997 Brand &amp; Web Sprint when booked within 30 days · Questions? <a href="mailto:hello@sofritostudio.com" class="underline hover:text-orange-500">hello@sofritostudio.com</a></div>
+                    <button type="submit" id="submit-btn" class="w-full bg-orange-600 text-white font-bold text-sm py-5 uppercase tracking-widest hover:bg-orange-700 transition-colors disabled:opacity-50 mt-6 shadow-[0_0_20px_rgba(234,88,12,0.2)]">
+                        Book Your Sofrito Session
+                    </button>
+                    <p class="text-xs text-zinc-500 text-center leading-relaxed mt-3">Secure checkout via Stripe. Choose your Sofrito Session time right after payment.</p>
+                </form>
+                <p class="text-xs text-zinc-500 text-center leading-relaxed mt-4">
+                    Your $400 Sofrito Session is credited in full toward your $997 Sprint when you book within 30 days.<br>
+                    The Sofrito Session is refundable if it is not worth it. Contact us to request a refund. <a href="/terms" class="underline hover:text-orange-500">Full terms</a>
+                </p>
+                <div id="success-view" class="hidden text-center py-8">
+                    <svg class="w-16 h-16 mx-auto mb-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <h3 class="text-2xl font-bold text-white mb-2">Request Received</h3>
+                    <p class="text-zinc-400 mb-6 max-w-md mx-auto">Choose your Sofrito Session time once the payment link arrives in your inbox.</p>
+                    <div id="checkout-status" class="hidden"><p class="text-sm text-orange-400 animate-pulse">Preparing your payment link...</p></div>
+                    <a id="checkout-btn" href="#" class="inline-flex w-full max-w-sm items-center justify-center rounded-md bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6 py-3 transition hidden">Book Your Sofrito Session</a>
+                    <p id="checkout-fallback" class="text-sm text-zinc-500 mt-4 hidden">Link did not appear? <a href="/sprint.html" class="underline text-orange-400">Resume your Sofrito Session booking</a> or <a href="mailto:hello@sofritostudio.com?subject=Session Booking Request" class="underline text-orange-400">email us</a>.</p>
+                    <button id="retry-btn" class="mt-6 text-sm text-zinc-500 hover:text-orange-400 transition hidden">Try again</button>
+                </div>
+                <div id="cancel-view" class="hidden text-center py-8">
+                    <svg class="w-16 h-16 mx-auto mb-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <h3 class="text-2xl font-bold text-white mb-2">Checkout Cancelled</h3>
+                    <p class="text-zinc-400 mb-6">No charge was made. Your Sofrito Session request is saved, and you can return when you are ready.</p>
+                    <a href="/sprint.html" class="inline-flex rounded-md bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6 py-3 transition">Resume Your Sofrito Session Booking</a>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-12 text-zinc-600 text-sm font-mono">
+            hello@sofritostudio.com
+        </div>
+    </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-zinc-950 border-t border-white/10 pt-16 pb-8 px-6 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 mb-12">
+            <!-- Brand Column -->
+            <div>
+                <h3 class="text-white font-bold tracking-widest uppercase text-lg mb-3 font-sans">SOFRITO STUDIO</h3>
+                <p class="text-zinc-400 text-sm leading-relaxed">Brand foundations for independent food businesses.</p>
+                <a href="mailto:hello@sofritostudio.com" class="text-zinc-500 text-sm hover:text-orange-500 transition-colors mt-4 inline-block">hello@sofritostudio.com</a>
+            </div>
+            <!-- Legal / Links Column -->
+            <div class="md:text-center">
+                <ul class="space-y-3 text-sm font-sans">
+                    <li><a href="/terms" class="text-zinc-400 hover:text-orange-500 transition-colors">Terms of Service</a></li>
+                    <li><a href="/privacy" class="text-zinc-400 hover:text-orange-500 transition-colors">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <!-- Social Icons -->
+            <div class="md:text-right">
+                <div class="flex md:justify-end gap-4">
+                    <a href="https://instagram.com/pr.sofritostudio" aria-label="Instagram" class="text-zinc-400 hover:text-orange-500 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>
+                    </a>
+                    <a href="https://facebook.com/sofritostudio" aria-label="Facebook" class="text-zinc-400 hover:text-orange-500 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                    </a>
+                    <a href="https://pinterest.com/sofritostudio" aria-label="Pinterest" class="text-zinc-400 hover:text-orange-500 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="8" y2="21"/><path d="M8 12a4 4 0 1 0 8 0 4 4 0 1 0-8 0z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-white/5 pt-6 text-center md:text-left md:flex md:justify-between md:items-center">
+            <p class="text-zinc-600 text-xs font-sans">&copy; 2026 Sofrito Studio. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Funnel Logic Scripts -->
+    <script>
+        const TURNSTILE_SITEKEY = '0x4AAAAAAE_vjXsiRBy7zzkp';
+        let awaitingTurnstile = false;
+        let turnstileToken = null;
+
+        function showError(message) {
+            const el = document.getElementById('form-error');
+            if (el) { el.textContent = message; el.classList.remove('hidden'); }
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return 'unknown';
+        }
+
+        window.turnstileCallback = function(token) {
+            turnstileToken = token;
+            awaitingTurnstile = false;
+            form.requestSubmit();
+        };
+
+        (function() {
+            const url = new URL(window.location.href);
+            const success = url.searchParams.get('success');
+            const sessionId = url.searchParams.get('session_id');
+            const canceled = url.searchParams.get('canceled');
+            if (success === 'true' && sessionId) {
+                const el = document.getElementById('checkout-status');
+                const btn = document.getElementById('checkout-btn');
+                const fb = document.getElementById('checkout-fallback');
+                if (el) el.classList.remove('hidden');
+                if (btn) btn.classList.remove('hidden');
+                fetch('/api/checkout-status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId })
+                }).then(r => r.json()).then(d => {
+                    if (d.status === 'paid') {
+                        if (el) el.classList.add('hidden');
+                        if (btn) { btn.href = d.dashboard_url || 'https://dashboard.stripe.com'; btn.classList.remove('hidden'); }
+                        if (fb) fb.classList.add('hidden');
+                    } else if (d.status === 'requires_action') {
+                        if (btn) { btn.href = d.checkout_url || '#'; btn.classList.remove('hidden'); if (el) el.classList.add('hidden'); }
+                        if (fb) fb.classList.add('hidden');
+                    } else {
+                        if (fb) fb.classList.remove('hidden');
+                    }
+                }).catch(() => { if (fb) fb.classList.remove('hidden'); });
+            } else if (canceled === 'true') {
+                form.classList.add('hidden');
+                document.getElementById('cancel-view').classList.remove('hidden');
+            }
+        })();
+
+        const TYPE_PITCHES = {
+            food_truck: 'Keep your menu, location, hours, and ordering links in one place.',
+            restaurant: 'Put reservations, catering inquiries, and menu details where customers can find them.',
+            cpg: 'Build a clear brand and a direct path for shoppers to learn more or buy.',
+            other: 'Tell us what you make. We will help you build a clear brand and website.'
+        };
+        const typeSelect = document.getElementById('business_type');
+        const pitchEl = document.getElementById('business-type-pitch');
+        typeSelect.addEventListener('change', () => {
+            const pitch = TYPE_PITCHES[typeSelect.value];
+            if (pitch) {
+                pitchEl.textContent = pitch;
+                pitchEl.classList.remove('hidden');
+            } else {
+                pitchEl.classList.add('hidden');
+            }
+        });
+
+        const container = document.getElementById('form-container');
+        const form = document.getElementById('lead-form');
+        const retryBtn = document.getElementById('retry-btn');
+
+        if (retryBtn) {
+            retryBtn.addEventListener('click', () => {
+                container.style.display = '';
+                form.reset();
+                document.getElementById('success-view').classList.add('hidden');
+                document.getElementById('cancel-view').classList.add('hidden');
+                retryBtn.classList.add('hidden');
+            });
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btn = document.getElementById('submit-btn');
+            const originalText = btn.innerText;
+
+            const token = turnstileToken || document.querySelector('textarea[name="cf-turnstile-response"]')?.value;
+
+            if (!token) {
+                if (awaitingTurnstile) return;
+                awaitingTurnstile = true;
+                btn.innerText = 'VERIFYING…'; btn.disabled = true;
+                try { if (window.turnstile) turnstile.reset(); turnstile.execute(); }
+
+                catch (err) { awaitingTurnstile = false; showError('Verification failed to load. Please refresh and try again.'); btn.innerText = originalText; btn.disabled = false; if (window.turnstile) turnstile.reset(); }
+                return;
+            }
+            awaitingTurnstile = false;
+
+            btn.innerText = 'REDIRECTING TO SECURE CHECKOUT…';
+            btn.disabled = true;
+
+            const cookieVal = getCookie('sofrito_ab_page');
+            const payload = {
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                business_name: document.getElementById('business_name').value.trim(),
+                business_type: document.getElementById('business_type').value,
+                message: document.getElementById('message').value.trim(),
+                channel: (cookieVal && cookieVal !== 'unknown') ? decodeURIComponent(cookieVal) : 'sprint_page',
+                turnstile_token: token
+            };
+
+            try {
+                const res = await fetch('/api/lead', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    if (data.ok && data.checkout_url) {
+                        btn.innerText = 'REDIRECTING TO SECURE CHECKOUT…';
+                        btn.disabled = true;
+                        window.location.href = data.checkout_url;
+                    } else {
+                        showError(data.error || 'Something went wrong. Please try again.');
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                        if (window.turnstile) turnstile.reset();
+                    }
+                } else {
+                    const data = await res.json().catch(() => ({}));
+                    showError(data.error || 'Something went wrong. Please try again.');
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                showError(error.message || 'Something went wrong. Please try again.');
+                btn.innerText = originalText;
+                btn.disabled = false;
+                if (window.turnstile) turnstile.reset();
+            }
+        });
+    </script>
 </body>
 </html>

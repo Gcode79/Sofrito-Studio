@@ -1,13 +1,12 @@
 <!doctype html>
 <html>
-<head><meta charset="utf-8"><title>New booking</title></head>
+<head><meta charset="utf-8"><title>New Sofrito Session booked</title></head>
 <body style="margin:0;background:#F9FAFB;font-family:Arial,Helvetica,sans-serif;color:#0F172A;">
   <div style="max-width:600px;margin:0 auto;padding:24px;">
     <p style="font-family:Georgia,serif;font-size:20px;color:#0F172A;margin:0 0 20px;">Sofrito<span style="color:#EA580C;">Studio</span></p>
     <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:28px;">
       <h1 style="font-family:Georgia,serif;font-size:22px;color:#0F172A;margin:0 0 4px;">New Sofrito Session booked</h1>
-      <p style="font-size:14px;color:#64748B;margin:0 0 16px;">90-minute brand session &middot; $400 &middot; payment handling pending owner decision</p>
-
+      <p style="font-size:14px;color:#64748B;margin:0 0 16px;">45-minute strategy session · $400 Session payment received through Stripe before booking · credited in full toward the $997 Brand &amp; Web Sprint when booked within 30 days</p>
       <table style="width:100%;font-size:14px;color:#334155;border-collapse:collapse;">
         <tr><td style="padding:6px 0;color:#94A3B8;width:38%;">Name</td><td style="padding:6px 0;">{{lead.name}}</td></tr>
         <tr><td style="padding:6px 0;color:#94A3B8;">Email</td><td style="padding:6px 0;">{{lead.email}}</td></tr>
@@ -18,13 +17,11 @@
         <tr><td style="padding:6px 0;color:#94A3B8;">Event</td><td style="padding:6px 0;">{{booking.event_name}}</td></tr>
         <tr><td style="padding:6px 0;color:#94A3B8;">Booking</td><td style="padding:6px 0;">{{booking.booking_uuid}}</td></tr>
       </table>
-
       <div style="background:#F1F5F9;border-radius:8px;padding:16px;font-size:14px;color:#334155;margin-top:12px;">
         <p style="margin:0;line-height:1.5;white-space:pre-line;">{{booking.answers_text}}</p>
       </div>
-
       <div style="background:#F1F5F9;border-radius:8px;padding:16px;font-size:13px;color:#64748B;margin-top:12px;">
-        <p style="margin:0;line-height:1.5;">Owner follow-ups: this booking also mirrors as a lead (status contacted) in the CRM. Charge-at-booking vs invoice-after-call is still undecided &mdash; no invoice is auto-issued yet.</p>
+        <p style="margin:0;line-height:1.5;">The Stripe payment is recorded. This booking also appears as a contacted lead in the CRM. The remaining $597 is due before launch if the client starts the $997 Brand &amp; Web Sprint.</p>
       </div>
     </div>
   </div>

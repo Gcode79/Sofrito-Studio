@@ -1,5 +1,0 @@
-# Sofrito Studio — robots.txt
-User-agent: *
-Allow: /
-
-Sitemap: https://sofritostudio.com/sitemap.xml

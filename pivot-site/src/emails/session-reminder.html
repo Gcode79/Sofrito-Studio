@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Tomorrow: your Sofrito Session</title></head>
+<body style="margin:0;background:#F9FAFB;font-family:Arial,Helvetica,sans-serif;color:#0F172A;">
+  <div style="max-width:600px;margin:0 auto;padding:24px;">
+    <p style="font-family:Georgia,serif;font-size:20px;color:#0F172A;margin:0 0 20px;">Sofrito<span style="color:#EA580C;">Studio</span></p>
+    <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:28px;">
+      <h1 style="font-family:Georgia,serif;font-size:22px;color:#0F172A;margin:0 0 8px;">Your Sofrito Session is tomorrow, {{lead.name}}</h1>
+      <p style="font-size:15px;line-height:1.6;color:#334155;margin:0 0 8px;"><strong>{{booking.scheduled_label}}</strong></p>
+      <p style="font-size:14px;color:#64748B;margin:0 0 20px;">Timezone: {{booking.timezone}} · 45 minutes</p>
+      <p style="font-size:15px;line-height:1.6;color:#334155;margin:0 0 18px;">We will use the session to review your brand direction, website, menu, audience, and competition. These notes will help us keep the conversation specific.</p>
+      <ul style="font-size:15px;line-height:1.7;color:#334155;margin:0 0 22px;padding-left:20px;">
+        <li>Bring your current menu, logo, website, or brand materials.</li>
+        <li>Choose three competitors you admire and one you do not.</li>
+        <li>Have your key customer questions and next business decision ready.</li>
+        <li>Allow the full 45 minutes.</li>
+      </ul>
+      <p style="font-size:15px;line-height:1.6;color:#334155;margin:0 0 18px;">If you need a different time, use the link below.</p>
+      <a href="{{booking.reschedule_url}}" style="display:inline-block;background:#EA580C;color:#FFFFFF;text-decoration:none;font-size:15px;font-weight:600;padding:12px 22px;border-radius:8px;">{{booking.reschedule_label}}</a>
+      <p style="font-size:14px;line-height:1.6;color:#64748B;margin:20px 0 0;">If anything changes, reply to this email or write to hello@sofritostudio.com.</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -20,15 +20,62 @@
 //   POST /api/calendly-webhook     -> booking ledger + mirror lead (verifies signature)
 //
 // Queue consumers:
-//   EMAIL_QUEUE     {kind:'email', ...}  -> Resend send + emails_sent log
+//   EMAIL_QUEUE     {kind:'email', ...}  -> Resend send + delivery tracking
 //   WEBHOOK_QUEUE   {topic, payload}     -> external webhook fire-and-forget (Zapier)
 //
 // Scheduled (hourly cron "0 * * * *"):
-//   lead drip (day 2/5/9), 24h owner reminder (day 1), day-1 and day-30
-//   post-delivery check-ins (won leads), Monday 13:00 UTC weekly digest.
+//   lead nurture, session reminders and follow-ups, checkout recovery,
+//   owner reminders, and the Monday 17:00 UTC weekly digest.
 // ============================================================
 
 import { timingSafeEqual } from 'node:crypto';
+import abandonedNudge from './emails/abandoned-nudge.html';
+import abandonedNudge2 from './emails/abandoned-nudge-2.html';
+import bookingCancelNotify from './emails/booking-cancel-notify.html';
+import bookingLink from './emails/booking-link.html';
+import bookingNotify from './emails/booking-notify.html';
+import followUpDay1 from './emails/follow-up-day1.html';
+import followUpDay30 from './emails/follow-up-day30.html';
+import followUpLeadReminder from './emails/follow-up-lead-reminder.html';
+import formConfirm from './emails/form-confirm.html';
+import invoicePaidNotify from './emails/invoice-paid-notify.html';
+import invoiceTriggerNotify from './emails/invoice-trigger-notify.html';
+import leadWon from './emails/lead-won.html';
+import leadAcknowledgement from './emails/lead_acknowledgement.html';
+import newLeadNotify from './emails/new-lead-notify.html';
+import onboardingPack from './emails/onboarding-pack.html';
+import receipt from './emails/receipt.html';
+import referralInvite from './emails/referral-invite.html';
+import revenueNotify from './emails/revenue-notify.html';
+import sessionReminder from './emails/session-reminder.html';
+import welcome1 from './emails/welcome-1.html';
+import welcome2 from './emails/welcome-2.html';
+import welcome3 from './emails/welcome-3.html';
+
+const REPO_EMAIL_TEMPLATES = Object.freeze({
+  'abandoned-nudge.html': abandonedNudge,
+  'abandoned-nudge-2.html': abandonedNudge2,
+  'booking-cancel-notify.html': bookingCancelNotify,
+  'booking-link.html': bookingLink,
+  'booking-notify.html': bookingNotify,
+  'follow-up-day1.html': followUpDay1,
+  'follow-up-day30.html': followUpDay30,
+  'follow-up-lead-reminder.html': followUpLeadReminder,
+  'form-confirm.html': formConfirm,
+  'invoice-paid-notify.html': invoicePaidNotify,
+  'invoice-trigger-notify.html': invoiceTriggerNotify,
+  'lead-won.html': leadWon,
+  'lead_acknowledgement.html': leadAcknowledgement,
+  'new-lead-notify.html': newLeadNotify,
+  'onboarding-pack.html': onboardingPack,
+  'receipt.html': receipt,
+  'referral-invite.html': referralInvite,
+  'revenue-notify.html': revenueNotify,
+  'session-reminder.html': sessionReminder,
+  'welcome-1.html': welcome1,
+  'welcome-2.html': welcome2,
+  'welcome-3.html': welcome3,
+});
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -80,8 +127,38 @@ const substitute = (html, data = {}) =>
     return v != null ? String(v) : '';
   });
 
+const escapeHtml = (value) =>
+  String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[char]);
+
 const uuid = () => crypto.randomUUID();
 const nowIso = () => new Date().toISOString();
+const nowEpoch = () => Math.floor(Date.now() / 1000);
+
+async function verifyTurnstile(env, token) {
+  if (!token) return false;
+  const secret = env.TURNSTILE_SECRET_KEY;
+  if (!secret) return false;
+  try {
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ secret, response: token }),
+    });
+    const data = await res.json();
+    return !!data.success;
+  } catch {
+    return false;
+  }
+}
+
+const BUSINESS_TYPES = ['food_truck', 'restaurant', 'cpg', 'other'];
+const CHANNELS = ['sprint_page', 'boh_sprint_page', 'sprint_boh', 'api', 'calendly', 'google_my_business', 'social', 'referral', 'other'];
 
 // ------------------------------------------------------------
 // Legacy retail redirects (shelved 2026-09-05)
@@ -93,8 +170,10 @@ const nowIso = () => new Date().toISOString();
 const LEGACY_REDIRECTS = [
   { match: (p) => p.startsWith('/privacy'), to: '/privacy.html' },
   { match: (p) => p.startsWith('/terms'), to: '/terms.html' },
-  { match: (p) => p.startsWith('/blog/'), to: '/blog/index.html' },
-  { match: (p) => p.startsWith('/posts/'), to: '/blog/index.html' },
+  { match: (p) => p.startsWith('/services'), to: '/' },
+  { match: (p) => p.startsWith('/pricing'), to: '/' },
+  { match: (p) => p.startsWith('/blog/'), to: '/' },
+  { match: (p) => p.startsWith('/posts/'), to: '/' },
 ];
 
 function legacyRedirectFor(pathname) {
@@ -140,15 +219,73 @@ const PACKAGE_FALLBACK = {
 // ------------------------------------------------------------
 // Queue helpers
 // ------------------------------------------------------------
+async function trackEmailQueued(env, job) {
+  const tracked = {
+    ...job,
+    emails_sent_id: uuid(),
+    email_log_id: uuid(),
+  };
+  const metadata = JSON.stringify({
+    ...(job.metadata || {}),
+    ...(job.lead_id ? { lead_id: job.lead_id } : {}),
+  });
+  const templateName = job.template || job.log_type || 'direct-email';
+  const logType = job.log_type || job.template || 'direct_email';
+
+  try {
+    await env.DB.batch([
+      env.DB.prepare(
+        `INSERT OR IGNORE INTO emails_sent (id, created_at, to_email, template, subject, status, metadata)
+         VALUES (?, ?, ?, ?, ?, 'queued', ?)`
+      )
+        .bind(tracked.emails_sent_id, nowIso(), job.to, templateName, job.subject, metadata),
+      env.DB.prepare(
+        `INSERT OR IGNORE INTO email_log (id, created_at, lead_id, type, status)
+         VALUES (?, ?, ?, ?, 'queued')`
+      )
+        .bind(tracked.email_log_id, nowIso(), job.log_lead_id || job.lead_id || 'system', logType),
+    ]);
+  } catch (e) {
+    console.error('email tracking insert failed', logType, e.message);
+  }
+
+  return tracked;
+}
+
+async function updateEmailTracking(env, job, result, providerId = null) {
+  const status = result.ok ? 'sent' : 'failed';
+  const error = result.ok ? null : String(result.error || `resend_${result.status || 0}`).slice(0, 500);
+  try {
+    const updates = [];
+    if (job.emails_sent_id) {
+      updates.push(
+        env.DB.prepare(
+          `UPDATE emails_sent SET status = ?, provider_id = ? WHERE id = ?`
+        )
+          .bind(status, providerId, job.emails_sent_id)
+      );
+    }
+    if (job.email_log_id) {
+      updates.push(
+        env.DB.prepare(
+          `UPDATE email_log SET status = ?, provider_id = ?, error = ? WHERE id = ?`
+        )
+          .bind(status, providerId, error, job.email_log_id)
+      );
+    }
+    if (updates.length) await env.DB.batch(updates);
+  } catch (e) {
+    console.error('email tracking update failed', job.log_type || job.template || 'direct_email', e.message);
+  }
+}
+
 async function enqueueEmail(env, job) {
-  await env.EMAIL_QUEUE.send(job);
-  if (job.template && job.lead_id) {
-    await env.DB.prepare(
-      `INSERT INTO emails_sent (id, created_at, to_email, template, subject, status, metadata)
-       VALUES (?, ?, ?, ?, ?, 'queued', ?)`
-    )
-      .bind(uuid(), nowIso(), job.to, job.template, job.subject, JSON.stringify({ lead_id: job.lead_id }))
-      .run();
+  const tracked = await trackEmailQueued(env, job);
+  try {
+    await env.EMAIL_QUEUE.send(tracked);
+  } catch (e) {
+    await updateEmailTracking(env, tracked, { ok: false, error: `queue: ${e.message}` });
+    throw e;
   }
 }
 
@@ -216,21 +353,26 @@ async function sendResend(env, { to, subject, html }) {
 }
 
 async function processEmailMessage(env, job) {
-  const htmlRaw = await env.CONFIG.get(`templates/emails/${job.template}`);
-  const html = substitute(htmlRaw || `<p>${job.subject}</p>`, { ...job.data, siteUrl: env.SITE_URL || '' });
-  const result = await sendResend(env, { to: job.to, subject: job.subject, html });
-  let providerId = null;
-  if (result.ok) {
-    try {
-      providerId = JSON.parse(result.body).id || null;
-    } catch {
-      providerId = null;
+  let result = null;
+  try {
+    const kvOverride = await env.CONFIG.get(`templates/emails/${job.template}`);
+    const htmlRaw = kvOverride || REPO_EMAIL_TEMPLATES[job.template];
+    const html = substitute(htmlRaw || `<p>${escapeHtml(job.subject)}</p>`, { ...job.data, siteUrl: env.SITE_URL || '' });
+    result = await sendResend(env, { to: job.to, subject: job.subject, html });
+    let providerId = null;
+    if (result.ok) {
+      try {
+        providerId = JSON.parse(result.body).id || null;
+      } catch {
+        providerId = null;
+      }
     }
+    await updateEmailTracking(env, job, result, providerId);
+    if (!result.ok) throw new Error(`resend ${result.status}`);
+  } catch (e) {
+    if (!result) await updateEmailTracking(env, job, { ok: false, error: e.message });
+    throw e;
   }
-  await env.DB.prepare(`UPDATE emails_sent SET status = ?, provider_id = ? WHERE template = ? AND metadata = ?`)
-    .bind(result.ok ? 'sent' : 'failed', providerId, job.template, JSON.stringify({ lead_id: job.lead_id }))
-    .run();
-  if (!result.ok) throw new Error(`resend ${result.status}`);
 }
 
 async function processWebhookMessage(env, job) {
@@ -285,6 +427,206 @@ async function handleSiteConfig(env) {
   const raw = await env.CONFIG.get('site/config');
   const cfg = raw ? { ...fallback, ...JSON.parse(raw) } : fallback;
   return json({ ok: true, ...cfg });
+}
+
+// ------------------------------------------------------------
+// POST /api/lead — inbound lead capture (Zapier → Google Sheets)
+// ------------------------------------------------------------
+async function createStripeCheckoutSession(env, siteUrl, lead) {
+  const stripeKey = env.STRIPE_API_KEY;
+  if (!stripeKey) return null;
+  const checkoutRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${stripeKey}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      mode: 'payment',
+      'line_items[0][price_data][currency]': 'usd',
+      'line_items[0][price_data][product_data][name]': 'Sofrito Session',
+      'line_items[0][price_data][product_data][description]': '45-minute brand strategy session; credited in full toward the $997 Sprint when booked within 30 days',
+      'line_items[0][price_data][unit_amount]': (await env.CONFIG.get('SESSION_PRICE_CENTS')) || '40000',
+      'line_items[0][quantity]': '1',
+      success_url: `${siteUrl}/success.html?session_id={CHECKOUT_SESSION_ID}&name=${encodeURIComponent(lead.name)}&email=${encodeURIComponent(lead.email)}`,
+      cancel_url: `${siteUrl}/cancelled.html`,
+      'metadata[lead_id]': lead.id,
+    }),
+  });
+  if (!checkoutRes.ok) {
+    console.error('stripe checkout create failed', checkoutRes.status);
+    return null;
+  }
+  const session = await checkoutRes.json();
+  return { id: session.id, url: session.url, expires_at: session.expires_at };
+}
+
+async function getStripeCheckoutSession(env, sessionId) {
+  if (!sessionId || !env.STRIPE_API_KEY) return null;
+  const response = await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`, {
+    headers: { Authorization: `Bearer ${env.STRIPE_API_KEY}` },
+  });
+  if (response.status === 404) return { missing: true };
+  if (!response.ok) {
+    console.error('stripe checkout retrieve failed', response.status);
+    return { unavailable: true };
+  }
+  return response.json();
+}
+
+async function ensureFreshCheckoutUrl(env, lead) {
+  const existing = await getStripeCheckoutSession(env, lead.stripe_session_id);
+  if (existing?.unavailable || existing?.status === 'complete') return null;
+  const expiresAt = Number(existing?.expires_at || 0);
+  const hasFreshUrl = existing?.status === 'open' && existing?.url && expiresAt > nowEpoch() + 1800;
+  if (hasFreshUrl) {
+    if (existing.url !== lead.checkout_url) {
+      await env.DB.prepare(`UPDATE leads SET checkout_url = ? WHERE id = ?`).bind(existing.url, lead.id).run();
+    }
+    return existing.url;
+  }
+  if (existing && !existing.missing && existing.status !== 'open' && existing.status !== 'expired') return null;
+  const fresh = await createStripeCheckoutSession(env, env.SITE_URL || 'https://sofritostudio.com', lead);
+  if (!fresh?.id || !fresh?.url) return null;
+  const update = await env.DB.prepare(
+    `UPDATE leads SET stripe_session_id = ?, checkout_url = ? WHERE id = ? AND paid_at IS NULL`
+  )
+    .bind(fresh.id, fresh.url, lead.id)
+    .run();
+  if (!update.meta?.changes) return null;
+  return fresh.url;
+}
+
+async function handleApiLead(request, env, ctx) {
+  let body;
+  try {
+    body = await readJson(request);
+  } catch {
+    return fail('Please send valid JSON.', 400);
+  }
+  const email = String(body.email || '').trim().toLowerCase();
+  const name = String(body.name || '').trim();
+  const phone = String(body.phone || '').trim();
+  const business_type = String(body.business_type || '').trim();
+  const channel = String(body.channel || 'api').trim();
+  const turnstileToken = String(body.turnstile_token || body['cf-turnstile-response'] || '').trim();
+
+  // Turnstile verification
+  const turnstileOk = await verifyTurnstile(env, turnstileToken);
+  if (!turnstileOk) return fail('Turnstile verification failed.', 422);
+
+  // Strict validation
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !name) {
+    return fail('Please include a valid email and your name.', 422);
+  }
+  if (phone && phone.replace(/\D/g, '').length < 7) {
+    return fail('Please include a valid phone number.', 422);
+  }
+  if (business_type && !BUSINESS_TYPES.includes(business_type)) {
+    return fail('Invalid business type.', 422);
+  }
+  if (channel && !CHANNELS.includes(channel)) {
+    return fail('Invalid channel.', 422);
+  }
+
+  // Rate limit: 10/min per IP
+  const ip = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'unknown';
+  const ipRlKey = `rl:ip:${ip}`;
+  const ipCount = parseInt(await env.CONFIG.get(ipRlKey) || '0', 10);
+  if (ipCount >= 10) return fail('You just submitted. Check your inbox.', 429);
+  ctx.waitUntil(env.CONFIG.put(ipRlKey, String(ipCount + 1), { expirationTtl: 60 }));
+
+  // Idempotency: same email within 15 minutes, status new or checkout_started → return existing lead
+  const existing = await env.DB.prepare(
+    `SELECT id, created_at, checkout_url FROM leads WHERE email = ? AND created_at >= datetime('now', '-15 minutes') AND (status = 'new' OR status = 'checkout_started') LIMIT 1`
+  )
+    .bind(email)
+    .first();
+  if (existing && existing.checkout_url) {
+    return json({ ok: true, id: existing.id, created_at: existing.created_at, checkout_url: existing.checkout_url }, 201);
+  }
+
+  // Deterministic id from the email → re-posts never create duplicates.
+  const id = `lead_${(await sha256Hex(email)).slice(0, 24)}`;
+  const now = nowEpoch();
+
+  const lead = {
+    id,
+    created_at: nowIso(),
+    name,
+    email,
+    phone,
+    business_name: String(body.business_name || '').trim(),
+    business_type,
+    package_interest: String(body.package_interest || '').trim(),
+    budget: String(body.budget || '').trim(),
+    message: String(body.message || '').trim(),
+    channel,
+  };
+
+  await env.DB.prepare(
+    `INSERT OR IGNORE INTO leads (id, created_at, name, email, phone, business_name, business_type, package_interest, budget, message, channel, status, source, checkout_started_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'checkout_started', 'lead_api', ?)`
+  )
+    .bind(id, lead.created_at, lead.name, lead.email, lead.phone, lead.business_name, lead.business_type, lead.package_interest, lead.budget, lead.message, lead.channel, now)
+    .run();
+
+  const siteUrl = env.SITE_URL || new URL(request.url).origin;
+  const checkout = await createStripeCheckoutSession(env, siteUrl, lead);
+  const checkoutUrl = checkout?.url || null;
+  if (checkout) {
+    await env.DB.prepare(
+      `UPDATE leads SET stripe_session_id = ?, checkout_url = ? WHERE id = ?`
+    )
+      .bind(checkout.id, checkout.url, lead.id)
+      .run();
+  }
+
+  const checkoutStatusText = checkoutUrl
+    ? 'Your secure checkout is ready below.'
+    : 'We could not create checkout automatically, so there is no payment link in this message.';
+  const checkoutAction = checkoutUrl
+    ? `<a href="${escapeHtml(checkoutUrl)}" style="display:inline-block;background:#EA580C;color:#FFFFFF;text-decoration:none;font-size:15px;font-weight:600;padding:12px 22px;border-radius:8px;">Book Your Sofrito Session</a>`
+    : '<p style="font-size:14px;color:#64748B;margin:0;">Please return to the form and submit again, or reply so we can help.</p>';
+  const ownerLead = { ...lead, score: 0, source: 'lead_api' };
+
+  ctx.waitUntil(
+    enqueueWebhook(env, 'lead.new', {
+      id: lead.id,
+      created_at: lead.created_at,
+      name: lead.name,
+      email: lead.email,
+      phone: lead.phone,
+      business_name: lead.business_name,
+      business_type: lead.business_type,
+      package_interest: lead.package_interest,
+      budget: lead.budget,
+      message: lead.message,
+      channel: lead.channel,
+    })
+  );
+  ctx.waitUntil(
+    Promise.all([
+      enqueueEmail(env, {
+        kind: 'email',
+        to: lead.email,
+        template: 'lead_acknowledgement.html',
+        subject: 'Thanks for reaching out - Sofrito Studio',
+        data: { name: lead.name, checkout_status_text: checkoutStatusText, checkout_action: checkoutAction },
+        lead_id: lead.id,
+      }),
+      enqueueEmail(env, {
+        kind: 'email',
+        to: env.NOTIFICATION_EMAIL || '',
+        template: 'new-lead-notify.html',
+        subject: `New lead received: ${lead.name}`,
+        data: { lead: ownerLead, siteUrl: env.SITE_URL || '' },
+        lead_id: lead.id,
+      }),
+    ])
+  );
+
+  return json({ ok: true, id: lead.id, created_at: lead.created_at, checkout_url: checkoutUrl }, 201);
 }
 
 async function handleContact(request, env, ctx) {
@@ -461,7 +803,7 @@ async function handleLeads(request, env, url) {
   return json({ ok: true, leads: res.results });
 }
 
-async function handleLeadUpdate(request, env, url) {
+async function handleLeadUpdate(request, env, ctx, url) {
   const id = url.pathname.split('/').pop();
   let body;
   try {
@@ -469,6 +811,8 @@ async function handleLeadUpdate(request, env, url) {
   } catch {
     return fail('Please send valid JSON.', 400);
   }
+  const previousLead = await env.DB.prepare(`SELECT * FROM leads WHERE id = ?`).bind(id).first();
+  if (!previousLead) return fail('lead not found', 404);
   const fields = [];
   const binds = [];
   if (body.status) {
@@ -485,21 +829,44 @@ async function handleLeadUpdate(request, env, url) {
   binds.push(id);
   await env.DB.prepare(`UPDATE leads SET ${fields.join(', ')} WHERE id = ?`).bind(...binds).run();
 
-  // Closing a deal seeds the pipeline: auto-create the project.
+  const becameWon = body.status === 'won' && previousLead.status !== 'won';
   if (body.status === 'won' || body.status === 'complete') {
-    const lead = await env.DB.prepare(`SELECT * FROM leads WHERE id = ?`).bind(id).first();
-    if (lead) {
-      const pkg = lead.package_interest
-        ? await env.CONFIG.get(`packages/${lead.package_interest}`).then((r) => (r ? JSON.parse(r) : null))
-        : null;
-      await env.DB.prepare(
-        `INSERT INTO projects (id, created_at, lead_id, name, package_name, price_cents, status)
-         VALUES (?, ?, ?, ?, ?, ?, 'active')`
-      )
-        .bind(uuid(), nowIso(), id, lead.business_name || lead.name, lead.package_interest, pkg ? pkg.price_cents : 0)
-        .run();
-    }
+    const pkg = previousLead.package_interest
+      ? await env.CONFIG.get(`packages/${previousLead.package_interest}`).then((r) => (r ? JSON.parse(r) : null))
+      : null;
+    await env.DB.prepare(
+      `INSERT INTO projects (id, created_at, lead_id, name, package_name, price_cents, status)
+       SELECT ?, ?, ?, ?, ?, ?, 'active'
+       WHERE NOT EXISTS (SELECT 1 FROM projects WHERE lead_id = ?)`
+    )
+      .bind(uuid(), nowIso(), id, previousLead.business_name || previousLead.name, previousLead.package_interest, pkg ? pkg.price_cents : 0, id)
+      .run();
   }
+
+  if (becameWon) {
+    const lead = { ...previousLead, status: 'won', updated_at: nowIso() };
+    ctx.waitUntil(
+      Promise.all([
+        enqueueEmail(env, {
+          kind: 'email',
+          to: env.NOTIFICATION_EMAIL || '',
+          template: 'lead-won.html',
+          subject: `New client confirmed: ${lead.business_name || lead.name}`,
+          data: { lead, source: lead.source || 'crm', siteUrl: env.SITE_URL || '' },
+          lead_id: lead.id,
+        }),
+        enqueueEmail(env, {
+          kind: 'email',
+          to: lead.email,
+          template: 'onboarding-pack.html',
+          subject: 'Welcome aboard — Sofrito Studio',
+          data: { lead, siteUrl: env.SITE_URL || '' },
+          lead_id: lead.id,
+        }),
+      ])
+    );
+  }
+
   return json({ ok: true });
 }
 
@@ -705,7 +1072,7 @@ async function handleInvoiceTrigger(request, env, ctx) {
 // ------------------------------------------------------------
 // Webhooks (idempotent revenue logging)
 // ------------------------------------------------------------
-async function insertRevenue(env, ctx, row) {
+async function insertRevenue(env, ctx, row, lead = null) {
   try {
     await env.DB.prepare(
       `INSERT INTO revenue (id, created_at, occurred_at, source, source_id, project_id, amount_cents, currency, description, metadata, paid)
@@ -713,13 +1080,23 @@ async function insertRevenue(env, ctx, row) {
     )
       .bind(uuid(), nowIso(), row.occurred_at, row.source, row.source_id, row.project_id || null, row.amount_cents, row.currency || 'usd', row.description || null, row.metadata ? JSON.stringify(row.metadata) : null, row.paid === false ? 0 : 1)
       .run();
+    const paidAt = new Date(row.occurred_at).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     ctx.waitUntil(
       enqueueEmail(env, {
         kind: 'email',
         to: env.NOTIFICATION_EMAIL || '',
         template: 'revenue-notify.html',
-        subject: `Payment logged: $${(row.amount_cents / 100).toFixed(2)}`,
-        data: { amount: (row.amount_cents / 100).toFixed(2), source: row.source, description: row.description || '', lead_id: row.project_id || '' },
+        subject: `Payment logged: $${(row.amount_cents / 100).toFixed(2)}${lead?.name ? ` — ${lead.name}` : ''}`,
+        data: {
+          amount: (row.amount_cents / 100).toFixed(2),
+          source: row.source,
+          description: row.description || '',
+          lead_id: row.project_id || '',
+          name: lead?.name || '',
+          email: lead?.email || '',
+          paid_at: paidAt,
+          session_id: row.session_id || '',
+        },
         lead_id: 'revenue',
       })
     );
@@ -728,6 +1105,37 @@ async function insertRevenue(env, ctx, row) {
     if (String(e.message).includes('UNIQUE')) return false;
     throw e;
   }
+}
+
+async function handleCheckoutExpired(env, ctx, event) {
+  const sessionId = String(event?.data?.object?.id || '');
+  if (!sessionId) return false;
+  const nudgeAt = nowEpoch();
+  const result = await env.DB.prepare(
+    `UPDATE leads
+     SET status = 'abandoned', nudge_sent_at = ?
+     WHERE stripe_session_id = ? AND nudge_sent_at IS NULL AND paid_at IS NULL AND checkout_url IS NOT NULL`
+  )
+    .bind(nudgeAt, sessionId)
+    .run();
+  if (!result.meta?.changes) return false;
+  const lead = await env.DB.prepare(
+    `SELECT id, name, email, checkout_url FROM leads WHERE stripe_session_id = ? LIMIT 1`
+  )
+    .bind(sessionId)
+    .first();
+  if (!lead) return false;
+  ctx.waitUntil(
+    enqueueEmail(env, {
+      kind: 'email',
+      to: lead.email,
+      template: 'abandoned-nudge.html',
+      subject: 'Your Sofrito Session — still interested?',
+      data: { lead_id: lead.id, name: lead.name, checkout_url: lead.checkout_url },
+      lead_id: lead.id,
+    })
+  );
+  return true;
 }
 
 async function handleStripeWebhook(request, env, ctx) {
@@ -743,6 +1151,9 @@ async function handleStripeWebhook(request, env, ctx) {
   if (!safeEqual(expected, v1)) return fail('invalid signature', 401);
 
   const event = JSON.parse(raw);
+  if (event.type === 'checkout.session.expired') {
+    return json({ ok: true, handled: await handleCheckoutExpired(env, ctx, event) });
+  }
   let amountCents = 0;
   let description = event.type;
   let stripeInvoiceId = null;
@@ -760,16 +1171,63 @@ async function handleStripeWebhook(request, env, ctx) {
   }
   if (!amountCents) return json({ ok: true, handled: false });
 
+  // Lead payment state from checkout sessions — lookup first so we can pass details to the notification email.
+  let leadData = null;
+  if (event.type.startsWith('checkout.session.completed')) {
+    const sessionId = event.data.object.id;
+    const leadRow = await env.DB.prepare(
+      `SELECT id FROM leads WHERE stripe_session_id = ? AND status != 'paid' LIMIT 1`
+    )
+      .bind(sessionId)
+      .first();
+    if (leadRow) {
+      const paidAt = nowEpoch();
+      await env.DB.prepare(
+        `UPDATE leads SET status = 'paid', paid_at = ? WHERE stripe_session_id = ?`
+      )
+        .bind(paidAt, sessionId)
+        .run();
+      leadData = await env.DB.prepare(
+        `SELECT id, name, email FROM leads WHERE stripe_session_id = ? LIMIT 1`
+      )
+        .bind(sessionId)
+        .first();
+    }
+  }
+
   const inserted = await insertRevenue(env, ctx, {
     occurred_at: new Date(event.created * 1000).toISOString(),
     source: 'stripe',
     source_id: event.id,
+    session_id: event.type.startsWith('checkout.session.completed') ? event.data.object.id : '',
     amount_cents: amountCents,
     currency: event.data.object.currency,
     description,
     metadata: { event_type: event.type },
     paid: amountCents >= 0,
-  });
+  }, leadData);
+
+  if (leadData) {
+    const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    ctx.waitUntil(Promise.all([
+      enqueueEmail(env, {
+        kind: 'email',
+        to: leadData.email,
+        template: 'receipt.html',
+        subject: 'Your Sofrito Session receipt',
+        data: { lead_id: leadData.id, lead: leadData, date },
+        lead_id: leadData.id,
+      }),
+      enqueueEmail(env, {
+        kind: 'email',
+        to: leadData.email,
+        template: 'booking-link.html',
+        subject: 'Book your Sofrito Session',
+        data: { lead_id: leadData.id, lead: leadData },
+        lead_id: leadData.id,
+      }),
+    ]));
+  }
 
   // S14: close the invoice ledger on payment. Match by our own
   // metadata.invoice_id first, then by the Stripe invoice id.
@@ -878,10 +1336,16 @@ async function handleCalendlyWebhook(request, env, ctx) {
     return json({ ok: true, handled: false, reason: `unhandled:${kind}` });
   }
 
-  const evUri = calendlyField(payload.event, ['uri']);
+  const scheduledEvent = payload.scheduled_event && typeof payload.scheduled_event === 'object'
+    ? payload.scheduled_event
+    : typeof payload.scheduled_event === 'string'
+      ? { uri: payload.scheduled_event }
+      : {};
+  const evUri = calendlyField(payload.event, ['uri']) || calendlyField(scheduledEvent, ['uri']);
   const buildingUuid =
     calendlyBookingUuid(evUri) ||
     calendlyBookingUuid(calendlyField(payload.invitee, ['uri', 'scheduled_event'])) ||
+    calendlyBookingUuid(calendlyField(scheduledEvent, ['uri'])) ||
     calendlyBookingUuid(calendlyField(payload, ['uri']));
   if (!buildingUuid) return json({ ok: true, handled: false, reason: 'no booking uuid' });
 
@@ -890,9 +1354,17 @@ async function handleCalendlyWebhook(request, env, ctx) {
 }
 
 async function handleCalendlyCreated(env, ctx, payload, bookingUuid) {
-  const invitee = payload.invitee || {};
-  const event = payload.event || {};
-  const questions = Array.isArray(invitee.questions_and_answers) ? invitee.questions_and_answers : [];
+  const nestedInvitee = payload.invitee && typeof payload.invitee === 'object' ? payload.invitee : {};
+  const nestedEvent = payload.event && typeof payload.event === 'object' ? payload.event : {};
+  const scheduledEvent = payload.scheduled_event && typeof payload.scheduled_event === 'object'
+    ? payload.scheduled_event
+    : typeof payload.scheduled_event === 'string'
+      ? { uri: payload.scheduled_event }
+      : {};
+  const invitee = { ...payload, ...nestedInvitee };
+  const event = Object.keys(nestedEvent).length ? nestedEvent : scheduledEvent;
+  const rawQuestions = invitee.questions_and_answers || payload.questions_and_answers;
+  const questions = Array.isArray(rawQuestions) ? rawQuestions : [];
   const answers = questions
     .filter((qa) => qa && qa.answer != null && String(qa.answer).trim())
     .map((qa) => ({ q: String(qa.question || '').trim(), a: String(qa.answer).trim() }));
@@ -910,8 +1382,8 @@ async function handleCalendlyCreated(env, ctx, payload, bookingUuid) {
     return json({ ok: true, handled: false, reason: 'incomplete invitee' });
   }
 
-  const scheduledFor = event.start_time || calendlyField(invitee, ['scheduled_event']);
-  const timezone = calendlyField(invitee, ['timezone']) || calendlyField(event, ['timezone']);
+  const scheduledFor = event.start_time || calendlyField(payload, ['scheduled_for', 'start_time']) || calendlyField(invitee, ['scheduled_for', 'start_time']);
+  const timezone = calendlyField(invitee, ['timezone']) || calendlyField(event, ['timezone']) || calendlyField(payload, ['timezone']);
 
   const now = nowIso();
   const lead = {
@@ -924,7 +1396,7 @@ async function handleCalendlyCreated(env, ctx, payload, bookingUuid) {
     business_type: 'session',
     package_interest: 'session',
     budget: '$400',
-    message: `Booked a 90-min Sofrito Session via Calendly${scheduledFor ? ` for ${scheduledFor}` : ''}. Booking ${bookingUuid}.`,
+    message: `Booked a 45-minute Sofrito Session via Calendly${scheduledFor ? ` for ${scheduledFor}` : ''}. Booking ${bookingUuid}.`,
     source: 'calendly_booking',
     channel: 'calendly',
     score: 0,
@@ -938,31 +1410,46 @@ async function handleCalendlyCreated(env, ctx, payload, bookingUuid) {
     invitee_name: name,
     scheduled_for: scheduledFor || null,
     timezone: timezone || null,
-    event_name: calendlyField(event, ['name']) || 'Sofrito Session',
+    event_name: calendlyField(event, ['name']) || calendlyField(payload, ['event_name']) || 'Sofrito Session',
     answers: answers.length ? JSON.stringify(answers) : null,
+    reschedule_url: calendlyField(payload, ['reschedule_url']) || calendlyField(invitee, ['reschedule_url']),
+    cancel_url: calendlyField(payload, ['cancel_url']) || calendlyField(invitee, ['cancel_url']),
   };
 
   // D1 batch is a transaction: the lead insert is keyed to NOT EXISTS so a
   // retry race can never mint a second lead for the same booking.
-  await env.DB.batch([
-    env.DB.prepare(
-      `INSERT INTO calendly_bookings (id, created_at, booking_uuid, invitee_email, invitee_name, scheduled_for, timezone, event_name, answers, lead_id, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')
-       ON CONFLICT(booking_uuid) DO NOTHING`
-    ).bind(uuid(), now, booking.booking_uuid, booking.invitee_email, booking.invitee_name, booking.scheduled_for, booking.timezone, booking.event_name, booking.answers, lead.id),
+  const batchResults = await env.DB.batch([
     env.DB.prepare(
       `INSERT INTO leads (id, created_at, name, email, phone, business_name, business_type, package_interest, budget, message, channel, score, status, source)
        SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'calendly', ?, 'contacted', 'calendly_booking'
        WHERE NOT EXISTS (SELECT 1 FROM calendly_bookings WHERE booking_uuid = ?)`
     ).bind(lead.id, now, lead.name, lead.email, lead.phone, lead.business_name, lead.business_type, lead.package_interest, lead.budget, lead.message, lead.score, bookingUuid),
+    env.DB.prepare(
+      `INSERT INTO calendly_bookings (id, created_at, booking_uuid, invitee_email, invitee_name, scheduled_for, timezone, event_name, answers, reschedule_url, cancel_url, lead_id, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')
+       ON CONFLICT(booking_uuid) DO NOTHING`
+    ).bind(uuid(), now, booking.booking_uuid, booking.invitee_email, booking.invitee_name, booking.scheduled_for, booking.timezone, booking.event_name, booking.answers, booking.reschedule_url, booking.cancel_url, lead.id),
   ]);
+  const bookingCreated = batchResults[1]?.meta?.changes === 1;
 
   const saved = await env.DB.prepare(
-    `SELECT id, lead_id FROM calendly_bookings WHERE booking_uuid = ?`
+    `SELECT id, lead_id, reschedule_url, cancel_url FROM calendly_bookings WHERE booking_uuid = ?`
   )
     .bind(bookingUuid)
     .first();
   if (!saved) return json({ ok: true, handled: false, reason: 'no booking row' });
+  if (booking.reschedule_url || booking.cancel_url) {
+    await env.DB.prepare(
+      `UPDATE calendly_bookings
+       SET reschedule_url = COALESCE(NULLIF(?, ''), reschedule_url),
+           cancel_url = COALESCE(NULLIF(?, ''), cancel_url),
+           updated_at = COALESCE(updated_at, ?)
+       WHERE booking_uuid = ?`
+    )
+      .bind(booking.reschedule_url, booking.cancel_url, now, bookingUuid)
+      .run();
+  }
+  if (!bookingCreated) return json({ ok: true, handled: false, reason: 'booking already processed' });
 
   const flat = {
     event: 'booking.new',
@@ -1021,8 +1508,13 @@ async function handleCalendlyCanceled(env, ctx, payload, bookingUuid) {
     `canceled by ${calendlyField(cancellation, ['canceler_name', 'canceler_type'])}`.trim() ||
     '';
 
-  await env.DB.prepare(`UPDATE calendly_bookings SET status = 'cancelled', updated_at = ?, cancelled_at = ? WHERE booking_uuid = ?`)
-    .bind(now, now, bookingUuid)
+  await env.DB.prepare(
+    `UPDATE calendly_bookings
+     SET status = 'cancelled', updated_at = ?, cancelled_at = ?,
+         cancel_url = COALESCE(NULLIF(?, ''), cancel_url)
+     WHERE booking_uuid = ?`
+  )
+    .bind(now, now, calendlyField(payload, ['cancel_url']), bookingUuid)
     .run();
   if (booking.lead_id) {
     await env.DB.prepare(`UPDATE leads SET status = 'cancelled', updated_at = ? WHERE id = ?`)
@@ -1086,26 +1578,259 @@ const DRIP_PLAN = [
 
 const daySince = (iso) => Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
 
+function formatSessionDate(value, timezone, options = {}) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  try {
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone || 'UTC',
+      ...options,
+    }).format(date);
+  } catch {
+    return new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', ...options }).format(date);
+  }
+}
+
+function bookingLead(booking) {
+  return {
+    id: booking.lead_id || `booking-${booking.booking_uuid}`,
+    name: booking.lead_name || booking.invitee_name || 'there',
+    email: booking.lead_email || booking.invitee_email,
+    phone: booking.phone || '',
+    business_name: booking.business_name || booking.invitee_name || '',
+    business_type: booking.business_type || 'session',
+    package_interest: booking.package_interest || 'session',
+    budget: booking.budget || '$400',
+  };
+}
+
 async function sentAlready(env, template, leadId) {
   const row = await env.DB.prepare(
-    `SELECT 1 FROM emails_sent WHERE template = ? AND json_extract(metadata, '$.lead_id') = ? AND status = 'sent' LIMIT 1`
+    `SELECT 1 FROM emails_sent WHERE template = ? AND json_extract(metadata, '$.lead_id') = ? AND status IN ('queued','sent') LIMIT 1`
   )
     .bind(template, leadId)
     .first();
   return !!row;
 }
 
+async function emailRecordedByEvent(env, template, eventId) {
+  const row = await env.DB.prepare(
+    `SELECT 1 FROM emails_sent WHERE template = ? AND json_extract(metadata, '$.event_id') = ? AND status IN ('queued','sent') LIMIT 1`
+  )
+    .bind(template, eventId)
+    .first();
+  return !!row;
+}
+
+async function handleCheckoutSafetyNet(env, ctx) {
+  const threshold = nowEpoch() - 7200;
+  const leads = await env.DB.prepare(
+    `SELECT id, email, name, checkout_url FROM leads
+     WHERE status = 'checkout_started' AND checkout_started_at < ? AND nudge_sent_at IS NULL`
+  )
+    .bind(threshold)
+    .all();
+  if (!leads.results?.length) return;
+  for (const lead of leads.results) {
+    const nudgeAt = nowEpoch();
+    const result = await env.DB.prepare(
+      `UPDATE leads SET nudge_sent_at = ?, status = 'abandoned'
+       WHERE id = ? AND status = 'checkout_started' AND nudge_sent_at IS NULL AND paid_at IS NULL AND checkout_url IS NOT NULL`
+    )
+      .bind(nudgeAt, lead.id)
+      .run();
+    if (!result.meta?.changes) continue;
+    await enqueueEmail(env, {
+      kind: 'email',
+      to: lead.email,
+      template: 'abandoned-nudge.html',
+      subject: 'Your Sofrito Session — still interested?',
+      data: { lead_id: lead.id, name: lead.name, checkout_url: lead.checkout_url },
+      lead_id: lead.id,
+    });
+  }
+}
+
+async function handleSecondCheckoutNudge(env) {
+  const threshold = nowEpoch() - 86400;
+  const leads = await env.DB.prepare(
+    `SELECT id, email, name, stripe_session_id, checkout_url FROM leads
+     WHERE checkout_started_at < ? AND nudge_sent_at IS NOT NULL AND paid_at IS NULL
+     ORDER BY checkout_started_at ASC LIMIT 200`
+  )
+    .bind(threshold)
+    .all();
+  for (const lead of leads.results || []) {
+    if (await sentAlready(env, 'abandoned-nudge-2.html', lead.id)) continue;
+    let checkoutUrl = null;
+    try {
+      checkoutUrl = await ensureFreshCheckoutUrl(env, lead);
+    } catch (e) {
+      console.error('second nudge checkout recovery failed', lead.id, e.message);
+    }
+    if (!checkoutUrl) continue;
+    const deadline = formatSessionDate(new Date(Date.now() + 86400000).toISOString(), 'UTC', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      timeZoneName: 'short',
+    });
+    await enqueueEmail(env, {
+      kind: 'email',
+      to: lead.email,
+      template: 'abandoned-nudge-2.html',
+      subject: 'Your Sofrito Session is still here',
+      data: { lead_id: lead.id, name: lead.name, checkout_url: checkoutUrl, deadline },
+      lead_id: lead.id,
+    });
+  }
+}
+
+async function runSessionAutomations(env) {
+  const reminderQuery = `SELECT b.*, l.name AS lead_name, l.email AS lead_email, l.phone, l.business_name, l.business_type, l.package_interest, l.budget
+    FROM calendly_bookings b
+    LEFT JOIN leads l ON l.id = b.lead_id
+    WHERE b.status = 'active' AND b.scheduled_for IS NOT NULL
+      AND julianday(b.scheduled_for) BETWEEN julianday('now', '+20 hours') AND julianday('now', '+28 hours')
+    ORDER BY b.scheduled_for ASC`;
+  const reminders = await env.DB.prepare(reminderQuery).all();
+  for (const booking of reminders.results || []) {
+    if (await emailRecordedByEvent(env, 'session-reminder.html', booking.booking_uuid)) continue;
+    const lead = bookingLead(booking);
+    const scheduledLabel = formatSessionDate(booking.scheduled_for, booking.timezone, {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      timeZoneName: 'short',
+    });
+    const subjectDate = formatSessionDate(booking.scheduled_for, booking.timezone, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+    const rescheduleUrl = booking.reschedule_url ||
+      `mailto:hello@sofritostudio.com?subject=${encodeURIComponent(`Change my Sofrito Session — ${subjectDate}`)}`;
+    const rescheduleLabel = booking.reschedule_url
+      ? 'Review or reschedule your Sofrito Session'
+      : 'Contact us to change your Sofrito Session time';
+    await enqueueEmail(env, {
+      kind: 'email',
+      to: lead.email,
+      template: 'session-reminder.html',
+      subject: `Tomorrow: your Sofrito Session — ${subjectDate}`,
+      data: {
+        lead,
+        booking: {
+          scheduled_label: scheduledLabel,
+          timezone: booking.timezone || 'UTC',
+          reschedule_url: rescheduleUrl,
+          reschedule_label: rescheduleLabel,
+        },
+      },
+      lead_id: lead.id,
+      metadata: { booking_id: booking.id, booking_uuid: booking.booking_uuid, event_id: booking.booking_uuid },
+    });
+  }
+
+  const day1Query = `SELECT b.*, l.name AS lead_name, l.email AS lead_email, l.phone, l.business_name, l.business_type, l.package_interest, l.budget
+    FROM calendly_bookings b
+    LEFT JOIN leads l ON l.id = b.lead_id
+    WHERE b.status = 'active' AND b.scheduled_for IS NOT NULL
+      AND julianday(b.scheduled_for) <= julianday('now', '-1 hour')
+      AND julianday(b.scheduled_for) >= julianday('now', '-48 hours')
+    ORDER BY b.scheduled_for ASC`;
+  const day1Bookings = await env.DB.prepare(day1Query).all();
+  for (const booking of day1Bookings.results || []) {
+    const lead = bookingLead(booking);
+    if (
+      (await emailRecordedByEvent(env, 'follow-up-day1.html', booking.booking_uuid)) ||
+      (await sentAlready(env, 'follow-up-day1.html', lead.id))
+    ) continue;
+    await enqueueEmail(env, {
+      kind: 'email',
+      to: lead.email,
+      template: 'follow-up-day1.html',
+      subject: 'Thank you for your Sofrito Session',
+      data: { lead, siteUrl: env.SITE_URL || '' },
+      lead_id: lead.id,
+      metadata: { booking_id: booking.id, booking_uuid: booking.booking_uuid, event_id: booking.booking_uuid },
+    });
+  }
+
+  const day30Query = `SELECT b.*, l.name AS lead_name, l.email AS lead_email, l.phone, l.business_name, l.business_type, l.package_interest, l.budget
+    FROM calendly_bookings b
+    LEFT JOIN leads l ON l.id = b.lead_id
+    WHERE b.status = 'active' AND b.scheduled_for IS NOT NULL
+      AND julianday(b.scheduled_for) <= julianday('now', '-30 days')
+      AND julianday(b.scheduled_for) >= julianday('now', '-31 days')
+    ORDER BY b.scheduled_for ASC`;
+  const day30Bookings = await env.DB.prepare(day30Query).all();
+  for (const booking of day30Bookings.results || []) {
+    const lead = bookingLead(booking);
+    if (
+      (await emailRecordedByEvent(env, 'follow-up-day30.html', booking.booking_uuid)) ||
+      (await sentAlready(env, 'follow-up-day30.html', lead.id))
+    ) continue;
+    await enqueueEmail(env, {
+      kind: 'email',
+      to: lead.email,
+      template: 'follow-up-day30.html',
+      subject: 'Thirty days after your Sofrito Session',
+      data: { lead, siteUrl: env.SITE_URL || '' },
+      lead_id: lead.id,
+      metadata: { booking_id: booking.id, booking_uuid: booking.booking_uuid, event_id: booking.booking_uuid },
+    });
+  }
+}
+
+async function runWonLeadFallbacks(env) {
+  const fallback = await env.DB.prepare(
+    `SELECT l.* FROM leads l
+     WHERE l.status = 'won' AND NOT EXISTS (SELECT 1 FROM calendly_bookings b WHERE b.lead_id = l.id)
+     ORDER BY l.updated_at ASC LIMIT 200`
+  ).all();
+  for (const lead of fallback.results || []) {
+    const sinceClose = daySince(lead.updated_at);
+    if (sinceClose >= 1 && !(await sentAlready(env, 'follow-up-day1.html', lead.id))) {
+      await enqueueEmail(env, {
+        kind: 'email',
+        to: lead.email,
+        template: 'follow-up-day1.html',
+        subject: 'Thank you for your Sofrito Session',
+        data: { lead, siteUrl: env.SITE_URL || '' },
+        lead_id: lead.id,
+      });
+    }
+    if (sinceClose >= 30 && !(await sentAlready(env, 'follow-up-day30.html', lead.id))) {
+      await enqueueEmail(env, {
+        kind: 'email',
+        to: lead.email,
+        template: 'follow-up-day30.html',
+        subject: 'Thirty days after your Sofrito Session',
+        data: { lead, siteUrl: env.SITE_URL || '' },
+        lead_id: lead.id,
+      });
+    }
+  }
+}
+
 async function runLeadAutomations(env) {
   const warm = await env.DB.prepare(
-    `SELECT id, created_at, name, email, business_name, updated_at, status FROM leads
-     WHERE status IN ('new','contacted','qualified','won') ORDER BY created_at ASC LIMIT 200`
+    `SELECT id, created_at, name, email, phone, business_name, business_type, package_interest, budget, message, channel, score, source, updated_at, status
+     FROM leads
+     WHERE status IN ('new','contacted','qualified','checkout_started','abandoned','won')
+       AND paid_at IS NULL AND unsubscribed_at IS NULL
+     ORDER BY created_at ASC LIMIT 200`
   ).all();
-  const nowIsoStr = nowIso();
 
   for (const lead of warm.results) {
     const day = daySince(lead.created_at);
 
-    // Drip: day 2 / 5 / 9
     for (const step of DRIP_PLAN) {
       if (day >= step.day && !(await sentAlready(env, step.template, lead.id))) {
         await enqueueEmail(env, {
@@ -1119,7 +1844,6 @@ async function runLeadAutomations(env) {
       }
     }
 
-    // 24h owner reminder (S5) — still 'new' and untouched
     if (lead.status === 'new' && day >= 1 && !(await sentAlready(env, 'follow-up-lead-reminder.html', lead.id))) {
       await enqueueEmail(env, {
         kind: 'email',
@@ -1132,60 +1856,144 @@ async function runLeadAutomations(env) {
       await enqueueWebhook(env, 'lead.reminder', lead);
     }
 
-    // Post-delivery check-in (day 1, status won, from updated_at) and day-30 ask
-    if (lead.status === 'won') {
-      const sinceClose = daySince(lead.updated_at);
-      if (sinceClose === 1 && !(await sentAlready(env, 'follow-up-day1.html', lead.id))) {
-        await enqueueEmail(env, {
-          kind: 'email',
-          to: lead.email,
-          template: 'follow-up-day1.html',
-          subject: "How's it pouring? / ¿Cómo va servido?",
-          data: { lead, siteUrl: env.SITE_URL || '' },
-          lead_id: lead.id,
-        });
-      }
-      if (sinceClose === 30 && !(await sentAlready(env, 'follow-up-day30.html', lead.id))) {
-        await enqueueEmail(env, {
-          kind: 'email',
-          to: lead.email,
-          template: 'follow-up-day30.html',
-          subject: "You at the table / Tú en la mesa",
-          data: { lead, siteUrl: env.SITE_URL || '' },
-          lead_id: lead.id,
-        });
-      }
+    if (
+      lead.status === 'won' &&
+      daySince(lead.updated_at) >= 7 &&
+      !(await sentAlready(env, 'referral-invite.html', lead.id))
+    ) {
+      await enqueueEmail(env, {
+        kind: 'email',
+        to: lead.email,
+        template: 'referral-invite.html',
+        subject: 'Your referral invitation',
+        data: {
+          lead,
+          referral_reward: 'For every referral who completes a Brand & Web Sprint, we send you $100. No limit.',
+          siteUrl: env.SITE_URL || '',
+        },
+        lead_id: lead.id,
+      });
     }
   }
-  void nowIsoStr;
+
+  await runWonLeadFallbacks(env);
 }
 
 async function weeklyDigest(env) {
-  const pipe = await env.DB.prepare(`SELECT * FROM v_pipeline`).first();
-  const top = await env.DB.prepare(`SELECT page_url, views FROM v_top_content`).all();
-  const newLeads = await env.DB.prepare(
-    `SELECT COUNT(*) AS n FROM leads WHERE created_at >= datetime('now','-7 days')`
+  const day24h = await env.DB.prepare(
+    `SELECT COUNT(*) AS n FROM leads WHERE created_at >= datetime('now','-24 hours')`
+  ).first();
+  const checkouts24h = await env.DB.prepare(
+    `SELECT COUNT(*) AS n FROM leads WHERE checkout_started_at >= unixepoch() - 86400`
+  ).first();
+  const paid24h = await env.DB.prepare(
+    `SELECT COUNT(*) AS n FROM leads WHERE paid_at >= unixepoch() - 86400`
+  ).first();
+  const rev24h = await env.DB.prepare(
+    `SELECT COALESCE(SUM(amount_cents),0) AS total FROM revenue WHERE occurred_at >= datetime('now','-24 hours') AND paid = 1`
+  ).first();
+  const abandoned = await env.DB.prepare(
+    `SELECT COUNT(*) AS n FROM leads WHERE checkout_started_at IS NOT NULL AND paid_at IS NULL AND checkout_started_at < unixepoch() - 7200`
+  ).first();
+  const mtdRev = await env.DB.prepare(
+    `SELECT COALESCE(SUM(amount_cents),0) AS total FROM revenue WHERE strftime('%Y-%m', occurred_at) = strftime('%Y-%m','now') AND paid = 1`
+  ).first();
+  const mtdOrders = await env.DB.prepare(
+    `SELECT COUNT(*) AS n FROM revenue WHERE strftime('%Y-%m', occurred_at) = strftime('%Y-%m','now') AND paid = 1`
   ).first();
   const html = [
-    '<div style="font-family:Arial,Helvetica,sans-serif;color:#0F172A;max-width:600px;margin:0 auto">',
-    '<h1 style="font-size:20px">Sofrito Studio — this week</h1>',
-    `<p><strong>New leads (7d):</strong> ${newLeads.n}</p>`,
-    `<p><strong>Open leads:</strong> ${pipe.open_leads}</p>`,
-    `<p><strong>Active projects:</strong> ${pipe.active_projects}</p>`,
-    `<p><strong>Revenue MTD:</strong> $${Number(pipe.revenue_mtd_dollars || 0).toFixed(2)}</p>`,
-    `<p><strong>Revenue (30d):</strong> $${Number(pipe.revenue_30d_dollars || 0).toFixed(2)}</p>`,
-    '<h2 style="font-size:16px">Top pages (7d)</h2><ul>',
-    ...top.results.map((t) => `<li>${t.page_url || '(home)'} — ${t.views}</li>`),
-    '</ul>',
+    '<div style="font-family:Arial,Helvetica,sans-serif;color:#0F172A;max-width:600px;margin:0 auto;padding:24px;">',
+    '<h1 style="font-size:20px">Sofrito Studio — pipeline digest</h1>',
+    `<p><strong>New leads (24h):</strong> ${day24h.n || 0}</p>`,
+    `<p><strong>Checkouts started (24h):</strong> ${checkouts24h.n || 0}</p>`,
+    `<p><strong>Payments completed (24h):</strong> ${paid24h.n || 0}</p>`,
+    `<p><strong>Revenue collected (24h):</strong> $${((rev24h.total || 0) / 100).toFixed(2)}</p>`,
+    `<p><strong>Abandoned checkouts:</strong> ${abandoned.n || 0}</p>`,
+    `<p><strong>MTD revenue:</strong> $${((mtdRev.total || 0) / 100).toFixed(2)}</p>`,
+    `<p><strong>MTD orders:</strong> ${mtdOrders.n || 0}</p>`,
     '<p><a href="https://dash.cloudflare.com" style="color:#EA580C">Open Cloudflare</a> to dig in.</p>',
     '</div>',
   ].join('');
-  const res = await sendResend(env, {
+  const job = await trackEmailQueued(env, {
+    kind: 'email',
     to: env.NOTIFICATION_EMAIL || '',
-    subject: 'Sofrito Studio weekly digest',
+    template: 'pipeline-digest.html',
+    log_type: 'pipeline_digest',
+    log_lead_id: 'system',
+    subject: 'Sofrito Studio — pipeline digest',
     html,
   });
+  let res = null;
+  try {
+    res = await sendResend(env, {
+      to: job.to,
+      subject: job.subject,
+      html,
+    });
+    let providerId = null;
+    if (res.ok) {
+      try {
+        providerId = JSON.parse(res.body).id || null;
+      } catch {
+        providerId = null;
+      }
+    }
+    await updateEmailTracking(env, job, res, providerId);
+    if (!res.ok) throw new Error(`resend ${res.status}`);
+  } catch (e) {
+    if (!res) await updateEmailTracking(env, job, { ok: false, error: e.message });
+    throw e;
+  }
   console.log('digest', res.status);
+}
+
+async function handleFlowGenerate(request, env) {
+  const backendUrl = env.BACKEND_URL;
+  if (!backendUrl) return json({ ok: false, error: 'backend not configured' }, 500);
+  const body = await request.text();
+  try {
+    const res = await fetch(`${backendUrl}/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    });
+    const data = await res.json();
+    return json(data, res.status);
+  } catch (e) {
+    return json({ ok: false, error: `backend unreachable: ${e.message}` }, 502);
+  }
+}
+
+const AB_CACHE_TTL_SECONDS = 60 * 60 * 24 * 30;
+const abCacheKey = (visitorId) => `ab:${visitorId}`;
+
+async function getAbCache(env, visitorId) {
+  try {
+    return await env.CONFIG.get(abCacheKey(visitorId));
+  } catch (e) {
+    console.error('ab cache read failed', e.message);
+    return null;
+  }
+}
+
+async function putAbCache(env, visitorId, variantLabel) {
+  try {
+    await env.CONFIG.put(abCacheKey(visitorId), variantLabel, { expirationTtl: AB_CACHE_TTL_SECONDS });
+    return true;
+  } catch (e) {
+    console.error('ab cache write failed', e.message);
+    return false;
+  }
+}
+
+async function abTestTerminated(env) {
+  try {
+    const flag = await env.CONFIG.get('ab_test_terminated');
+    return !!flag && flag !== '0';
+  } catch (e) {
+    console.error('ab termination flag read failed', e.message);
+    return false;
+  }
 }
 
 // ------------------------------------------------------------
@@ -1193,6 +2001,14 @@ async function weeklyDigest(env) {
 // ------------------------------------------------------------
 export default {
   async fetch(request, env, ctx) {
+    // CSP violation reports: browsers POST a JSON body here. Drain the body
+    // before responding — leaving it unread crashes `wrangler dev` locally
+    // ("Can't read from request stream after response has been sent").
+    if (new URL(request.url).pathname === '/csp-report') {
+      try { await request.text(); } catch {}
+      return new Response(null, { status: 204 });
+    }
+
     const url = new URL(request.url);
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
 
@@ -1204,6 +2020,7 @@ export default {
         if (p === '/api/packages' && request.method === 'GET') return handlePackages(env);
         if (p === '/api/config' && request.method === 'GET') return handleSiteConfig(env);
         if (p === '/api/contact' && request.method === 'POST') return handleContact(request, env, ctx);
+        if (p === '/api/lead' && request.method === 'POST') return handleApiLead(request, env, ctx);
         if (p === '/api/newsletter' && request.method === 'POST') return handleNewsletter(request, env, ctx);
         if ((p === '/api/events' || p === '/api/analytics') && request.method === 'POST')
           return handleEvent(request, env, ctx);
@@ -1224,7 +2041,7 @@ export default {
         if (p.startsWith('/api/leads/') && request.method === 'PATCH') {
           const g = adm();
           if (g) return g;
-          return handleLeadUpdate(request, env, url);
+          return handleLeadUpdate(request, env, ctx, url);
         }
         if (p === '/api/revenue' && request.method === 'GET') {
           const g = adm();
@@ -1242,6 +2059,8 @@ export default {
           return handleInvoiceTrigger(request, env, ctx);
         }
 
+        if (p === '/api/flow/generate' && request.method === 'POST') return handleFlowGenerate(request, env);
+
         if (p === '/api/stripe-webhook' && request.method === 'POST')
           return handleStripeWebhook(request, env, ctx);
 
@@ -1257,17 +2076,120 @@ export default {
     // html_handling = "none" means the platform serves exact files only, so map
     // the extensionless root and bare directory names to their .html files here
     // (mirrors every canonical tag + sitemap entry).
+        // ------------------------------------------------------------
+    // A/B split test for the landing page (entity='page')
+    // ------------------------------------------------------------
     const assetUrl = new URL(request.url);
-    if ((request.method === 'GET' || request.method === 'HEAD') && assetUrl.pathname === '/') {
-      const req = new Request(assetUrl.origin + '/index.html', request);
-      return env.ASSETS.fetch(req);
-    }
-    if ((request.method === 'GET' || request.method === 'HEAD') && assetUrl.pathname === '/sprint') {
-      const req = new Request(assetUrl.origin + '/sprint.html', request);
-      return env.ASSETS.fetch(req);
-    }
+    const pathname = assetUrl.pathname;
 
-    // Legacy retail redirects that the _redirects engine can't express (its globs
+    // Only apply the test to GET/HEAD on the root or the extensionless /sprint path
+    if ((request.method === "GET" || request.method === "HEAD") &&
+        (pathname === "/" || pathname === "/sprint")) {
+
+      // ----- 1. Read existing cookies -----
+      const cookieHeader = request.headers.get('Cookie') || '';
+      const cookies = Object.fromEntries(
+        cookieHeader.split('; ')
+          .map(c => c.trim())
+          .filter(c => c)
+          .map(c => {
+            const [k, v] = c.split('=');
+            return [k, decodeURIComponent(v)];
+          })
+      );
+
+      let variantLabel = cookies['sofrito_ab_page'];
+      let visitorId = cookies['sofrito_ab_vid'];
+
+      // ----- 2. If no variant yet, decide and set cookies -----
+      const terminated = await abTestTerminated(env);
+      if (terminated) {
+        variantLabel = null;
+      } else if (!variantLabel) {
+        if (!visitorId) visitorId = crypto.randomUUID();
+        variantLabel = await getAbCache(env, visitorId);
+        if (!variantLabel) {
+          try {
+            const testRow = await env.DB.prepare(
+              "SELECT id FROM ab_tests WHERE entity = 'page' AND status = 'running' LIMIT 1"
+            ).first();
+
+            if (testRow) {
+              const testId = testRow.id;
+              const existingAssignment = await env.DB.prepare(
+                `SELECT v.label
+                 FROM ab_assignments a
+                 JOIN ab_variants v ON v.id = a.variant_id
+                 WHERE a.test_id = ? AND a.subject_id = ?
+                 ORDER BY a.created_at DESC
+                 LIMIT 1`
+              )
+                .bind(testId, visitorId)
+                .first();
+
+              if (existingAssignment) {
+                variantLabel = existingAssignment.label;
+              } else {
+                const variants = await env.DB.prepare(
+                  "SELECT id, label, weight FROM ab_variants WHERE test_id = ? ORDER BY id"
+                ).bind(testId).all();
+
+                const totalWeight = variants.results.reduce((sum, v) => sum + v.weight, 0);
+                let r = Math.random() * totalWeight;
+                let chosen = null;
+                for (const v of variants.results) {
+                  if (r < v.weight) {
+                    chosen = v;
+                    break;
+                  }
+                  r -= v.weight;
+                }
+                if (!chosen && variants.results.length) chosen = variants.results[variants.results.length - 1];
+
+                if (chosen) {
+                  const period = new Date().toISOString().slice(0, 10);
+                  await env.DB.prepare(
+                    "INSERT INTO ab_assignments (id, test_id, subject_id, variant_id, period, assignment_type) VALUES (?, ?, ?, ?, ?, 'random_roll')"
+                  )
+                    .bind(crypto.randomUUID(), testId, visitorId, chosen.id, period)
+                    .run();
+                  variantLabel = chosen.label;
+                }
+              }
+
+              if (variantLabel) await putAbCache(env, visitorId, variantLabel);
+            }
+          } catch (e) {
+            variantLabel = null;
+            console.error('ab test lookup failed, serving default', e.message);
+          }
+        }
+      }
+
+      // ----- 5. Serve the appropriate asset -----
+      // Sprint page is now always the long-form version
+      const servePath = '/sprint.html';
+      const assetReq = new Request(assetUrl.origin + servePath, request);
+
+      let res = await env.ASSETS.fetch(assetReq);
+
+      // If we decided to set cookies, inject them into the response
+      if (visitorId && variantLabel) {
+        const visitorCookie = `sofrito_ab_vid=${encodeURIComponent(visitorId)}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+        const variantCookie = `sofrito_ab_page=${encodeURIComponent(variantLabel)}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+        const newHeaders = new Headers(res.headers);
+        newHeaders.append('Set-Cookie', visitorCookie);
+        newHeaders.append('Set-Cookie', variantCookie);
+        res = new Response(res.body, {
+          status: res.status,
+          statusText: res.statusText,
+          headers: newHeaders
+        });
+      }
+
+      return res;
+    }
+// Legacy retail redirects that the _redirects engine can't express (its globs
     // hit real files). Probe ASSETS first: if the path is an actual file, serve
     // it; only redirect the paths that genuinely 404.
     if (request.method === 'GET' || request.method === 'HEAD') {
@@ -1298,15 +2220,51 @@ export default {
   },
 
   async scheduled(controller, env, ctx) {
+    // ── A/B test termination (one-time) ──
+    const alreadyTerminated = await env.CONFIG.get('ab_test_terminated');
+    if (!alreadyTerminated) {
+      try {
+        await env.DB.prepare(
+          "UPDATE ab_tests SET status = 'completed', winner_variant = 'control' WHERE entity = 'page' AND status = 'running'"
+        ).run();
+        await env.CONFIG.put('ab_test_terminated', '1');
+      } catch (e) {
+        console.error('ab test termination failed', e.message);
+      }
+    }
+
     const now = new Date();
     const utcDay = now.getUTCDay();
     const utcHour = now.getUTCHours();
+
+    // ── Lead and booking automations ──
     try {
       await runLeadAutomations(env);
     } catch (e) {
       console.error('lead automation failed', e.message);
     }
-    if (utcDay === 1 && utcHour === 13) {
+
+    try {
+      await runSessionAutomations(env);
+    } catch (e) {
+      console.error('session automation failed', e.message);
+    }
+
+    // ── Checkout safety net ──
+    try {
+      await handleCheckoutSafetyNet(env, ctx);
+    } catch (e) {
+      console.error('checkout safety net failed', e.message);
+    }
+
+    try {
+      await handleSecondCheckoutNudge(env);
+    } catch (e) {
+      console.error('second checkout nudge failed', e.message);
+    }
+
+    // ── Weekly digest (Monday 17:00 UTC) ──
+    if (utcDay === 1 && utcHour === 17) {
       try {
         await weeklyDigest(env);
       } catch (e) {

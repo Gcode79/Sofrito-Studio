@@ -9,6 +9,7 @@
 # Secrets — never commit
 .dev.vars
 config/.env
+.env
 
 # Wrangler local state
 .wrangler/

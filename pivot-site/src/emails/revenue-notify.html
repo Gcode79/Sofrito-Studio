@@ -6,11 +6,15 @@
     <p style="font-family:Georgia,serif;font-size:20px;color:#0F172A;margin:0 0 20px;">Sofrito<span style="color:#EA580C;">Studio</span></p>
     <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:28px;">
       <h1 style="font-family:Georgia,serif;font-size:21px;color:#0F172A;margin:0 0 8px;">Payment logged</h1>
-      <p style="font-size:15px;color:#334155;margin:0 0 16px;">A payment was recorded automatically via {{source}}.</p>
+      <p style="font-size:15px;color:#334155;margin:0 0 16px;">A payment was recorded automatically via Stripe.</p>
       <table style="width:100%;font-size:15px;color:#334155;border-collapse:collapse;">
-        <tr><td style="padding:6px 0;color:#94A3B8;width:38%;">Amount</td><td style="padding:6px 0;"><strong style="font-size:20px;color:#0F172A;">${{amount}}</strong></td></tr>
-        <tr><td style="padding:6px 0;color:#94A3B8;">Description</td><td style="padding:6px 0;">{{description}}</td></tr>
+        <tr><td style="padding:6px 0;color:#94A3B8;width:38%;">Customer</td><td style="padding:6px 0;"><strong style="font-size:15px;color:#0F172A;">{{name}}</strong></td></tr>
+        <tr><td style="padding:6px 0;color:#94A3B8;">Email</td><td style="padding:6px 0;">{{email}}</td></tr>
+        <tr><td style="padding:6px 0;color:#94A3B8;">Amount</td><td style="padding:6px 0;"><strong style="font-size:20px;color:#0F172A;">${{amount}}</strong></td></tr>
+        <tr><td style="padding:6px 0;color:#94A3B8;">Date / time paid</td><td style="padding:6px 0;">{{paid_at}}</td></tr>
+        <tr><td style="padding:6px 0;color:#94A3B8;">Stripe session ID</td><td style="padding:6px 0;word-break:break-all;">{{session_id}}</td></tr>
         <tr><td style="padding:6px 0;color:#94A3B8;">Source</td><td style="padding:6px 0;">{{source}}</td></tr>
+        <tr><td style="padding:6px 0;color:#94A3B8;">Description</td><td style="padding:6px 0;">{{description}}</td></tr>
       </table>
       <p style="font-size:13px;color:#64748B;margin:16px 0 0;">This is a system notice from your Sofrito Studio pipeline — no reply needed.</p>
     </div>

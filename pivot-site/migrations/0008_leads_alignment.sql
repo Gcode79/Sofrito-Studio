@@ -1,0 +1,21 @@
+-- ============================================================
+-- Migration 0008 — schema.sql alignment (applied 2026-09-20)
+-- Adds columns/indexes to `leads` that exist in schema.sql
+-- (the canonical source of truth) but were missing from the
+-- live D1 after incremental migrations 0001-0007.
+--
+-- Note: 0006_growth_engine.sql and 0007_hosting_addon.sql
+--   were applied ad-hoc (columns added directly to D1) but
+--   never recorded in d1_migrations. They are marked here.
+--
+-- D1 limitations applied:
+--   - updated_at uses plain TEXT (no non-constant default)
+--     because D1 ALTER TABLE does not support them
+--   - No IF NOT EXISTS — all ALTERs assumed columns were absent
+--
+-- Apply: npx wrangler d1 migrations apply sofrito-db --remote
+-- ============================================================
+-- NOTE: All columns and indexes in this migration already exist
+-- in the live D1 (added via 0001_initial.sql, 0006_growth_engine.sql,
+-- and 0007_hosting_addon.sql). This migration is a no-op —
+-- statements retained for documentation only.

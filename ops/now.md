@@ -45,4 +45,4 @@
   - KV config namespace `087850adfcab4ecf86a6987e32cc4cb2`.
   - Live worker `40c50672-...`, account `b10d2ee39fa75abc3de1799de8903ebc`.
   - Wrangler: always `-c wrangler.toml` from `pivot-site/`; `npm run check` + `wrangler deploy --dry-run` before any deploy.
-  - Local commits exist but are NOT pushed; safety copy at `SofritoStudio-Legacy/`.
+  - Local commits exist but are NOT pushed.

@@ -21,6 +21,12 @@ name = "sofrito-studio"
 main = "src/worker.js"
 compatibility_date = "2026-08-25"
 compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+[[rules]]
+type = "Text"
+globs = ["src/emails/*.html"]
+fallthrough = true
 
 # Serve the static site (public/) from this Worker. run_worker_first = true so
 # /api/* routes and edge logic intercept before the asset lookup. html_handling
@@ -37,6 +43,9 @@ html_handling = "none"
 [[routes]]
 pattern = "sofritostudio.com"
 custom_domain = true
+enabled = true
+previews_enabled = false
+
 
 # --- D1: source of truth for ALL business data ---
 [[d1_databases]]
@@ -80,8 +89,7 @@ RESEND_FROM_NAME = "Sofrito Studio"
 NOTIFICATION_EMAIL = "j.ortiz1148@gmail.com"
 BUTTONDOWN_EMAIL = "hello@sofritostudio.com"
 
-# Hourly tick drives the lead drip (day 2/5/9), 24h owner reminder,
-# day-14 check-in, day-30 testimonial ask, and the Monday digest
-# (gated by UTC day/hour inside the scheduled handler).
+# Hourly tick drives lead nurture, session reminders and follow-ups,
+# checkout recovery, owner reminders, and the Monday 17:00 UTC digest.
 [triggers]
 crons = ["0 * * * *"]

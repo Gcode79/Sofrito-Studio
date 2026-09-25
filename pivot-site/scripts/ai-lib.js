@@ -33,19 +33,23 @@ Rules (never break these):
 - Never pitch in the first message; give the reader one useful thing.
 - Format plain text with simple markdown (## for subheads, - for bullets). No emojis unless asked for explicitly.`;
 
-export async function askOpenRouter({ model, system = VOICE_SYSTEM, prompt, temperature = 0.7, maxTokens = 1200 }) {
+export async function askOpenRouter({ model, system = VOICE_SYSTEM, prompt, temperature = 0.7, maxTokens = 2048 }) {
   const key = process.env.OPENROUTER_API_KEY;
   if (!key) {
     throw new Error('OPENROUTER_API_KEY not set. Copy .env.example to .env (or export it) and add your key.');
   }
   const body = {
-    model: model || process.env.OPENROUTER_MODEL || 'openai/gpt-4o-mini',
+    model: model || process.env.OPENROUTER_MODEL || 'inclusionai/ling-3.0-flash-vl:free',
     messages: [
       { role: 'system', content: system },
       { role: 'user', content: prompt },
     ],
     temperature,
-    max_tokens: maxTokens,
+    // Floor the budget at 2048 so a short caller value can never truncate a
+    // long-form answer mid-flight (the "GPT-OSS 120B stops mid-sentence" bug).
+    max_tokens: Math.max(maxTokens, 2048),
+    // Disable all implicit stop strings — the model stops only when it's done.
+    stop: [],
   };
   const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
@@ -61,6 +65,59 @@ export async function askOpenRouter({ model, system = VOICE_SYSTEM, prompt, temp
   }
   const data = await res.json();
   return data.choices[0].message.content;
+}
+
+// ------------------------------------------------------------
+// Hugging Face hosted Inference API (offline-friendly fallback).
+// Same guards as askOpenRouter: floor the token budget and clear
+// implicit stop strings so long-form answers never get cut mid-flight.
+// Requires env: HF_TOKEN
+// ------------------------------------------------------------
+export async function askHuggingFace({ system = VOICE_SYSTEM, prompt, temperature = 0.4, maxTokens = 2048 }) {
+  const key = process.env.HF_TOKEN;
+  if (!key) {
+    throw new Error('HF_TOKEN not set. Copy .env.example to .env (or export it) and add your token.');
+  }
+  const body = {
+    inputs: prompt,
+    parameters: {
+      max_new_tokens: Math.max(maxTokens, 2048),
+      stop: [],
+      temperature,
+      return_full_text: false,
+    },
+  };
+  const res = await fetch(
+    `https://api-inference.huggingface.co/models/${process.env.HF_MODEL || 'google/flan-t5-xl'}`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }
+  );
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`HuggingFace ${res.status}: ${t.slice(0, 300)}`);
+  }
+  const data = await res.json();
+  // HF returns either an array of { generated_text } or { error }.
+  return Array.isArray(data) && data[0]?.generated_text ? data[0].generated_text : '';
+}
+
+// ------------------------------------------------------------
+// Primary-first fallback: use OpenRouter when a key is set, otherwise
+// (or if it throws) drop to the Hugging Face Inference API. Lets every
+// script share one entry point without per-script conditional logic.
+// ------------------------------------------------------------
+export async function askSmart(args) {
+  if (process.env.OPENROUTER_API_KEY) {
+    try {
+      return await askOpenRouter(args);
+    } catch (openErr) {
+      console.warn(`[ai-lib] OpenRouter failed (${openErr.message}), falling back to HF…`);
+    }
+  }
+  return askHuggingFace(args);
 }
 
 export function slugify(str) {

@@ -1,19 +1,19 @@
 <!doctype html>
 <html>
-<head><meta charset="utf-8"><title>You just won a client / Cierre logrado</title></head>
+<head><meta charset="utf-8"><title>New client confirmed</title></head>
 <body style="margin:0;background:#F9FAFB;font-family:Arial,Helvetica,sans-serif;color:#0F172A;">
   <div style="max-width:600px;margin:0 auto;padding:24px;">
     <p style="font-family:Georgia,serif;font-size:20px;color:#0F172A;margin:0 0 20px;">Sofrito<span style="color:#EA580C;">Studio</span></p>
     <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:28px;">
-      <div style="background:#16A34A;border-radius:8px;padding:12px 16px;color:#FFFFFF;font-size:14px;font-weight:600;margin-bottom:16px;">Closed / Cerrado — ${{amount}}</div>
-      <h1 style="font-family:Georgia,serif;font-size:21px;color:#0F172A;margin:0 0 8px;">{{lead.business_name}} is on the table</h1>
-      <p style="font-size:15px;line-height:1.6;color:#334155;margin:0 0 16px;">A new client locked in. Log it, schedule the kickoff, and update the dashboard status to "won". / Nuevo cliente asegurado. Anótalo, agenda el arranque y marca el estado como "won".</p>
+      <div style="background:#16A34A;border-radius:8px;padding:12px 16px;color:#FFFFFF;font-size:14px;font-weight:600;margin-bottom:16px;">New client confirmed</div>
+      <h1 style="font-family:Georgia,serif;font-size:21px;color:#0F172A;margin:0 0 8px;">{{lead.business_name}} is ready to begin</h1>
+      <p style="font-size:15px;line-height:1.6;color:#334155;margin:0 0 16px;">We have confirmed the engagement. The next step is to make sure the customer has the session details and preparation materials they need.</p>
       <table style="width:100%;font-size:14px;color:#334155;border-collapse:collapse;">
         <tr><td style="padding:6px 0;color:#94A3B8;width:38%;">Client</td><td style="padding:6px 0;">{{lead.business_name}} · {{lead.package_interest}}</td></tr>
         <tr><td style="padding:6px 0;color:#94A3B8;">Contact</td><td style="padding:6px 0;"><a href="mailto:{{lead.email}}" style="color:#EA580C;">{{lead.email}}</a> · {{lead.phone}}</td></tr>
         <tr><td style="padding:6px 0;color:#94A3B8;">Source</td><td style="padding:6px 0;">{{source}}</td></tr>
       </table>
-      <a href="{{siteUrl}}/work.html" style="display:inline-block;margin-top:20px;background:#EA580C;color:#FFFFFF;text-decoration:none;font-size:15px;font-weight:600;padding:12px 22px;border-radius:8px;">Kickoff checklist</a>
+      <p style="font-size:13px;color:#64748B;margin:18px 0 0;">The customer has been sent a welcome email with the next steps.</p>
     </div>
   </div>
 </body>

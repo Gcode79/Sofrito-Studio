@@ -10,6 +10,7 @@
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS leads (
+  -- Core (schema.sql canonical)
   id             TEXT PRIMARY KEY,
   created_at     TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
   name           TEXT NOT NULL,
@@ -19,22 +20,43 @@ CREATE TABLE IF NOT EXISTS leads (
   business_type  TEXT,
   package_interest TEXT,
   budget         TEXT,
-  stage          TEXT,
-  timeline       TEXT,
-  city           TEXT,
-  decision       TEXT,
+  stage          TEXT,                               -- added migration 0002
+  timeline       TEXT,                               -- added migration 0002
+  city           TEXT,                               -- added migration 0002
+  decision       TEXT,                               -- added migration 0002
   message        TEXT,
   channel        TEXT DEFAULT 'contact_form',
   score          INTEGER DEFAULT 0,
-  status         TEXT NOT NULL DEFAULT 'new',     -- new|contacted|qualified|proposal|won|lost
+  status         TEXT NOT NULL DEFAULT 'new',        -- new|contacted|qualified|proposal|won|lost
   notes          TEXT,
   source         TEXT DEFAULT 'organic',
-  updated_at     TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+  updated_at     TEXT NOT NULL,
+  -- Outreach (migration 0006)
+  variant            TEXT,                           -- A/B variant id
+  outreach_status    TEXT DEFAULT 'not_started',     -- not_started|scheduled|in_progress|paused|done
+  first_contacted_at TEXT,
+  last_contacted_at  TEXT,
+  last_replied_at    TEXT,
+  opens_count        INTEGER NOT NULL DEFAULT 0,
+  replies_count      INTEGER NOT NULL DEFAULT 0,
+  meetings_booked    INTEGER NOT NULL DEFAULT 0,
+  last_activity_at   TEXT,
+  unsubscribed_at    TEXT,
+  lead_source_detail TEXT,                           -- source doc id (scraped_leads.id / calendly booking_uuid)
+  -- Hosting (migration 0007)
+  hosting_addon INTEGER NOT NULL DEFAULT 0,         -- $49/mo maintenance toggle
+  stripe_session_id TEXT,
+  checkout_started_at INTEGER,
+  paid_at INTEGER,
+  nudge_sent_at INTEGER,
+  checkout_url TEXT
 );
 
-CREATE INDEX IF NOT EXISTS idx_leads_status   ON leads(status);
-CREATE INDEX IF NOT EXISTS idx_leads_created  ON leads(created_at);
-CREATE INDEX IF NOT EXISTS idx_leads_email    ON leads(email);
+CREATE INDEX IF NOT EXISTS idx_leads_status     ON leads(status);
+CREATE INDEX IF NOT EXISTS idx_leads_created    ON leads(created_at);
+CREATE INDEX IF NOT EXISTS idx_leads_email      ON leads(email);
+CREATE INDEX IF NOT EXISTS idx_leads_outreach   ON leads(outreach_status, last_activity_at);
+CREATE INDEX IF NOT EXISTS idx_leads_variant    ON leads(variant);
 
 -- ============================================================
 CREATE TABLE IF NOT EXISTS projects (
@@ -48,7 +70,7 @@ CREATE TABLE IF NOT EXISTS projects (
   started_at     TEXT,
   completed_at   TEXT,
   notes          TEXT,
-  updated_at     TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+  updated_at     TEXT NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status);
@@ -86,6 +108,19 @@ CREATE TABLE IF NOT EXISTS emails_sent (
 );
 
 CREATE INDEX IF NOT EXISTS idx_emails_sent_to ON emails_sent(to_email, created_at);
+
+CREATE TABLE IF NOT EXISTS email_log (
+  id             TEXT PRIMARY KEY,
+  created_at     TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  lead_id        TEXT NOT NULL,
+  type           TEXT NOT NULL,
+  status         TEXT DEFAULT 'queued',
+  provider_id    TEXT,
+  error          TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_email_log_lead ON email_log(lead_id);
+CREATE INDEX IF NOT EXISTS idx_email_log_type_status ON email_log(type, status);
 
 -- ============================================================
 CREATE TABLE IF NOT EXISTS events (

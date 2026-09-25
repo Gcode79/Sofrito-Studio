@@ -1,13 +1,12 @@
 <!doctype html>
 <html>
-<head><meta charset="utf-8"><title>New lead / Nuevo lead</title></head>
+<head><meta charset="utf-8"><title>New lead received</title></head>
 <body style="margin:0;background:#F9FAFB;font-family:Arial,Helvetica,sans-serif;color:#0F172A;">
   <div style="max-width:600px;margin:0 auto;padding:24px;">
     <p style="font-family:Georgia,serif;font-size:20px;color:#0F172A;margin:0 0 20px;">Sofrito<span style="color:#EA580C;">Studio</span></p>
     <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:28px;">
-      <h1 style="font-family:Georgia,serif;font-size:22px;color:#0F172A;margin:0 0 4px;">New lead: {{lead.name}}</h1>
-      <p style="font-size:14px;color:#64748B;margin:0 0 16px;">Score <strong style="color:#EA580C;">{{lead.score}}</strong>/100 · {{lead.created_at}}</p>
-
+      <h1 style="font-family:Georgia,serif;font-size:22px;color:#0F172A;margin:0 0 4px;">New lead received: {{lead.name}}</h1>
+      <p style="font-size:14px;color:#64748B;margin:0 0 16px;">Received {{lead.created_at}} · lead score {{lead.score}}/100</p>
       <table style="width:100%;font-size:14px;color:#334155;border-collapse:collapse;">
         <tr><td style="padding:6px 0;color:#94A3B8;width:38%;">Email</td><td style="padding:6px 0;"><a href="mailto:{{lead.email}}" style="color:#EA580C;">{{lead.email}}</a></td></tr>
         <tr><td style="padding:6px 0;color:#94A3B8;">Phone</td><td style="padding:6px 0;">{{lead.phone}}</td></tr>
@@ -16,13 +15,11 @@
         <tr><td style="padding:6px 0;color:#94A3B8;">Budget</td><td style="padding:6px 0;">{{lead.budget}}</td></tr>
         <tr><td style="padding:6px 0;color:#94A3B8;">Source</td><td style="padding:6px 0;">{{lead.source}} / {{lead.channel}}</td></tr>
       </table>
-
       <div style="background:#F1F5F9;border-radius:8px;padding:16px;font-size:14px;color:#334155;margin-top:12px;">
         <p style="margin:0 0 6px;"><strong style="color:#0F172A;">Message:</strong></p>
         <p style="margin:0;line-height:1.5;">{{lead.message}}</p>
       </div>
-
-      <p style="font-size:13px;color:#64748B;margin:16px 0 0;">Reply within 24h — the drip fires on day 2, 5, and 9. Dashboard: <a href="https://dash.cloudflare.com" style="color:#EA580C;">Cloudflare D1</a></p>
+      <p style="font-size:13px;color:#64748B;margin:16px 0 0;">We will review this request and follow up as soon as possible.</p>
     </div>
   </div>
 </body>
