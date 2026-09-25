@@ -196,7 +196,7 @@ CREATE TABLE IF NOT EXISTS invoices (
   id                  TEXT PRIMARY KEY,
   created_at          TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
   project_id          TEXT NOT NULL REFERENCES projects(id),
-  milestone           TEXT NOT NULL CHECK (milestone IN ('deposit','milestone_25','final_25')),
+  milestone           TEXT NOT NULL CHECK (milestone IN ('session','final')),
   amount_cents        INTEGER NOT NULL,
   currency            TEXT NOT NULL DEFAULT 'usd',
   stripe_invoice_id   TEXT,
