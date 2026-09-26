@@ -1212,17 +1212,25 @@ async function handleStripeWebhook(request, env, ctx) {
     }
   }
 
-  const inserted = await insertRevenue(env, ctx, {
-    occurred_at: new Date(event.created * 1000).toISOString(),
-    source: 'stripe',
-    source_id: event.id,
-    session_id: event.type.startsWith('checkout.session.completed') ? event.data.object.id : '',
-    amount_cents: amountCents,
-    currency: event.data.object.currency,
-    description,
-    metadata: { event_type: event.type },
-    paid: amountCents >= 0,
-  }, leadData);
+  // Test-mode Stripe events carry livemode:false and must never be recorded as
+  // production revenue. This is the worker's only revenue write path, so the
+  // guard covers checkout.session.completed, invoice.paid and charge.refunded.
+  let inserted = false;
+  if (event.livemode === true) {
+    inserted = await insertRevenue(env, ctx, {
+      occurred_at: new Date(event.created * 1000).toISOString(),
+      source: 'stripe',
+      source_id: event.id,
+      session_id: event.type.startsWith('checkout.session.completed') ? event.data.object.id : '',
+      amount_cents: amountCents,
+      currency: event.data.object.currency,
+      description,
+      metadata: { event_type: event.type },
+      paid: amountCents >= 0,
+    }, leadData);
+  } else {
+    console.log('stripe webhook skipped (test mode)', event.type, event.id);
+  }
 
   if (leadData) {
     const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
