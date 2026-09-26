@@ -738,7 +738,8 @@
       "image_url": "https://sofritostudio.com/images/pins/rec-arroz-gandules-pin.png",
       "caption": "Mainland ingredient swaps — cook boricua anywhere 🇵🇷\n\nhttps://sofritostudio.com/products/starter-kit.html",
       "posted": false,
-      "fail_count": 2
+      "fail_count": 2,
+      "skipped": true
     },
     {
       "id": "fb-034",
@@ -747,7 +748,8 @@
       "image_url": "https://sofritostudio.com/images/rec-arroz-gandules.jpg",
       "caption": "Mainland ingredient swaps — cook boricua anywhere — https://sofritostudio.com/products/starter-kit.html",
       "posted": false,
-      "fail_count": 2
+      "fail_count": 2,
+      "skipped": true
     },
     {
       "id": "ig-035",
@@ -756,7 +758,7 @@
       "image_url": "https://sofritostudio.com/images/pins/rec-arroz-pin.png",
       "caption": "Nochebuena planning — the timeline that saves the table 🇵🇷\n\nhttps://sofritostudio.com/products/full-table.html",
       "posted": false,
-      "fail_count": 1
+      "fail_count": 2
     },
     {
       "id": "fb-035",
@@ -765,7 +767,7 @@
       "image_url": "https://sofritostudio.com/images/rec-arroz.jpg",
       "caption": "Nochebuena planning — the timeline that saves the table — https://sofritostudio.com/products/full-table.html",
       "posted": false,
-      "fail_count": 1
+      "fail_count": 2
     },
     {
       "id": "ig-036",
@@ -773,7 +775,8 @@
       "datetime": "2026-09-25T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/pins/rec-coquito-pin.png",
       "caption": "Coquito & postres — the sweet side of the island 🇵🇷\n\nhttps://sofritostudio.com/products/coquito-guide.html",
-      "posted": false
+      "posted": false,
+      "fail_count": 1
     },
     {
       "id": "fb-036",
@@ -781,7 +784,8 @@
       "datetime": "2026-09-25T10:00:00+00:00",
       "image_url": "https://sofritostudio.com/images/rec-coquito.jpg",
       "caption": "Coquito & postres — the sweet side of the island — https://sofritostudio.com/products/coquito-guide.html",
-      "posted": false
+      "posted": false,
+      "fail_count": 1
     },
     {
       "id": "ig-037",
