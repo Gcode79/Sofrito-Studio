@@ -15,7 +15,10 @@ jobs:
       - name: Check site + endpoints
         run: |
           FAILED=0
-          for path in "/" "/products.html" "/health" "/js/main.js" "/css/style.css" "/data/products.json"; do
+          # Only live routes. The previous list probed /products.html, /health,
+          # /js/main.js, /css/style.css and /data/products.json — all retired
+          # 404s — so the job failed every 6h while covering nothing.
+          for path in "/" "/api/health"; do
             code=$(curl -s -o /dev/null -w "%{http_code}" -m 20 "https://sofritostudio.com${path}" \
                      -H "User-Agent: sofrito-uptime-check" || echo "000")
             echo "  $code  ${path}"

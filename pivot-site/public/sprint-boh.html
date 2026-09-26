@@ -256,6 +256,10 @@
 
 
         (function() {
+            // One submit key per page render. Re-rendering yields a new key, so a
+            // real repeat purchase is never blocked; a double-click on the same
+            // render reuses this key and the server returns the same checkout.
+            const submitKey = crypto.randomUUID();
             const url = new URL(window.location.href);
             const success = url.searchParams.get('success');
             const sessionId = url.searchParams.get('session_id');
@@ -351,7 +355,8 @@
                 business_type: document.getElementById('business_type').value,
                 message: document.getElementById('message').value.trim(),
                 channel: (cookieVal && cookieVal !== 'unknown') ? decodeURIComponent(cookieVal) : 'boh_sprint_page',
-                turnstile_token: token
+                turnstile_token: token,
+                submit_key: submitKey
             };
 
             try {

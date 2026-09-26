@@ -432,15 +432,19 @@ async function handleSiteConfig(env) {
 // ------------------------------------------------------------
 // POST /api/lead — inbound lead capture (Zapier → Google Sheets)
 // ------------------------------------------------------------
-async function createStripeCheckoutSession(env, siteUrl, lead) {
+async function createStripeCheckoutSession(env, siteUrl, lead, submitKey = null) {
   const stripeKey = env.STRIPE_API_KEY;
   if (!stripeKey) return null;
+  // Deriving the key from the per-render submit_key means a retry with the same
+  // key replays the original session at Stripe instead of creating a new one.
+  const headers = {
+    Authorization: `Bearer ${stripeKey}`,
+    'Content-Type': 'application/x-www-form-urlencoded',
+  };
+  if (submitKey) headers['Idempotency-Key'] = `submit_${submitKey}`;
   const checkoutRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${stripeKey}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
+    headers,
     body: new URLSearchParams({
       mode: 'payment',
       'line_items[0][price_data][currency]': 'usd',
@@ -510,6 +514,10 @@ async function handleApiLead(request, env, ctx) {
   const business_type = String(body.business_type || '').trim();
   const channel = String(body.channel || 'api').trim();
   const turnstileToken = String(body.turnstile_token || body['cf-turnstile-response'] || '').trim();
+  // Client-generated once per page render. Enforced by UNIQUE(submit_key) so a
+  // concurrent double-submit cannot open two checkout sessions. Optional: a
+  // request without it still works, it just loses the race protection.
+  const submitKey = String(body.submit_key || '').trim().slice(0, 64) || null;
 
   // Turnstile verification
   const turnstileOk = await verifyTurnstile(env, turnstileToken);
@@ -546,6 +554,22 @@ async function handleApiLead(request, env, ctx) {
     return json({ ok: true, id: existing.id, created_at: existing.created_at, checkout_url: existing.checkout_url }, 201);
   }
 
+  // Same submit_key already used (double-click on one page render) → hand back
+  // the checkout that was already created instead of creating a second one.
+  if (submitKey) {
+    const byKey = await env.DB.prepare(
+      `SELECT id, created_at, checkout_url, status FROM leads WHERE submit_key = ? LIMIT 1`
+    )
+      .bind(submitKey)
+      .first();
+    if (byKey) {
+      if (byKey.checkout_url) {
+        return json({ ok: true, id: byKey.id, created_at: byKey.created_at, checkout_url: byKey.checkout_url, duplicate: true }, 200);
+      }
+      return json({ ok: true, id: byKey.id, created_at: byKey.created_at, checkout_url: null, pending: true }, 202);
+    }
+  }
+
   // Deterministic id from the email → re-posts never create duplicates.
   const id = `lead_${(await sha256Hex(email)).slice(0, 24)}`;
   const now = nowEpoch();
@@ -565,14 +589,14 @@ async function handleApiLead(request, env, ctx) {
   };
 
   await env.DB.prepare(
-    `INSERT OR IGNORE INTO leads (id, created_at, name, email, phone, business_name, business_type, package_interest, budget, message, channel, status, source, checkout_started_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'checkout_started', 'lead_api', ?)`
+    `INSERT OR IGNORE INTO leads (id, created_at, name, email, phone, business_name, business_type, package_interest, budget, message, channel, status, source, checkout_started_at, submit_key)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'checkout_started', 'lead_api', ?, ?)`
   )
-    .bind(id, lead.created_at, lead.name, lead.email, lead.phone, lead.business_name, lead.business_type, lead.package_interest, lead.budget, lead.message, lead.channel, now)
+    .bind(id, lead.created_at, lead.name, lead.email, lead.phone, lead.business_name, lead.business_type, lead.package_interest, lead.budget, lead.message, lead.channel, now, submitKey)
     .run();
 
   const siteUrl = env.SITE_URL || new URL(request.url).origin;
-  const checkout = await createStripeCheckoutSession(env, siteUrl, lead);
+  const checkout = await createStripeCheckoutSession(env, siteUrl, lead, submitKey);
   const checkoutUrl = checkout?.url || null;
   if (checkout) {
     await env.DB.prepare(

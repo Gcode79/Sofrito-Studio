@@ -8,7 +8,7 @@
 | 4 | End-to-end, Stripe test card 4242… | Stripe → pay → webhook → D1 `paid` → receipt + booking emails → `/success.html` with working prefilled Calendly link |
 | 5 | Declined card 4000…0002 | Stripe decline; lead stays `checkout_started`; no emails; cancel path works |
 | 6 | Replay `checkout.session.completed` ×2 | Exactly one receipt + one booking email |
-| 7 | Webhook bad signature | 400, no state change |
+| 7 | Webhook bad signature | 401, no state change |
 | 8 | Abandon 2h+ | One nudge email, lead `abandoned` |
 | 9 | Double-submit same email < 15 min | One lead row |
 | 10 | Both A/B variants | `sprint.html` → `sprint_page`, `sprint-boh.html` → `boh_sprint_page` in D1 |
