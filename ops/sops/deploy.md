@@ -28,9 +28,30 @@ To roll back to the legacy retail site (`../cloudflare`):
 2. Redeploy the old worker from `SofritoStudio\cloudflare`.
 (Note: `wrangler.toml` header comments document this; rollback has NOT been executed — use only with owner approval.)
 
-## CI deploy
+## CI deploy — none exists
 
-`wrangler.toml` header comment: "Deploy: npx wrangler deploy (CI does this on main push)". The CI deploy runs on the pinned `wrangler.toml` config; the `--config` script protects against the parent-config ambiguity.
+**Deploys are manual-only. There is no CI auto-deploy.**
+
+Verified 2026-09-25:
+
+- No workflow in `.github/workflows` has a `push` trigger, and none invokes
+  wrangler. The six present (`content`, `email-automation`, `opencode`,
+  `pinterest-poster`, `social-poster`, `uptime`) are schedule/dispatch only.
+- Zero Cloudflare Builds runs on any worker in the account
+  (`sofrito-studio`, `mise-portal`, `ofrito-tudio` all report `total_count: 0`).
+- No Cloudflare Pages project exists.
+
+**A push to `main` does NOT move production.** Production changes only when a
+human runs the pinned `npm run deploy`.
+
+This section previously claimed CI deployed on main push, citing the
+`wrangler.toml` header comment — that comment was stale and has been corrected.
+An earlier version of this SOP carried the hedge *"Assumed correct as of
+2026-09-20; verify if odd behaviour."* It is now verified, not assumed.
+
+Ordering consequence: because nothing auto-deploys, a migration can be applied
+to remote D1 **before** the worker code that depends on it is deployed, without
+risk of a push deploying code ahead of its migration.
 
 ## Pre-deploy verification checklist
 

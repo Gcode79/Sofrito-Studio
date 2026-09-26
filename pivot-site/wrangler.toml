@@ -8,7 +8,11 @@
 #          webhooks) with Queue-backed async side effects.
 #
 # Local dev:   npx wrangler dev --local
-# Deploy:      npx wrangler deploy   (CI does this on main push)
+# Deploy:      npm run deploy  (== wrangler deploy --config wrangler.toml)
+#              MANUAL ONLY — there is no CI auto-deploy. Verified 2026-09-25:
+#              no push-triggered workflow in .github/workflows, zero Cloudflare
+#              Builds runs, and no Cloudflare Pages project. A push to main does
+#              NOT move production.
 #
 # One-time manual steps (IDs below are placeholders until you run):
 #   npx wrangler d1 create sofrito-db
