@@ -1,5 +1,159 @@
 {
   "posts": [{
+      "id": "ig-001",
+      "platform": "instagram",
+      "datetime": "2026-08-21T10:00:00",
+      "image_url": "https://sofritostudio.com/images/pins/rec-mofongo-pin.png",
+      "caption": "Mofongo is the dish that makes everyone stop talking and reach for seconds. Green plantains, fried, pounded with garlic and chicharrón. The recipe is on the blog — link in bio. 🇵🇷\n\n#mofongo #puertoricanrecipes #boricuafood #mofongorecipe #latinfood #puertorico",
+      "posted": false,
+      "skipped": true
+    },
+    {
+      "id": "ig-002",
+      "platform": "instagram",
+      "datetime": "2026-08-22T10:00:00",
+      "image_url": "https://sofritostudio.com/images/pins/pernil-course-pin.png",
+      "caption": "Pernil is the reason the oven runs all day on Nochebuena. Crispy skin, garlicky mojo, fall-apart pork. Master it once, make it forever. Recipe on the blog.\n\n#pernil #pernilrecipe #nochebuena #puertoricanfood #boricuafood #caribbeanfood",
+      "posted": false,
+      "skipped": true
+    },
+    {
+      "id": "ig-003",
+      "platform": "instagram",
+      "datetime": "2026-08-23T10:00:00",
+      "image_url": "https://sofritostudio.com/images/pins/rec-arroz-gandules-pin.png",
+      "caption": "Arroz con gandules — the dish that anchors every boricua table. Golden rice, sofrito, and pigeon peas in one pot. Full recipe on the blog.\n\n#arrozcongandules #puertoricanrecipes #latinfood #arroz #boricuafood #sundaydinner",
+      "posted": true,
+      "fail_count": 0
+    },
+    {
+      "id": "ig-004",
+      "platform": "instagram",
+      "datetime": "2026-08-24T10:00:00",
+      "image_url": "https://sofritostudio.com/images/pins/rec-coquito-pin.png",
+      "caption": "Coquito season is a state of mind. Creamy coconut, cinnamon, a little rum — the holiday drink that starts in November and never stops. Recipe up now.\n\n#coquito #coquitorecipe #navidad #puertoricanfood #christmasdrinks #holidayseason",
+      "posted": true,
+      "fail_count": 0
+    },
+    {
+      "id": "ig-005",
+      "platform": "instagram",
+      "datetime": "2026-08-25T10:00:00",
+      "image_url": "https://sofritostudio.com/images/pins/rec-arroz-pin.png",
+      "caption": "Arroz con pollo is the weeknight hero of Puerto Rican cooking. One pot, chicken and rice, deeply seasoned. Comfort food that never misses. On the blog.\n\n#arrozconpollo #puertoricanrecipes #onepotmeal #comfortfood #latinfood #boricuafood",
+      "posted": true,
+      "fail_count": 0
+    },
+    {
+      "id": "ig-006",
+      "platform": "instagram",
+      "datetime": "2026-08-26T10:00:00",
+      "image_url": "https://sofritostudio.com/images/pins/rec-tostones-pin.png",
+      "caption": "Tostones: twice-fried, garlicky, impossible to eat just one. The side that makes every plate complete. Recipe on the blog — link in bio.\n\n#tostones #plantains #puertoricanfood #boricuafood #caribbeanfood #sidedish",
+      "posted": true,
+      "fail_count": 0
+    },
+    {
+      "id": "ig-007",
+      "platform": "instagram",
+      "datetime": "2026-08-27T10:00:00",
+      "image_url": "https://sofritostudio.com/images/pins/rec-pastelillos-pin.png",
+      "caption": "Pastelillos — flaky fried turnovers stuffed with seasoned beef. Beach day favorite, party essential. Full recipe on the blog.\n\n#pastelillos #empanadas #puertoricanrecipes #frituras #boricuafood #latinfood",
+      "posted": false,
+      "fail_count": 3,
+      "skipped": true
+    },
+    {
+      "id": "fb-001",
+      "platform": "facebook",
+      "datetime": "2026-08-21T10:00:00",
+      "image_url": "https://sofritostudio.com/images/rec-mofongo.jpg",
+      "caption": "The dish that stops the whole table: mofongo. Green plantains, garlic, chicharrón — pounded until dense and irresistible. Full recipe on the blog (EN + ES). Buen provecho, familia.",
+      "posted": false,
+      "skipped": true
+    },
+    {
+      "id": "fb-002",
+      "platform": "facebook",
+      "datetime": "2026-08-22T10:00:00",
+      "image_url": "https://sofritostudio.com/images/pernil-course.jpg",
+      "caption": "Planning Nochebuena? Start here: pernil with crispy skin and garlicky mojo. We broke down the exact timeline so the table comes together without the panic. Blog link in the comments.",
+      "posted": false,
+      "skipped": true
+    },
+    {
+      "id": "fb-003",
+      "platform": "facebook",
+      "datetime": "2026-08-23T10:00:00",
+      "image_url": "https://sofritostudio.com/images/rec-arroz-gandules.jpg",
+      "caption": "Arroz con gandules is the rice every Puerto Rican table anchors on. Our recipe keeps it true to the classic with easy mainland swaps. Check the blog.",
+      "posted": true,
+      "fail_count": 0
+    },
+    {
+      "id": "fb-004",
+      "platform": "facebook",
+      "datetime": "2026-08-24T10:00:00",
+      "image_url": "https://sofritostudio.com/images/rec-coquito.jpg",
+      "caption": "It's coquito season somewhere. Our family recipe — coconut, cinnamon, a touch of rum. Make a batch, gift a bottle. Recipe on the blog.",
+      "posted": true,
+      "fail_count": 0
+    },
+    {
+      "id": "fb-005",
+      "platform": "facebook",
+      "datetime": "2026-08-25T10:00:00",
+      "image_url": "https://sofritostudio.com/images/rec-arroz.jpg",
+      "caption": "Arroz con pollo, the one-pot that feeds the whole house. Deep sofrito flavor, tender chicken, golden rice. On the blog — bilingual.",
+      "posted": true,
+      "fail_count": 0
+    },
+    {
+      "id": "fb-006",
+      "platform": "facebook",
+      "datetime": "2026-08-26T10:00:00",
+      "image_url": "https://sofritostudio.com/images/rec-tostones.jpg",
+      "caption": "Tostones tonight? Twice-fried plantains, a little garlic, a lot of love. Recipe on the blog with the mojo to match.",
+      "posted": true,
+      "fail_count": 0
+    },
+    {
+      "id": "fb-007",
+      "platform": "facebook",
+      "datetime": "2026-08-27T10:00:00",
+      "image_url": "https://sofritostudio.com/images/rec-pastelillos.jpg",
+      "caption": "Weekend fritura alert: pastelillos. Crispy dough, seasoned beef, zero leftovers. Full recipe on the blog.",
+      "posted": false,
+      "fail_count": 3,
+      "skipped": true
+    },
+    {
+      "id": "ig-016",
+      "platform": "instagram",
+      "kind": "video",
+      "datetime": "2026-09-05T10:00:00+00:00",
+      "video_url": "https://sofritostudio.com/videos/cooking-demo.mp4",
+      "image_url": "https://sofritostudio.com/images/pins/rec-mofongo-pin.png",
+      "caption": "This is how mofongo gets made in our kitchen. Green plantains, garlic, chicharrón — mashed while hot. Browse 30+ bilingual recipes: sofritostudio.com/recipe-db #mofongo #boricuafood",
+      "posted": false,
+      "note": "Concept 2 · Cultural Nostalgia — Mofongo (CTA: recipe database)",
+      "skipped": true
+    },
+    {
+      "id": "fb-016",
+      "platform": "facebook",
+      "kind": "video",
+      "datetime": "2026-09-05T10:00:00+00:00",
+      "video_url": "https://sofritostudio.com/videos/cooking-demo-small.mp4",
+      "image_url": "https://sofritostudio.com/images/pins/rec-mofongo-pin.png",
+      "caption": "This is how mofongo gets made in our kitchen. Browse the free bilingual recipe library: sofritostudio.com/recipe-db",
+      "posted": false,
+      "note": "Concept 2 · Cultural Nostalgia — Mofongo (CTA: recipe database)",
+      "ready": true,
+      "fail_count": 1,
+      "skipped": true
+    },
+    {
       "id": "ig-101",
       "platform": "instagram",
       "kind": "video",
