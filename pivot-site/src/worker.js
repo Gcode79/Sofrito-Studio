@@ -538,7 +538,9 @@ async function handleApiLead(request, env, ctx) {
   }
 
   // Rate limit: 10/min per IP
-  const ip = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'unknown';
+  const xff = request.headers.get('x-forwarded-for') || '';
+  const firstForwardedIp = xff.split(',')[0].trim();
+  const ip = request.headers.get('cf-connecting-ip') || firstForwardedIp || 'unknown';
   const ipRlKey = `rl:ip:${ip}`;
   const ipCount = parseInt(await env.CONFIG.get(ipRlKey) || '0', 10);
   if (ipCount >= 10) return fail('You just submitted. Check your inbox.', 429);
@@ -565,6 +567,18 @@ async function handleApiLead(request, env, ctx) {
     if (byKey) {
       if (byKey.checkout_url) {
         return json({ ok: true, id: byKey.id, created_at: byKey.created_at, checkout_url: byKey.checkout_url, duplicate: true }, 200);
+      }
+      // Same submit_key, but the first attempt never produced a checkout URL (Stripe call failed).
+      // Retry checkout creation for the existing lead instead of returning 202 with a null URL.
+      if (byKey.status !== 'paid') {
+        const retrySiteUrl = env.SITE_URL || new URL(request.url).origin;
+        const retryCheckout = await createStripeCheckoutSession(env, retrySiteUrl, { id: byKey.id, name, email }, submitKey);
+        if (retryCheckout && retryCheckout.url) {
+          await env.DB.prepare(
+            `UPDATE leads SET stripe_session_id = ?, checkout_url = ? WHERE id = ? AND paid_at IS NULL`
+          ).bind(retryCheckout.id, retryCheckout.url, byKey.id).run();
+          return json({ ok: true, id: byKey.id, created_at: byKey.created_at, checkout_url: retryCheckout.url, duplicate: true }, 200);
+        }
       }
       return json({ ok: true, id: byKey.id, created_at: byKey.created_at, checkout_url: null, pending: true }, 202);
     }
