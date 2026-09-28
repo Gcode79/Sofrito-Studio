@@ -1,5 +1,6 @@
 {
-  "posts": [{
+  "posts": [
+    {
       "id": "ig-101",
       "platform": "instagram",
       "kind": "video",
