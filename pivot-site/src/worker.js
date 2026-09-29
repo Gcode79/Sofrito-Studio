@@ -172,8 +172,9 @@ const LEGACY_REDIRECTS = [
   { match: (p) => p.startsWith('/terms'), to: '/terms.html' },
   { match: (p) => p.startsWith('/services'), to: '/' },
   { match: (p) => p.startsWith('/pricing'), to: '/' },
-  { match: (p) => p.startsWith('/blog/'), to: '/' },
-  { match: (p) => p.startsWith('/posts/'), to: '/' },
+    { match: (p) => p.startsWith('/blog/'), to: '/' },
+    { match: (p) => p.startsWith('/posts/'), to: '/' },
+    { match: (p) => p === '/sprint.html', to: '/' },
 ];
 
 function legacyRedirectFor(pathname) {
@@ -2233,8 +2234,9 @@ export default {
       }
 
       // ----- 5. Serve the appropriate asset -----
-      // Sprint page is now always the long-form version
-      const servePath = '/sprint.html';
+      // The homepage now lives at public/index.html, so / and /sprint are canonical.
+      // /sprint.html is retired and 301s to / (see LEGACY_REDIRECTS).
+      const servePath = '/index.html';
       const assetReq = new Request(assetUrl.origin + servePath, request);
 
       let res = await env.ASSETS.fetch(assetReq);
