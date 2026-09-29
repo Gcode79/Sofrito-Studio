@@ -83,6 +83,18 @@ const CORS = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
+// Admin routes must not be callable cross-origin: strip the wildcard CORS
+// headers so a browser on any other site cannot read admin responses, even
+// with a stolen key in play. Same-origin and non-browser clients (curl) are
+// unaffected — they never needed CORS.
+const stripCors = (res) => {
+  const headers = new Headers(res.headers);
+  headers.delete('Access-Control-Allow-Origin');
+  headers.delete('Access-Control-Allow-Methods');
+  headers.delete('Access-Control-Allow-Headers');
+  return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+};
+
 const json = (body, status = 200, headers = {}) =>
   new Response(JSON.stringify(body), {
     status,
@@ -91,10 +103,40 @@ const json = (body, status = 200, headers = {}) =>
 
 const fail = (msg, status = 400) => json({ ok: false, error: msg }, status);
 
-const readJson = async (request) => {
+// Body-size guards. Public JSON routes reject anything over 256KB with 413
+// before buffering; webhook raw bodies (needed intact for signature
+// verification) get a 1MB ceiling. Content-Length is checked first for a fast
+// reject, then the buffered text as a backstop (chunked requests omit it).
+const MAX_JSON_BYTES = 256 * 1024;
+const MAX_WEBHOOK_BYTES = 1024 * 1024;
+
+const bodyTooLarge = (request, maxBytes) => {
+  const len = Number(request.headers.get('content-length') || 0);
+  return Number.isFinite(len) && len > maxBytes;
+};
+
+const tooLargeError = () => {
+  const err = new Error('body too large');
+  err.status = 413;
+  return err;
+};
+
+const readJson = async (request, maxBytes = MAX_JSON_BYTES) => {
+  if (bodyTooLarge(request, maxBytes)) throw tooLargeError();
   const raw = await request.text();
+  if (raw.length > maxBytes) throw tooLargeError();
   return JSON.parse(raw);
 };
+
+const readWebhookText = async (request) => {
+  if (bodyTooLarge(request, MAX_WEBHOOK_BYTES)) throw tooLargeError();
+  const raw = await request.text();
+  if (raw.length > MAX_WEBHOOK_BYTES) throw tooLargeError();
+  return raw;
+};
+
+// Maps body-parse errors to responses: 413 for oversized, 400 otherwise.
+const badBody = (e) => (e && e.status === 413 ? fail('Request body too large.', 413) : fail('Please send valid JSON.', 400));
 
 const hmacSha256 = (secret, body) =>
   crypto.subtle
@@ -527,10 +569,10 @@ async function getStripeCheckoutSession(env, sessionId) {
 async function handleCheckoutStatus(request, env) {
   let sessionId = '';
   try {
-    const body = await request.json();
+    const body = await readJson(request);
     sessionId = String(body.session_id || '');
-  } catch {
-    return json({ status: 'unknown' }, 400);
+  } catch (e) {
+    return e && e.status === 413 ? json({ status: 'unknown' }, 413) : json({ status: 'unknown' }, 400);
   }
   if (!/^cs_(test|live)_[A-Za-z0-9]+$/.test(sessionId) || sessionId.length > 255) {
     return json({ status: 'unknown' }, 400);
@@ -571,8 +613,8 @@ async function handleApiLead(request, env, ctx) {
   let body;
   try {
     body = await readJson(request);
-  } catch {
-    return fail('Please send valid JSON.', 400);
+  } catch (e) {
+    return badBody(e);
   }
   const email = String(body.email || '').trim().toLowerCase();
   const name = String(body.name || '').trim();
@@ -668,9 +710,23 @@ async function handleApiLead(request, env, ctx) {
     channel,
   };
 
+  // Lead id is deterministic from the email, so a resubmission hits the same
+  // row. Refresh the mutable detail fields instead of ignoring the new data —
+  // a lead who resubmits with a new phone number or message must not keep the
+  // stale one. created_at, status, source, and checkout timestamps are
+  // preserved; empty resubmitted values do not wipe existing data.
   await env.DB.prepare(
-    `INSERT OR IGNORE INTO leads (id, created_at, name, email, phone, business_name, business_type, package_interest, budget, message, channel, status, source, checkout_started_at, submit_key)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'checkout_started', 'lead_api', ?, ?)`
+    `INSERT INTO leads (id, created_at, name, email, phone, business_name, business_type, package_interest, budget, message, channel, status, source, checkout_started_at, submit_key)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'checkout_started', 'lead_api', ?, ?)
+     ON CONFLICT(id) DO UPDATE SET
+       name = COALESCE(NULLIF(excluded.name, ''), leads.name),
+       phone = COALESCE(NULLIF(excluded.phone, ''), leads.phone),
+       business_name = COALESCE(NULLIF(excluded.business_name, ''), leads.business_name),
+       business_type = COALESCE(NULLIF(excluded.business_type, ''), leads.business_type),
+       package_interest = COALESCE(NULLIF(excluded.package_interest, ''), leads.package_interest),
+       budget = COALESCE(NULLIF(excluded.budget, ''), leads.budget),
+       message = COALESCE(NULLIF(excluded.message, ''), leads.message),
+       channel = COALESCE(NULLIF(excluded.channel, ''), leads.channel)`
   )
     .bind(id, lead.created_at, lead.name, lead.email, lead.phone, lead.business_name, lead.business_type, lead.package_interest, lead.budget, lead.message, lead.channel, now, submitKey)
     .run();
@@ -737,8 +793,8 @@ async function handleContact(request, env, ctx) {
   let body;
   try {
     body = await readJson(request);
-  } catch {
-    return fail('Please send valid JSON.', 400);
+  } catch (e) {
+    return badBody(e);
   }
   const name = String(body.name || '').trim();
   const email = String(body.email || '').trim().toLowerCase();
@@ -816,8 +872,8 @@ async function handleNewsletter(request, env, ctx) {
   let body;
   try {
     body = await readJson(request);
-  } catch {
-    return fail('Please send valid JSON.', 400);
+  } catch (e) {
+    return badBody(e);
   }
   const email = String(body.email || '').trim().toLowerCase();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fail('Enter a valid email address.', 422);
@@ -855,8 +911,8 @@ async function handleEvent(request, env, ctx) {
   let body;
   try {
     body = await readJson(request);
-  } catch {
-    return fail('Please send valid JSON.', 400);
+  } catch (e) {
+    return badBody(e);
   }
   const name = String(body.name || '').trim();
   if (!name) return fail('event name required', 422);
@@ -912,8 +968,8 @@ async function handleLeadUpdate(request, env, ctx, url) {
   let body;
   try {
     body = await readJson(request);
-  } catch {
-    return fail('Please send valid JSON.', 400);
+  } catch (e) {
+    return badBody(e);
   }
   const previousLead = await env.DB.prepare(`SELECT * FROM leads WHERE id = ?`).bind(id).first();
   if (!previousLead) return fail('lead not found', 404);
@@ -1004,8 +1060,10 @@ const MILESTONE_LABELS = Object.fromEntries(MILESTONES.map((m) => [m.key, m.labe
 // Two-offer schedule: the $400 Sofrito Session is charged up front and
 // credits toward the Sprint; the final balance is whatever remains
 // (Sprint = 99700 - 40000 = 59700, billed before launch).
-const splitMilestoneAmounts = (priceCents) => {
-  const session = Math.min(priceCents, SESSION_CENTS);
+// sessionCents comes from validated KV (getSessionPriceCents), not the
+// constant below, so a price change propagates to invoice splits too.
+const splitMilestoneAmounts = (priceCents, sessionCents) => {
+  const session = Math.min(priceCents, sessionCents);
   return { session, final: priceCents - session };
 };
 
@@ -1065,12 +1123,46 @@ async function handleInvoiceStatus(env) {
   return json({ ok: true, invoices: invoices.results, projects: projects.results, totals });
 }
 
+// GET /api/invoice-reconcile (admin) — diffs local invoice rows against
+// Stripe's record. Catches the drift a silent webhook failure leaves behind:
+// local says sent/unpaid while Stripe says paid, amounts disagree, or Stripe
+// voided the invoice while local still shows it outstanding. On-demand (the
+// founder's morning check), capped at 25 rows so it can't fan out into dozens
+// of Stripe calls.
+async function handleInvoiceReconcile(env) {
+  const rows = await env.DB.prepare(
+    `SELECT id, project_id, milestone, amount_cents, status, stripe_invoice_id
+     FROM invoices WHERE stripe_invoice_id IS NOT NULL AND status != 'paid'
+     ORDER BY created_at DESC LIMIT 25`
+  ).all();
+  const mismatches = [];
+  let checked = 0;
+  for (const inv of rows.results || []) {
+    checked += 1;
+    let si;
+    try {
+      si = await stripeRequest(env, 'GET', `/invoices/${inv.stripe_invoice_id}`);
+    } catch (e) {
+      mismatches.push({ invoice_id: inv.id, stripe_invoice_id: inv.stripe_invoice_id, issue: 'stripe_unreachable', detail: String(e.message).slice(0, 200) });
+      continue;
+    }
+    if (si.status === 'paid' && inv.status !== 'paid') {
+      mismatches.push({ invoice_id: inv.id, stripe_invoice_id: inv.stripe_invoice_id, issue: 'paid_at_stripe', local_status: inv.status });
+    } else if (si.status === 'void' && (inv.status === 'sent' || inv.status === 'pending')) {
+      mismatches.push({ invoice_id: inv.id, stripe_invoice_id: inv.stripe_invoice_id, issue: 'void_at_stripe', local_status: inv.status });
+    } else if (typeof si.amount_due === 'number' && si.amount_due !== inv.amount_cents && si.status !== 'paid') {
+      mismatches.push({ invoice_id: inv.id, stripe_invoice_id: inv.stripe_invoice_id, issue: 'amount_differs', local_cents: inv.amount_cents, stripe_cents: si.amount_due });
+    }
+  }
+  return json({ ok: true, checked, mismatches });
+}
+
 async function handleInvoiceTrigger(request, env, ctx) {
   let body;
   try {
     body = await readJson(request);
-  } catch {
-    return fail('Please send valid JSON.', 400);
+  } catch (e) {
+    return badBody(e);
   }
   const projectId = String(body.project_id || '').trim();
   const milestone = String(body.milestone || '').trim();
@@ -1092,7 +1184,7 @@ async function handleInvoiceTrigger(request, env, ctx) {
   const priceCents = project.price_cents && project.price_cents > 0 ? project.price_cents : pkgFallback.price_cents || 0;
   if (!priceCents) return fail(`no price on record for ${project.name}; fix projects.price_cents first`, 422);
 
-  const amountCents = splitMilestoneAmounts(priceCents)[milestone];
+  const amountCents = splitMilestoneAmounts(priceCents, Number(await getSessionPriceCents(env)))[milestone];
   const invoiceId = uuid();
   const stamp = milestone === 'final' ? 'files_delivered_at' : null;
   const stampVal = stamp ? nowIso() : null;
@@ -1263,7 +1355,12 @@ async function handleCheckoutExpired(env, ctx, event) {
 
 async function handleStripeWebhook(request, env, ctx) {
   const secret = env.STRIPE_WEBHOOK_SECRET;
-  const raw = await request.text();
+  let raw;
+  try {
+    raw = await readWebhookText(request);
+  } catch (e) {
+    return fail(e && e.status === 413 ? 'body too large' : 'unreadable body', e && e.status === 413 ? 413 : 400);
+  }
   const header = request.headers.get('stripe-signature');
   if (!secret || !header) return fail('missing signature', 400);
   const [t, ...rest] = header.split(',');
@@ -1453,7 +1550,12 @@ function calendlyField(payload, keys) {
 
 async function handleCalendlyWebhook(request, env, ctx) {
   const secret = env.CALENDLY_WEBHOOK_SIGNING_KEY;
-  const raw = await request.text();
+  let raw;
+  try {
+    raw = await readWebhookText(request);
+  } catch (e) {
+    return fail(e && e.status === 413 ? 'body too large' : 'unreadable body', e && e.status === 413 ? 413 : 400);
+  }
   const { t, v1 } = parseCalendlySignature(request.headers.get('calendly-webhook-signature'));
   if (!secret || !t || !v1) return fail('missing signature', 400);
   if (Math.abs(Date.now() / 1000 - Number(t)) > 300) return fail('stale signature', 401);
@@ -2086,7 +2188,12 @@ async function weeklyDigest(env) {
 async function handleFlowGenerate(request, env) {
   const backendUrl = env.BACKEND_URL;
   if (!backendUrl) return json({ ok: false, error: 'backend not configured' }, 500);
-  const body = await request.text();
+  let body;
+  try {
+    body = await readWebhookText(request);
+  } catch (e) {
+    return fail(e && e.status === 413 ? 'body too large' : 'unreadable body', e && e.status === 413 ? 413 : 400);
+  }
   try {
     const res = await fetch(`${backendUrl}/generate`, {
       method: 'POST',
@@ -2141,7 +2248,11 @@ export default {
     // before responding — leaving it unread crashes `wrangler dev` locally
     // ("Can't read from request stream after response has been sent").
     if (new URL(request.url).pathname === '/csp-report') {
-      try { await request.text(); } catch {}
+      // Drain small bodies only — a huge report body is not worth buffering;
+      // the 204 goes out either way.
+      try {
+        if (!bodyTooLarge(request, MAX_WEBHOOK_BYTES)) await request.text();
+      } catch {}
       return new Response(null, { status: 204 });
     }
 
@@ -2162,43 +2273,48 @@ export default {
           return handleEvent(request, env, ctx);
 
         const adm = () => {
-          if (!authorized(env, request)) return json({ ok: false, error: 'unauthorized' }, 401);
+          if (!authorized(env, request)) return stripCors(json({ ok: false, error: 'unauthorized' }, 401));
         };
         if (p === '/api/dashboard' && request.method === 'GET') {
           const g = adm();
           if (g) return g;
-          return handleDashboard(request, env);
+          return stripCors(await handleDashboard(request, env));
         }
         if (p === '/api/leads' && request.method === 'GET') {
           const g = adm();
           if (g) return g;
-          return handleLeads(request, env, url);
+          return stripCors(await handleLeads(request, env, url));
         }
         if (p.startsWith('/api/leads/') && request.method === 'PATCH') {
           const g = adm();
           if (g) return g;
-          return handleLeadUpdate(request, env, ctx, url);
+          return stripCors(await handleLeadUpdate(request, env, ctx, url));
         }
         if (p === '/api/revenue' && request.method === 'GET') {
           const g = adm();
           if (g) return g;
-          return handleRevenue(env);
+          return stripCors(await handleRevenue(env));
         }
         if (p === '/api/invoice-status' && request.method === 'GET') {
           const g = adm();
           if (g) return g;
-          return handleInvoiceStatus(env);
+          return stripCors(await handleInvoiceStatus(env));
+        }
+        if (p === '/api/invoice-reconcile' && request.method === 'GET') {
+          const g = adm();
+          if (g) return g;
+          return stripCors(await handleInvoiceReconcile(env));
         }
         if (p === '/api/invoice-trigger' && request.method === 'POST') {
           const g = adm();
           if (g) return g;
-          return handleInvoiceTrigger(request, env, ctx);
+          return stripCors(await handleInvoiceTrigger(request, env, ctx));
         }
 
         if (p === '/api/flow/generate' && request.method === 'POST') {
           const g = adm();
           if (g) return g;
-          return handleFlowGenerate(request, env);
+          return stripCors(await handleFlowGenerate(request, env));
         }
 
         if (p === '/api/stripe-webhook' && request.method === 'POST')
