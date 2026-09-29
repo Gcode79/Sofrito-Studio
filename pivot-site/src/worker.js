@@ -1136,7 +1136,10 @@ async function insertRevenue(env, ctx, row, lead = null) {
       .run();
   } catch (e) {
     if (String(e.message).includes('UNIQUE')) return false;
-    console.error('revenue insert failed', row.source, row.source_id, e.message);
+    // Non-duplicate DB failure: never send the "Payment logged" notification
+    // for a row that was not recorded. Throw so the webhook 500s and Stripe
+    // retries the event instead of silently dropping it.
+    throw new Error(`revenue insert failed (${row.source}/${row.source_id}): ${e.message}`);
   }
 
   const paidAt = new Date(row.occurred_at).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -1228,8 +1231,10 @@ async function handleStripeWebhook(request, env, ctx) {
   if (!amountCents) return json({ ok: true, handled: false });
 
   // Lead payment state from checkout sessions — lookup first so we can pass details to the notification email.
+  // Test-mode events (livemode:false) must never mutate production lead state.
+  const isLive = event.livemode === true;
   let leadData = null;
-  if (event.type.startsWith('checkout.session.completed')) {
+  if (isLive && event.type.startsWith('checkout.session.completed')) {
     const sessionId = event.data.object.id;
     const leadRow = await env.DB.prepare(
       `SELECT id FROM leads WHERE stripe_session_id = ? AND status != 'paid' LIMIT 1`
@@ -1255,7 +1260,7 @@ async function handleStripeWebhook(request, env, ctx) {
   // production revenue. This is the worker's only revenue write path, so the
   // guard covers checkout.session.completed, invoice.paid and charge.refunded.
   let inserted = false;
-  if (event.livemode === true) {
+  if (isLive) {
     inserted = await insertRevenue(env, ctx, {
       occurred_at: new Date(event.created * 1000).toISOString(),
       source: 'stripe',
@@ -1271,7 +1276,9 @@ async function handleStripeWebhook(request, env, ctx) {
     console.log('stripe webhook skipped (test mode)', event.type, event.id);
   }
 
-  if (leadData) {
+  // Receipt + booking emails only for live-mode payments: a test event must
+  // never email a customer as if they paid.
+  if (isLive && leadData) {
     const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     ctx.waitUntil(Promise.all([
       enqueueEmail(env, {
@@ -1295,7 +1302,8 @@ async function handleStripeWebhook(request, env, ctx) {
 
   // S14: close the invoice ledger on payment. Match by our own
   // metadata.invoice_id first, then by the Stripe invoice id.
-  if (event.type === 'invoice.paid') {
+  // Live-mode only: a test event must never close a production invoice.
+  if (isLive && event.type === 'invoice.paid') {
     const metaInvoiceId = (event.data.object.metadata && event.data.object.metadata.invoice_id) || '';
     const paidAt = new Date(event.created * 1000).toISOString();
     const found = await env.DB.prepare(
