@@ -121,12 +121,6 @@ const authorized = (env, request) => {
   return header.startsWith('Bearer ') && safeEqual(header.slice(7), key);
 };
 
-const substitute = (html, data = {}) =>
-  html.replace(/{{\s*([\w.]+)\s*}}/g, (_, k) => {
-    const v = k.split('.').reduce((acc, part) => (acc == null ? acc : acc[part]), data);
-    return v != null ? String(v) : '';
-  });
-
 const escapeHtml = (value) =>
   String(value ?? '').replace(/[&<>"']/g, (char) => ({
     '&': '&amp;',
@@ -136,6 +130,19 @@ const escapeHtml = (value) =>
     "'": '&#39;',
   })[char]);
 
+// Template substitution for HTML emails. Values are HTML-escaped by default
+// because most interpolated data is lead-controlled (name, business, message,
+// email). Use triple braces {{{key}}} ONLY for server-rendered HTML fragments
+// that are already escaped at build time (currently: the checkout button in
+// lead_acknowledgement.html). Never pass raw lead input through {{{}}}.
+const substitute = (html, data = {}) =>
+  html.replace(/{{{([\w.]+)}}}|{{([\w.]+)}}/g, (_, rawKey, escKey) => {
+    const k = rawKey || escKey;
+    const v = k.split('.').reduce((acc, part) => (acc == null ? acc : acc[part]), data);
+    if (v == null) return '';
+    return rawKey ? String(v) : escapeHtml(v);
+  });
+
 const uuid = () => crypto.randomUUID();
 const nowIso = () => new Date().toISOString();
 const nowEpoch = () => Math.floor(Date.now() / 1000);
@@ -144,6 +151,15 @@ async function verifyTurnstile(env, token) {
   if (!token) return false;
   const secret = env.TURNSTILE_SECRET_KEY;
   if (!secret) return false;
+  // Fail closed on hostname mismatch: a token minted for another site must
+  // not verify here. Expected hostname comes from SITE_URL (production:
+  // sofritostudio.com).
+  let expectedHostname = 'sofritostudio.com';
+  try {
+    expectedHostname = new URL(env.SITE_URL || 'https://sofritostudio.com').hostname;
+  } catch {
+    /* keep default */
+  }
   try {
     const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
       method: 'POST',
@@ -151,7 +167,12 @@ async function verifyTurnstile(env, token) {
       body: new URLSearchParams({ secret, response: token }),
     });
     const data = await res.json();
-    return !!data.success;
+    if (!data.success) return false;
+    if (!data.hostname || data.hostname !== expectedHostname) {
+      console.error('turnstile hostname mismatch', data.hostname);
+      return false;
+    }
+    return true;
   } catch {
     return false;
   }
@@ -433,6 +454,26 @@ async function handleSiteConfig(env) {
 // ------------------------------------------------------------
 // POST /api/lead — inbound lead capture (Zapier → Google Sheets)
 // ------------------------------------------------------------
+// SESSION_PRICE_CENTS lives in KV so the price can change without a deploy,
+// but a bad value must never reach Stripe (unit_amount requires a positive
+// integer). Anything invalid falls back to the $400 default and gets logged.
+async function getSessionPriceCents(env) {
+  const fallback = '40000';
+  let raw = null;
+  try {
+    raw = await env.CONFIG.get('SESSION_PRICE_CENTS');
+  } catch (e) {
+    console.error('SESSION_PRICE_CENTS KV read failed', e.message);
+    return fallback;
+  }
+  if (raw == null || String(raw).trim() === '') return fallback;
+  const n = Number(String(raw).trim());
+  if (!Number.isInteger(n) || n <= 0 || n > 100000000) {
+    console.error('invalid SESSION_PRICE_CENTS in KV, using default', String(raw).slice(0, 32));
+    return fallback;
+  }
+  return String(n);
+}
 async function createStripeCheckoutSession(env, siteUrl, lead, submitKey = null) {
   const stripeKey = env.STRIPE_API_KEY;
   if (!stripeKey) return null;
@@ -451,7 +492,7 @@ async function createStripeCheckoutSession(env, siteUrl, lead, submitKey = null)
       'line_items[0][price_data][currency]': 'usd',
       'line_items[0][price_data][product_data][name]': 'Sofrito Session',
       'line_items[0][price_data][product_data][description]': '45-minute brand strategy session; credited in full toward the $997 Sprint when booked within 30 days',
-      'line_items[0][price_data][unit_amount]': (await env.CONFIG.get('SESSION_PRICE_CENTS')) || '40000',
+      'line_items[0][price_data][unit_amount]': (await getSessionPriceCents(env)),
       'line_items[0][quantity]': '1',
       success_url: `${siteUrl}/success.html?session_id={CHECKOUT_SESSION_ID}&name=${encodeURIComponent(lead.name)}&email=${encodeURIComponent(lead.email)}`,
       cancel_url: `${siteUrl}/cancelled.html`,
@@ -477,6 +518,30 @@ async function getStripeCheckoutSession(env, sessionId) {
     return { unavailable: true };
   }
   return response.json();
+}
+
+// POST /api/checkout-status — lets the success page verify a payment after
+// Stripe redirects back with ?success=true&session_id=.... Only the session id
+// format is trusted from the client; everything else comes from Stripe's API.
+// Never expose secrets, customer emails, or amounts in the response.
+async function handleCheckoutStatus(request, env) {
+  let sessionId = '';
+  try {
+    const body = await request.json();
+    sessionId = String(body.session_id || '');
+  } catch {
+    return json({ status: 'unknown' }, 400);
+  }
+  if (!/^cs_(test|live)_[A-Za-z0-9]+$/.test(sessionId) || sessionId.length > 255) {
+    return json({ status: 'unknown' }, 400);
+  }
+  const session = await getStripeCheckoutSession(env, sessionId);
+  if (!session || session.missing || session.unavailable) return json({ status: 'unknown' });
+  if (session.payment_status === 'paid') return json({ status: 'paid' });
+  if (session.status === 'open' && session.url) {
+    return json({ status: 'requires_action', checkout_url: session.url });
+  }
+  return json({ status: 'unknown' });
 }
 
 async function ensureFreshCheckoutUrl(env, lead) {
@@ -2138,6 +2203,9 @@ export default {
 
         if (p === '/api/stripe-webhook' && request.method === 'POST')
           return handleStripeWebhook(request, env, ctx);
+
+        if (p === '/api/checkout-status' && request.method === 'POST')
+          return handleCheckoutStatus(request, env);
 
         if (p === '/api/calendly-webhook' && request.method === 'POST')
           return handleCalendlyWebhook(request, env, ctx);

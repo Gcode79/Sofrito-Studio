@@ -278,8 +278,8 @@
                     body: JSON.stringify({ session_id: sessionId })
                 }).then(r => r.json()).then(d => {
                     if (d.status === 'paid') {
-                        if (el) el.classList.add('hidden');
-                        if (btn) { btn.href = d.dashboard_url || 'https://dashboard.stripe.com'; btn.classList.remove('hidden'); }
+                        if (el) { el.innerHTML = '<p class="text-sm text-emerald-400 font-semibold">Payment confirmed — your booking link is on its way to your email.</p>'; el.classList.remove('hidden'); }
+                        if (btn) btn.classList.add('hidden');
                         if (fb) fb.classList.add('hidden');
                     } else if (d.status === 'requires_action') {
                         if (btn) { btn.href = d.checkout_url || '#'; btn.classList.remove('hidden'); if (el) el.classList.add('hidden'); }
