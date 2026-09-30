@@ -7,6 +7,13 @@
     <meta name="description" content="How Sofrito Studio handles information submitted through this website.">
     <link rel="canonical" href="https://sofritostudio.com/privacy">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <meta name="theme-color" content="#09090b">
+    <link rel="stylesheet" href="/css/theme.css">
+    <script>
+    /* Theme init: apply the saved theme before first paint (no flash). Dark is the default. */
+    (function(){try{if(localStorage.getItem('sofrito-theme')==='light'){document.documentElement.classList.add('light');}}catch(e){}})();
+    </script>
+    <script src="/js/theme.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-zinc-950 font-sans text-zinc-300 antialiased">
@@ -16,7 +23,13 @@
                 <img src="/assets/SofritoStudio-logo-transparent.png" alt="Sofrito Studio" class="h-9 w-auto">
                 <span class="text-sm font-bold uppercase tracking-widest text-white">Sofrito Studio</span>
             </a>
+            <div class="flex items-center gap-3">
+            <button type="button" data-theme-toggle class="theme-toggle" aria-label="Toggle light and dark theme">
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+            </button>
             <a href="/" class="rounded-sm bg-orange-600 px-4 py-2 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500">Back to site</a>
+            </div>
         </nav>
     </header>
 

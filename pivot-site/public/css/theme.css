@@ -1,0 +1,117 @@
+/* ============================================================
+   Sofrito Studio — light theme
+   Dark is the default. When <html> carries .light, these rules
+   remap the dark-first Tailwind utilities to the warm-paper
+   light palette. Loaded after the Tailwind CDN script.
+   An inline head script applies .light before first paint,
+   so there is no flash of the wrong theme.
+   ============================================================ */
+
+/* ---------- Page ---------- */
+html.light body {
+  background-color: #faf7f2;
+  color: #18181b;
+}
+
+/* ---------- Surfaces ---------- */
+html.light .bg-zinc-950 { background-color: #faf7f2; }
+html.light .bg-zinc-900 { background-color: #ffffff; }
+html.light .bg-zinc-900\/50 { background-color: rgba(255, 255, 255, 0.72); }
+html.light .bg-zinc-900\/30 { background-color: rgba(255, 255, 255, 0.6); }
+html.light .bg-black\/50 { background-color: #ffffff; }
+
+/* ---------- Text ---------- */
+/* Keep white text on the orange CTA backgrounds readable. */
+html.light .text-white:not(.bg-orange-600):not(.bg-orange-700) { color: #18181b; }
+html.light .text-zinc-50 { color: #18181b; }
+html.light .text-zinc-200 { color: #27272a; }
+html.light .text-zinc-300 { color: #3f3f46; }
+html.light .text-zinc-400 { color: #52525b; }
+html.light .text-zinc-600 { color: #52525b; }
+/* text-zinc-500 is readable on both themes; left alone. */
+/* Lift the light oranges so links keep contrast on paper. */
+html.light .text-orange-400 { color: #ea580c; }
+html.light .text-orange-300 { color: #c2410c; }
+html.light .text-red-400 { color: #dc2626; }
+
+/* ---------- Borders ---------- */
+html.light .border-white\/10 { border-color: #e4e4e7; }
+html.light .border-white\/5 { border-color: #f4f4f5; }
+html.light .border-white\/25 { border-color: #d4d4d8; }
+
+/* ---------- Focus rings ---------- */
+html.light .ring-offset-zinc-950 { --tw-ring-offset-color: #faf7f2; }
+
+/* ---------- Brand treatments ---------- */
+html.light .glass-panel {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(24, 24, 27, 0.08);
+}
+html.light .text-chrome {
+  background: linear-gradient(180deg, #18181b 0%, #71717a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ---------- Form fields ---------- */
+html.light input,
+html.light textarea,
+html.light select {
+  color-scheme: light;
+}
+html.light ::placeholder {
+  color: #a1a1aa;
+  opacity: 1;
+}
+
+/* ---------- Theme toggle button ---------- */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  color: #e4e4e7;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+.theme-toggle:hover {
+  border-color: #ea580c;
+  color: #ea580c;
+}
+.theme-toggle:focus-visible {
+  outline: 2px solid #ea580c;
+  outline-offset: 2px;
+}
+.theme-toggle svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+.theme-toggle .icon-sun { display: none; }
+html.light .theme-toggle {
+  border-color: rgba(24, 24, 27, 0.15);
+  color: #52525b;
+}
+html.light .theme-toggle:hover {
+  border-color: #ea580c;
+  color: #ea580c;
+}
+html.light .theme-toggle .icon-sun { display: block; }
+html.light .theme-toggle .icon-moon { display: none; }
+
+/* Floating variant for pages without a header (success, cancelled). */
+.theme-toggle--floating {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 50;
+  background: rgba(24, 24, 27, 0.85);
+}
+html.light .theme-toggle--floating {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 16px rgba(24, 24, 27, 0.12);
+}
