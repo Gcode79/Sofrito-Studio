@@ -1723,7 +1723,7 @@ async function handleStripeWebhook(request, env, ctx) {
         to: leadData.email,
         template: 'receipt.html',
         subject: 'Your Sofrito Session receipt',
-        data: { lead_id: leadData.id, lead: leadData, date, booking_url: calendlyPrefillUrl(leadData.name, leadData.email) },
+        data: { lead_id: leadData.id, lead: leadData, date, booking_url: calendlyPrefillUrl(leadData.name, leadData.email), amount: (amountCents / 100).toFixed(2) },
         lead_id: leadData.id,
       }),
       enqueueEmail(env, {
@@ -2362,7 +2362,7 @@ async function handleSecondCheckoutNudge(env) {
 }
 
 async function runSessionAutomations(env) {
-  const reminderQuery = `SELECT b.*, l.name AS lead_name, l.email AS lead_email, l.phone, l.business_name, l.business_type, l.package_interest, l.budget
+  const reminderQuery = `SELECT b.*, l.name AS lead_name, l.email AS lead_email, l.phone, l.business_name, l.business_type, l.package_interest, l.budget, l.status AS lead_status
     FROM calendly_bookings b
     LEFT JOIN leads l ON l.id = b.lead_id
     WHERE b.status = 'active' AND b.scheduled_for IS NOT NULL
@@ -2372,6 +2372,14 @@ async function runSessionAutomations(env) {
   for (const booking of reminders.results || []) {
     if (await emailRecordedByEvent(env, 'session-reminder.html', booking.booking_uuid)) continue;
     const lead = bookingLead(booking);
+    // An unpaid booker must not get a reminder that reads like a confirmed
+    // session: their slot isn't held until payment completes. Paid bookers
+    // get the plain reminder.
+    const bookingIsPaid = booking.lead_status === 'paid';
+    const payUrl = `${env.SITE_URL || ''}/#book?email=${encodeURIComponent(lead.email || '')}&name=${encodeURIComponent(lead.name === 'there' ? '' : lead.name)}`;
+    const paymentBanner = bookingIsPaid
+      ? ''
+      : `<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:14px 16px;font-size:14px;color:#991B1B;margin:0 0 16px;"><strong>Heads up:</strong> we haven't received your $400 payment yet, so your session time isn't held. <a href="${payUrl}" style="color:#991B1B;font-weight:700;">Complete your payment</a> to lock it in.</div>`;
     const scheduledLabel = formatSessionDate(booking.scheduled_for, booking.timezone, {
       weekday: 'long',
       month: 'long',
@@ -2404,6 +2412,7 @@ async function runSessionAutomations(env) {
           reschedule_url: rescheduleUrl,
           reschedule_label: rescheduleLabel,
         },
+        payment_banner: paymentBanner,
       },
       lead_id: lead.id,
       metadata: { booking_id: booking.id, booking_uuid: booking.booking_uuid, event_id: booking.booking_uuid },
