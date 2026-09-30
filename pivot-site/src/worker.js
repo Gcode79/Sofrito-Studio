@@ -619,7 +619,7 @@ async function getStripeCheckoutSession(env, sessionId) {
 }
 
 // POST /api/checkout-status — lets the success page verify a payment after
-// Stripe redirects back with ?success=true&session_id=.... Only the session id
+// Stripe redirects back to /success.html?session_id=.... Only the session id
 // format is trusted from the client; everything else comes from Stripe's API.
 // Never expose secrets, customer emails, or amounts in the response.
 async function handleCheckoutStatus(request, env) {

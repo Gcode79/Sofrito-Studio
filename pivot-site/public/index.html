@@ -327,27 +327,27 @@
                 <form id="lead-form" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Name <span class="text-zinc-500">*</span></label>
+                            <label for="name" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Name <span class="text-zinc-500">*</span></label>
                             <input type="text" id="name" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors" required>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Email <span class="text-zinc-500">*</span></label>
+                            <label for="email" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Email <span class="text-zinc-500">*</span></label>
                             <input type="email" id="email" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors" required>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Business Name <span class="text-zinc-500">*</span></label>
+                            <label for="business_name" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Business Name <span class="text-zinc-500">*</span></label>
                             <input type="text" id="business_name" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors" required>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Cell Phone <span class="text-red-500">*</span></label>
+                            <label for="phone" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Cell Phone <span class="text-zinc-500">*</span></label>
                             <input type="tel" id="phone" required class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors">
                             <p class="text-xs text-zinc-500 mt-1.5">So we can reach you before your session to talk through your project.</p>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Business Type <span class="text-zinc-500">*</span></label>
+                        <label for="business_type" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Business Type <span class="text-zinc-500">*</span></label>
                         <select id="business_type" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors appearance-none" required>
                             <option value="" class="bg-zinc-900">Select...</option>
                             <option value="food_truck" class="bg-zinc-900">Food Truck</option>
@@ -358,7 +358,7 @@
                         <p id="business-type-pitch" class="text-sm text-zinc-400 mt-3 hidden"></p>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Message (Optional)</label>
+                        <label for="message" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Message (Optional)</label>
                         <textarea id="message" rows="3" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors"></textarea>
                     </div>
                     <div class="cf-turnstile" data-sitekey="0x4AAAAAAFAfcfVLJKtjbuO8" data-callback="turnstileCallback"></div>
@@ -377,21 +377,6 @@
                     Your $400 Sofrito Session is credited in full toward your $997 Sprint when you start the sprint within 30 days of your session.<br>
                     The $400 session is refundable in full within 7 days after your session and before direction lock — or within 30 days of payment if you never had the session. Email <a href="mailto:support@sofritostudio.com" class="underline hover:text-zinc-200">support@sofritostudio.com</a> to request a refund. <a href="/terms" class="underline hover:text-zinc-200">Full terms</a>
                 </p>
-                <div id="success-view" class="hidden text-center py-8">
-                    <svg class="w-16 h-16 mx-auto mb-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                    <h3 class="text-2xl font-bold text-white mb-2">Request Received</h3>
-                    <p class="text-zinc-400 mb-6 max-w-md mx-auto">Choose your Sofrito Session time once the payment link arrives in your inbox.</p>
-                    <div id="checkout-status" class="hidden"><p class="text-sm text-zinc-400 animate-pulse">Preparing your payment link...</p></div>
-                    <a id="checkout-btn" href="#" class="inline-flex w-full max-w-sm items-center justify-center rounded-md bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6 py-3 transition hidden">Book Your Sofrito Session</a>
-                    <p id="checkout-fallback" class="text-sm text-zinc-500 mt-4 hidden">Link did not appear? <a href="/" class="underline text-zinc-300">Resume your Sofrito Session booking</a> or <a href="mailto:hello@sofritostudio.com?subject=Session Booking Request" class="underline text-zinc-300">email us</a>.</p>
-                    <button id="retry-btn" class="mt-6 text-sm text-zinc-500 hover:text-zinc-200 transition hidden">Try again</button>
-                </div>
-                <div id="cancel-view" class="hidden text-center py-8">
-                    <svg class="w-16 h-16 mx-auto mb-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    <h3 class="text-2xl font-bold text-white mb-2">Checkout Cancelled</h3>
-                    <p class="text-zinc-400 mb-6">No charge was made. Your Sofrito Session request is saved, and you can return when you are ready.</p>
-                    <a href="/" class="inline-flex rounded-md bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6 py-3 transition">Resume Your Sofrito Session Booking</a>
-                </div>
             </div>
         </div>
         <div class="text-center mt-12 text-zinc-600 text-sm font-mono">
@@ -440,7 +425,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
                     </a>
                     <a href="https://pinterest.com/sofritostudio" aria-label="Pinterest" class="text-zinc-400 hover:text-zinc-200 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="8" y2="21"/><path d="M8 12a4 4 0 1 0 8 0 4 4 0 1 0-8 0z"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/></svg>
                     </a>
                 </div>
             </div>
@@ -452,7 +437,6 @@
 
     <!-- Funnel Logic Scripts -->
     <script>
-        const TURNSTILE_SITEKEY = '0x4AAAAAAE_vjXsiRBy7zzkp';
         let awaitingTurnstile = false;
         let turnstileToken = null;
 
@@ -474,44 +458,14 @@
             form.requestSubmit();
         };
 
-        // One submit key per page render. Hoisted above the IIFE below because the
-        // submit handler sits at top level, outside it. Re-rendering yields a new
-        // key, so a real repeat purchase is never blocked; a double-click on the
-        // same render reuses this key and the server returns the same checkout.
+        // One submit key per page render. Re-rendering yields a new key, so a
+        // real repeat purchase is never blocked; a double-click on the same
+        // render reuses this key and the server returns the same checkout.
         const submitKey = crypto.randomUUID();
 
-        (function() {
-            const url = new URL(window.location.href);
-            const success = url.searchParams.get('success');
-            const sessionId = url.searchParams.get('session_id');
-            const canceled = url.searchParams.get('canceled');
-            if (success === 'true' && sessionId) {
-                const el = document.getElementById('checkout-status');
-                const btn = document.getElementById('checkout-btn');
-                const fb = document.getElementById('checkout-fallback');
-                if (el) el.classList.remove('hidden');
-                if (btn) btn.classList.remove('hidden');
-                fetch('/api/checkout-status', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ session_id: sessionId })
-                }).then(r => r.json()).then(d => {
-                    if (d.status === 'paid') {
-                        if (el) { el.innerHTML = '<p class="text-sm text-emerald-400 font-semibold">Payment confirmed — your booking link is on its way to your email.</p>'; el.classList.remove('hidden'); }
-                        if (btn) btn.classList.add('hidden');
-                        if (fb) fb.classList.add('hidden');
-                    } else if (d.status === 'requires_action') {
-                        if (btn) { btn.href = d.checkout_url || '#'; btn.classList.remove('hidden'); if (el) el.classList.add('hidden'); }
-                        if (fb) fb.classList.add('hidden');
-                    } else {
-                        if (fb) fb.classList.remove('hidden');
-                    }
-                }).catch(() => { if (fb) fb.classList.remove('hidden'); });
-            } else if (canceled === 'true') {
-                form.classList.add('hidden');
-                document.getElementById('cancel-view').classList.remove('hidden');
-            }
-        })();
+        // NOTE: Stripe returns buyers to /success.html (paid / resume) and
+        // /cancelled.html (abandoned). There is intentionally no ?success= or
+        // ?canceled= handling on this page.
 
         const TYPE_PITCHES = {
             food_truck: 'Keep your menu, location, hours, and ordering links in one place.',
@@ -531,9 +485,7 @@
             }
         });
 
-        const container = document.getElementById('form-container');
         const form = document.getElementById('lead-form');
-        const retryBtn = document.getElementById('retry-btn');
 
         // Prefill from payment-nudge links (?name=&email=) so returning
         // bookers don't re-type what we already know.
@@ -546,16 +498,6 @@
             if (preName && nameEl && !nameEl.value) nameEl.value = preName;
             if (preEmail && emailEl && !emailEl.value && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(preEmail)) emailEl.value = preEmail;
         } catch (e) { /* prefill is best-effort */ }
-
-        if (retryBtn) {
-            retryBtn.addEventListener('click', () => {
-                container.style.display = '';
-                form.reset();
-                document.getElementById('success-view').classList.add('hidden');
-                document.getElementById('cancel-view').classList.add('hidden');
-                retryBtn.classList.add('hidden');
-            });
-        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
