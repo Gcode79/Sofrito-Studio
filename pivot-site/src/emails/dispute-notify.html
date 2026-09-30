@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Chargeback dispute</title></head>
+<body style="margin:0;background:#F9FAFB;font-family:Arial,Helvetica,sans-serif;color:#0F172A;">
+  <div style="max-width:600px;margin:0 auto;padding:24px;">
+    <p style="font-family:Georgia,serif;font-size:20px;color:#0F172A;margin:0 0 20px;">Sofrito<span style="color:#EA580C;">Studio</span></p>
+    <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:28px;">
+      <h1 style="font-family:Georgia,serif;font-size:22px;color:#0F172A;margin:0 0 4px;">Dispute {{outcome}} — {{lead.name}}</h1>
+      <p style="font-size:14px;color:#64748B;margin:0 0 16px;">${{amount}} · reason: {{reason}}</p>
+      <table style="width:100%;font-size:14px;color:#334155;border-collapse:collapse;">
+        <tr><td style="padding:6px 0;color:#94A3B8;width:38%;">Client</td><td style="padding:6px 0;">{{lead.name}}</td></tr>
+        <tr><td style="padding:6px 0;color:#94A3B8;">Email</td><td style="padding:6px 0;">{{lead.email}}</td></tr>
+        <tr><td style="padding:6px 0;color:#94A3B8;">Amount</td><td style="padding:6px 0;">${{amount}}</td></tr>
+        <tr><td style="padding:6px 0;color:#94A3B8;">Charge</td><td style="padding:6px 0;">{{charge_id}}</td></tr>
+        <tr><td style="padding:6px 0;color:#94A3B8;">Evidence due</td><td style="padding:6px 0;">{{evidence_due}}</td></tr>
+      </table>
+      <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:16px;font-size:14px;color:#991B1B;margin-top:12px;">
+        <p style="margin:0;line-height:1.5;">While the dispute is open the lead is marked <strong>disputed</strong> and the booking sweeps are paused. If you win, the lead is restored to paid automatically; if you lose, it is marked refunded like a normal refund. Submit evidence in the Stripe Dashboard before the deadline.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -35,6 +35,7 @@ import bookingCancelNotify from './emails/booking-cancel-notify.html';
 import bookingLink from './emails/booking-link.html';
 import bookingNotify from './emails/booking-notify.html';
 import bookingNudge from './emails/booking-nudge.html';
+import disputeNotify from './emails/dispute-notify.html';
 import followUpDay1 from './emails/follow-up-day1.html';
 import followUpDay30 from './emails/follow-up-day30.html';
 import followUpLeadReminder from './emails/follow-up-lead-reminder.html';
@@ -65,6 +66,7 @@ const REPO_EMAIL_TEMPLATES = Object.freeze({
   'booking-link.html': bookingLink,
   'booking-notify.html': bookingNotify,
   'booking-nudge.html': bookingNudge,
+  'dispute-notify.html': disputeNotify,
   'follow-up-day1.html': followUpDay1,
   'follow-up-day30.html': followUpDay30,
   'follow-up-lead-reminder.html': followUpLeadReminder,
@@ -204,6 +206,11 @@ const nowEpoch = () => Math.floor(Date.now() / 1000);
 // new Date() directly — epoch seconds read as milliseconds land in Jan 1970.
 // paidAtMs() normalizes both epoch seconds and ISO strings to milliseconds.
 const paidAtMs = (v) => (typeof v === 'number' ? v * 1000 : new Date(v).getTime());
+// Calendly prefill links must be URL-encoded server-side: template
+// substitution HTML-escapes but does not URL-encode, so a name like
+// "R&B Foods" would corrupt the query string and break prefill.
+const calendlyPrefillUrl = (name, email) =>
+  `https://calendly.com/sofrito-studio/sofrito-strategy-session?name=${encodeURIComponent(name || '')}&email=${encodeURIComponent(email || '')}`;
 
 async function verifyTurnstile(env, token) {
   if (!token) return false;
@@ -1406,12 +1413,18 @@ async function insertRevenue(env, ctx, row, lead = null) {
   }
 
   const paidAt = new Date(row.occurred_at).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  // Negative ledger entries are refunds or disputes — label them honestly
+  // instead of "Payment logged: $-400.00".
+  const absAmt = (Math.abs(row.amount_cents) / 100).toFixed(2);
+  const entryKind = row.amount_cents < 0
+    ? (String(row.description || '').startsWith('dispute') ? 'Dispute' : 'Refund')
+    : 'Payment';
   ctx.waitUntil(
     enqueueEmail(env, {
       kind: 'email',
       to: env.NOTIFICATION_EMAIL || '',
       template: 'revenue-notify.html',
-      subject: `Payment logged: $${(row.amount_cents / 100).toFixed(2)}${lead?.name ? ` — ${lead.name}` : ''}`,
+      subject: `${entryKind} logged: $${absAmt}${lead?.name ? ` — ${lead.name}` : ''}`,
       data: {
         amount: (row.amount_cents / 100).toFixed(2),
         source: row.source,
@@ -1426,6 +1439,111 @@ async function insertRevenue(env, ctx, row, lead = null) {
     })
   );
   return true;
+}
+
+// Chargebacks (S-stripe): a dispute pulls the funds while it is open, so it
+// needs the same bookkeeping as a refund — a contra ledger entry, the lead
+// moved out of 'paid' so the sweeps stop nudging, and a founder alert with
+// the evidence deadline. On close: won → funds return, lead restored to
+// 'paid' (only if still 'disputed', so an intervening refund wins); lost →
+// money is gone, treated like a refund.
+async function handleDisputeEvent(env, ctx, event) {
+  const dispute = event.data.object || {};
+  const isCreated = event.type === 'charge.dispute.created';
+  const won = dispute.status === 'won';
+  const amountCents = Number(dispute.amount || 0);
+  const occurredAt = new Date(event.created * 1000).toISOString();
+
+  // Resolve the payer email: dispute.charge may be an expanded object or an id.
+  let chargeId = '';
+  let email = '';
+  const chargeRef = dispute.charge;
+  if (chargeRef && typeof chargeRef === 'object') {
+    chargeId = String(chargeRef.id || '');
+    email = String(
+      chargeRef.receipt_email ||
+      (chargeRef.billing_details && chargeRef.billing_details.email) ||
+      ''
+    ).trim().toLowerCase();
+  } else {
+    chargeId = String(chargeRef || '');
+    if (chargeId && env.STRIPE_API_KEY) {
+      try {
+        const ch = await stripeRequest(env, 'GET', `/charges/${chargeId}`);
+        email = String(
+          ch.receipt_email ||
+          (ch.billing_details && ch.billing_details.email) ||
+          ''
+        ).trim().toLowerCase();
+      } catch (e) {
+        console.error('dispute charge lookup failed', chargeId, e.message);
+      }
+    }
+  }
+
+  const lead = email
+    ? await env.DB.prepare(
+        `SELECT id, name, email FROM leads WHERE email = ? AND status IN ('paid', 'disputed') ORDER BY paid_at DESC LIMIT 1`
+      ).bind(email).first()
+    : null;
+
+  if (isCreated) {
+    await insertRevenue(env, ctx, {
+      occurred_at: occurredAt,
+      source: 'stripe',
+      source_id: event.id,
+      session_id: chargeId,
+      amount_cents: -amountCents,
+      currency: dispute.currency || 'usd',
+      description: 'dispute opened',
+      metadata: { event_type: event.type },
+      paid: false,
+    }, lead);
+    if (lead) {
+      await env.DB.prepare(`UPDATE leads SET status = 'disputed' WHERE id = ? AND status = 'paid'`).bind(lead.id).run();
+    }
+  } else if (won) {
+    await insertRevenue(env, ctx, {
+      occurred_at: occurredAt,
+      source: 'stripe',
+      source_id: event.id,
+      session_id: chargeId,
+      amount_cents: amountCents,
+      currency: dispute.currency || 'usd',
+      description: 'dispute won — funds returned',
+      metadata: { event_type: event.type },
+      paid: true,
+    }, lead);
+    if (lead) {
+      await env.DB.prepare(`UPDATE leads SET status = 'paid' WHERE id = ? AND status = 'disputed'`).bind(lead.id).run();
+    }
+  } else {
+    // lost (or any other terminal state): money is gone — same as a refund.
+    if (lead) {
+      await env.DB.prepare(`UPDATE leads SET status = 'refunded' WHERE id = ? AND status IN ('paid', 'disputed')`).bind(lead.id).run();
+    }
+  }
+
+  const evidenceDue = dispute.evidence_details && dispute.evidence_details.due_by
+    ? new Date(dispute.evidence_details.due_by * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : '—';
+  const outcome = isCreated ? 'opened' : won ? 'WON — funds returned' : 'LOST — funds withdrawn';
+  await enqueueEmail(env, {
+    kind: 'email',
+    to: env.NOTIFICATION_EMAIL || '',
+    template: 'dispute-notify.html',
+    subject: `[Dispute ${isCreated ? 'opened' : won ? 'won' : 'lost'}] ${lead?.name || email || chargeId} — $${(amountCents / 100).toFixed(2)}`,
+    data: {
+      lead: lead || { name: email || '(no matching lead — look up in Stripe)', email: email || '' },
+      amount: (amountCents / 100).toFixed(2),
+      outcome,
+      reason: dispute.reason || '',
+      evidence_due: evidenceDue,
+      charge_id: chargeId,
+      siteUrl: env.SITE_URL || '',
+    },
+    lead_id: lead?.id,
+  });
 }
 
 async function handleCheckoutExpired(env, ctx, event) {
@@ -1478,6 +1596,21 @@ async function handleStripeWebhook(request, env, ctx) {
   if (Math.abs(Date.now() / 1000 - Number(ts)) > 300) return fail('stale signature', 401);
 
   const event = JSON.parse(raw);
+  // Disputes are handled on their own path: they carry no payment amount
+  // (amountCents would be 0 and the generic flow would drop them), but a
+  // chargeback still needs a ledger entry, a lead-status move, and a
+  // founder alert. NOTE: these events only arrive if charge.dispute.*
+  // is subscribed on the Stripe endpoint — that subscription is on the
+  // Dashboard side.
+  if (event.type === 'charge.dispute.created' || event.type === 'charge.dispute.closed') {
+    const live = event.livemode === true;
+    if (live) {
+      await handleDisputeEvent(env, ctx, event);
+    } else {
+      console.log('stripe webhook skipped (test mode)', event.type, event.id);
+    }
+    return json({ ok: true, handled: live });
+  }
   if (event.type === 'checkout.session.expired') {
     return json({ ok: true, handled: await handleCheckoutExpired(env, ctx, event) });
   }
@@ -1590,7 +1723,7 @@ async function handleStripeWebhook(request, env, ctx) {
         to: leadData.email,
         template: 'receipt.html',
         subject: 'Your Sofrito Session receipt',
-        data: { lead_id: leadData.id, lead: leadData, date },
+        data: { lead_id: leadData.id, lead: leadData, date, booking_url: calendlyPrefillUrl(leadData.name, leadData.email) },
         lead_id: leadData.id,
       }),
       enqueueEmail(env, {
@@ -1598,7 +1731,7 @@ async function handleStripeWebhook(request, env, ctx) {
         to: leadData.email,
         template: 'booking-link.html',
         subject: 'Book your Sofrito Session',
-        data: { lead_id: leadData.id, lead: leadData },
+        data: { lead_id: leadData.id, lead: leadData, booking_url: calendlyPrefillUrl(leadData.name, leadData.email) },
         lead_id: leadData.id,
       }),
     ]));
@@ -1925,8 +2058,13 @@ async function handleCalendlyCanceled(env, ctx, payload, bookingUuid) {
   )
     .bind(now, now, calendlyField(payload, ['cancel_url']), bookingUuid)
     .run();
+  // A paid lead stays 'paid' when its booking is cancelled. The booking
+  // safety net keys on status='paid' (48h client nudge, 7d founder alert),
+  // and a reschedule's invitee.created must re-match the paid lead — not
+  // mint a duplicate row and send a false "complete your payment" nudge to
+  // someone who already paid $400.
   if (booking.lead_id) {
-    await env.DB.prepare(`UPDATE leads SET status = 'cancelled', updated_at = ? WHERE id = ?`)
+    await env.DB.prepare(`UPDATE leads SET status = 'cancelled', updated_at = ? WHERE id = ? AND status != 'paid'`)
       .bind(now, booking.lead_id)
       .run();
   }
@@ -2099,7 +2237,7 @@ async function handleBookingSafetyNet(env) {
         to: lead.email,
         template: 'booking-nudge.html',
         subject: 'Pick your Sofrito Session time',
-        data: { lead, siteUrl: env.SITE_URL || '' },
+        data: { lead, siteUrl: env.SITE_URL || '', booking_url: calendlyPrefillUrl(lead.name, lead.email) },
         lead_id: lead.id,
       });
     }
