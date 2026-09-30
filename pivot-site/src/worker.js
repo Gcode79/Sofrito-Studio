@@ -34,6 +34,7 @@ import abandonedNudge2 from './emails/abandoned-nudge-2.html';
 import bookingCancelNotify from './emails/booking-cancel-notify.html';
 import bookingLink from './emails/booking-link.html';
 import bookingNotify from './emails/booking-notify.html';
+import bookingNudge from './emails/booking-nudge.html';
 import followUpDay1 from './emails/follow-up-day1.html';
 import followUpDay30 from './emails/follow-up-day30.html';
 import followUpLeadReminder from './emails/follow-up-lead-reminder.html';
@@ -44,12 +45,14 @@ import leadWon from './emails/lead-won.html';
 import leadAcknowledgement from './emails/lead_acknowledgement.html';
 import newLeadNotify from './emails/new-lead-notify.html';
 import onboardingPack from './emails/onboarding-pack.html';
+import paymentNudge from './emails/payment-nudge.html';
 import priceOverrideNotify from './emails/price-override-notify.html';
 import receipt from './emails/receipt.html';
 import referralInvite from './emails/referral-invite.html';
 import revenueNotify from './emails/revenue-notify.html';
 import sessionReminder from './emails/session-reminder.html';
 import unbilledFinalNotify from './emails/unbilled-final-notify.html';
+import unbookedSessionNotify from './emails/unbooked-session-notify.html';
 import welcome1 from './emails/welcome-1.html';
 import welcome2 from './emails/welcome-2.html';
 import welcome3 from './emails/welcome-3.html';
@@ -60,6 +63,7 @@ const REPO_EMAIL_TEMPLATES = Object.freeze({
   'booking-cancel-notify.html': bookingCancelNotify,
   'booking-link.html': bookingLink,
   'booking-notify.html': bookingNotify,
+  'booking-nudge.html': bookingNudge,
   'follow-up-day1.html': followUpDay1,
   'follow-up-day30.html': followUpDay30,
   'follow-up-lead-reminder.html': followUpLeadReminder,
@@ -70,12 +74,14 @@ const REPO_EMAIL_TEMPLATES = Object.freeze({
   'lead_acknowledgement.html': leadAcknowledgement,
   'new-lead-notify.html': newLeadNotify,
   'onboarding-pack.html': onboardingPack,
+  'payment-nudge.html': paymentNudge,
   'price-override-notify.html': priceOverrideNotify,
   'receipt.html': receipt,
   'referral-invite.html': referralInvite,
   'revenue-notify.html': revenueNotify,
   'session-reminder.html': sessionReminder,
   'unbilled-final-notify.html': unbilledFinalNotify,
+  'unbooked-session-notify.html': unbookedSessionNotify,
   'welcome-1.html': welcome1,
   'welcome-2.html': welcome2,
   'welcome-3.html': welcome3,
@@ -567,7 +573,7 @@ async function createStripeCheckoutSession(env, siteUrl, lead, submitKey = null,
       mode: 'payment',
       'line_items[0][price_data][currency]': 'usd',
       'line_items[0][price_data][product_data][name]': 'Sofrito Session',
-      'line_items[0][price_data][product_data][description]': '45-minute brand strategy session; credited in full toward the $997 Sprint when booked within 30 days',
+      'line_items[0][price_data][product_data][description]': '45-minute brand strategy session; credited in full toward the $997 Sprint when the sprint starts within 30 days of your session',
       'line_items[0][price_data][unit_amount]': sessionPriceCents,
       'line_items[0][quantity]': '1',
       success_url: `${siteUrl}/success.html?session_id={CHECKOUT_SESSION_ID}&name=${encodeURIComponent(lead.name)}&email=${encodeURIComponent(lead.email)}`,
@@ -1219,14 +1225,24 @@ async function handleInvoiceTrigger(request, env, ctx) {
   if (!priceCents) return fail(`no price on record for ${project.name}; fix projects.price_cents first`, 422);
 
   // 30-day credit window: the advertised term credits the $400 session
-  // toward the $997 sprint only when the sprint is booked within 30 days of
-  // the session. Past the window the final invoice bills the full sprint
-  // price unless the founder explicitly passes honor_expired_credit: true.
+  // toward the $997 sprint only when the sprint starts within 30 days of the
+  // session. The anchor is the actual session date (the Calendly booking),
+  // falling back to the payment date when there is no booking row (e.g. a
+  // session held outside Calendly). Past the window the final invoice bills
+  // the full sprint price unless the founder explicitly passes honor_expired_credit: true.
   let daysSinceSession = null;
   let creditExpired = false;
-  if (milestone === 'final' && project.session_paid_at) {
-    daysSinceSession = Math.floor((Date.now() - new Date(project.session_paid_at).getTime()) / 86400000);
-    creditExpired = daysSinceSession > 30;
+  if (milestone === 'final' && project.lead_id) {
+    const booking = await env.DB.prepare(
+      `SELECT scheduled_for FROM calendly_bookings
+       WHERE lead_id = ? AND (status IS NULL OR status != 'cancelled')
+       ORDER BY scheduled_for ASC LIMIT 1`
+    ).bind(project.lead_id).first();
+    const anchor = (booking && booking.scheduled_for) || project.session_paid_at;
+    if (anchor) {
+      daysSinceSession = Math.floor((Date.now() - new Date(anchor).getTime()) / 86400000);
+      creditExpired = daysSinceSession > 30;
+    }
   }
   const honorExpired = String(body.honor_expired_credit || '').toLowerCase() === 'true';
   const sessionPriceForSplit = (milestone === 'final' && creditExpired && !honorExpired)
@@ -1994,6 +2010,89 @@ async function handleUnbilledFinalSweep(env) {
   }
 }
 
+// Booking safety net: two silent-drop gaps the other sweeps miss.
+// (a) Paid session, no booking: the Stripe webhook marks payers status='paid',
+// which neither the warm drip (paid_at IS NULL) nor the won-lead fallback
+// (status='won') selects. A payer who closes the tab before Calendly would
+// drift forever — nudge the client once at 48h, alert the founder once at 7d.
+// (b) Booking, no payment: a Calendly booking whose email has no paid lead.
+// Nudge the booker once at 24h to complete payment (their slot isn't held).
+// Cancelled bookings are excluded from both.
+async function handleBookingSafetyNet(env) {
+  const unbooked = await env.DB.prepare(
+    `SELECT l.id, l.name, l.email, l.phone, l.paid_at
+     FROM leads l
+     WHERE l.status = 'paid' AND l.paid_at IS NOT NULL
+       AND NOT EXISTS (
+         SELECT 1 FROM calendly_bookings b
+         WHERE b.lead_id = l.id AND (b.status IS NULL OR b.status != 'cancelled')
+       )`
+  ).all();
+  for (const lead of unbooked.results || []) {
+    const days = (Date.now() - new Date(lead.paid_at).getTime()) / 86400000;
+    if (days >= 2 && !(await sentAlready(env, 'booking-nudge.html', lead.id))) {
+      await enqueueEmail(env, {
+        kind: 'email',
+        to: lead.email,
+        template: 'booking-nudge.html',
+        subject: 'Pick your Sofrito Session time',
+        data: { lead, siteUrl: env.SITE_URL || '' },
+        lead_id: lead.id,
+      });
+    }
+    if (days >= 7 && !(await sentAlready(env, 'unbooked-session-notify.html', lead.id))) {
+      await enqueueEmail(env, {
+        kind: 'email',
+        to: env.NOTIFICATION_EMAIL || '',
+        template: 'unbooked-session-notify.html',
+        subject: `[Unbooked session] ${lead.name || lead.email} paid $400, never booked`,
+        data: {
+          lead: {
+            name: lead.name || lead.email,
+            email: lead.email,
+            phone: lead.phone || '—',
+            paid_at: lead.paid_at
+              ? new Date(lead.paid_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+              : '',
+          },
+          days_since_paid: String(Math.floor(days)),
+          siteUrl: env.SITE_URL || '',
+        },
+        lead_id: lead.id,
+      });
+    }
+  }
+
+  const unpaid = await env.DB.prepare(
+    `SELECT b.booking_uuid, b.invitee_email, b.invitee_name, b.scheduled_for, b.created_at
+     FROM calendly_bookings b
+     WHERE (b.status IS NULL OR b.status != 'cancelled')
+       AND b.created_at < datetime('now', '-1 day')
+       AND NOT EXISTS (
+         SELECT 1 FROM leads l
+         WHERE l.id = b.lead_id AND l.status = 'paid' AND l.paid_at IS NOT NULL
+       )`
+  ).all();
+  for (const booking of unpaid.results || []) {
+    if (await emailRecordedByEvent(env, 'payment-nudge.html', booking.booking_uuid)) continue;
+    const when = booking.scheduled_for
+      ? ` for ${new Date(booking.scheduled_for).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}`
+      : '';
+    await enqueueEmail(env, {
+      kind: 'email',
+      to: booking.invitee_email,
+      template: 'payment-nudge.html',
+      subject: 'Complete your payment to hold your session time',
+      data: {
+        lead: { name: booking.invitee_name || 'there', email: booking.invitee_email },
+        scheduled_for: when,
+        siteUrl: env.SITE_URL || '',
+      },
+      metadata: { event_id: booking.booking_uuid },
+    });
+  }
+}
+
 async function handleCheckoutSafetyNet(env, ctx) {
   const threshold = nowEpoch() - 7200;
   const leads = await env.DB.prepare(
@@ -2665,6 +2764,13 @@ export default {
       await handleUnbilledFinalSweep(env);
     } catch (e) {
       console.error('unbilled final sweep failed', e.message);
+    }
+
+    // ── Booking safety net (paid/no-booking, booking/no-payment) ──
+    try {
+      await handleBookingSafetyNet(env);
+    } catch (e) {
+      console.error('booking safety net failed', e.message);
     }
 
     // ── Weekly digest (Monday 17:00 UTC) ──
