@@ -280,7 +280,7 @@
         </div>
     </section>
 
-    <section aria-label="FAQ" class="py-16 px-6 max-w-3xl mx-auto">
+    <section aria-label="FAQ" id="faq" class="py-16 px-6 max-w-3xl mx-auto">
         <h2 class="text-4xl font-bold tracking-tighter text-white font-serif mb-8">FAQ</h2>
         <div class="space-y-4">
             <details class="glass-panel p-6">
@@ -401,22 +401,35 @@
 
     <!-- Footer -->
     <footer class="bg-zinc-950 border-t border-white/10 pt-16 pb-8 px-6 max-w-7xl mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 mb-12">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 mb-12">
             <!-- Brand Column -->
             <div>
                 <h3 class="text-white font-bold tracking-widest uppercase text-lg mb-3 font-sans">SOFRITO STUDIO</h3>
                 <p class="text-zinc-400 text-sm leading-relaxed">Brand foundations for independent food businesses.</p>
-                <a href="mailto:hello@sofritostudio.com" class="text-zinc-500 text-sm hover:text-zinc-200 transition-colors mt-4 inline-block">hello@sofritostudio.com</a>
+                <a href="mailto:hello@sofritostudio.com" class="text-zinc-500 text-sm hover:text-zinc-200 transition-colors mt-4 block">hello@sofritostudio.com</a>
+                <a href="mailto:support@sofritostudio.com" class="text-zinc-500 text-sm hover:text-zinc-200 transition-colors mt-1 block">support@sofritostudio.com</a>
             </div>
-            <!-- Legal / Links Column -->
-            <div class="md:text-center">
+            <!-- Explore Column -->
+            <div>
+                <h4 class="text-zinc-500 text-xs font-bold tracking-widest uppercase mb-4 font-sans">Explore</h4>
+                <ul class="space-y-3 text-sm font-sans">
+                    <li><a href="#sprint" class="text-zinc-400 hover:text-zinc-200 transition-colors">The Sprint</a></li>
+                    <li><a href="#process" class="text-zinc-400 hover:text-zinc-200 transition-colors">Process</a></li>
+                    <li><a href="#faq" class="text-zinc-400 hover:text-zinc-200 transition-colors">FAQ</a></li>
+                    <li><a href="#book-now" class="text-zinc-400 hover:text-zinc-200 transition-colors">Book Your Session</a></li>
+                </ul>
+            </div>
+            <!-- Legal Column -->
+            <div>
+                <h4 class="text-zinc-500 text-xs font-bold tracking-widest uppercase mb-4 font-sans">Legal</h4>
                 <ul class="space-y-3 text-sm font-sans">
                     <li><a href="/terms" class="text-zinc-400 hover:text-zinc-200 transition-colors">Terms of Service</a></li>
                     <li><a href="/privacy" class="text-zinc-400 hover:text-zinc-200 transition-colors">Privacy Policy</a></li>
                 </ul>
             </div>
-            <!-- Social Icons -->
+            <!-- Social Column -->
             <div class="md:text-right">
+                <h4 class="text-zinc-500 text-xs font-bold tracking-widest uppercase mb-4 font-sans">Follow</h4>
                 <div class="flex md:justify-end gap-4">
                     <a href="https://instagram.com/pr.sofritostudio" aria-label="Instagram" class="text-zinc-400 hover:text-zinc-200 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>
