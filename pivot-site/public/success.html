@@ -68,8 +68,9 @@
         (function() {
             var params = new URLSearchParams(window.location.search);
             var sessionId = params.get('session_id') || '';
-            var name = params.get('name') || '';
-            var email = params.get('email') || '';
+            // NOTE: name/email are deliberately NOT read from URL params —
+            // they are editable by the payer. The verified identity comes
+            // from /api/checkout-status, matched by session id in our DB.
 
             function show(id) {
                 ['state-verifying', 'state-paid', 'state-action', 'state-unknown'].forEach(function(s) {
@@ -77,7 +78,7 @@
                 });
             }
 
-            function prefillCalendly() {
+            function prefillCalendly(name, email) {
                 var btn = document.getElementById('calendly-btn');
                 if (name || email) {
                     var url = new URL(btn.href);
@@ -101,7 +102,7 @@
             .then(function(data) {
                 var status = data && data.status;
                 if (status === 'paid') {
-                    prefillCalendly();
+                    prefillCalendly(data.name || '', data.email || '');
                     show('state-paid');
                 } else if (status === 'requires_action' && data.checkout_url) {
                     document.getElementById('resume-btn').href = data.checkout_url;

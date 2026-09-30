@@ -622,7 +622,10 @@ async function getStripeCheckoutSession(env, sessionId) {
 // POST /api/checkout-status — lets the success page verify a payment after
 // Stripe redirects back to /success.html?session_id=.... Only the session id
 // format is trusted from the client; everything else comes from Stripe's API.
-// Never expose secrets, customer emails, or amounts in the response.
+// Never expose secrets or amounts in the response. The payer's own stored
+// name/email ARE returned on a verified paid session — only to prefill the
+// payer's own Calendly booking, and only matched by session id in our DB
+// (never from editable URL params).
 async function handleCheckoutStatus(request, env) {
   let sessionId = '';
   try {
@@ -636,7 +639,27 @@ async function handleCheckoutStatus(request, env) {
   }
   const session = await getStripeCheckoutSession(env, sessionId);
   if (!session || session.missing || session.unavailable) return json({ status: 'unknown' });
-  if (session.payment_status === 'paid') return json({ status: 'paid' });
+  if (session.payment_status === 'paid') {
+    // Payer's own stored identity for Calendly prefill. Matched by session
+    // id in our DB — the success page must not trust ?name=/ ?email= URL
+    // params, which the payer can freely edit.
+    let name = '';
+    let email = '';
+    try {
+      const lead = await env.DB.prepare(
+        `SELECT name, email FROM leads WHERE stripe_session_id = ? LIMIT 1`
+      )
+        .bind(sessionId)
+        .first();
+      if (lead) {
+        name = lead.name || '';
+        email = lead.email || '';
+      }
+    } catch (e) {
+      // Prefill is cosmetic — the paid state stands without it.
+    }
+    return json({ status: 'paid', name, email });
+  }
   if (session.status === 'open' && session.url) {
     return json({ status: 'requires_action', checkout_url: session.url });
   }
@@ -2125,7 +2148,30 @@ async function handleCalendlyCreated(env, ctx, payload, bookingUuid) {
     ? `<div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:8px;padding:12px 16px;font-size:14px;color:#065F46;margin:0 0 16px;"><strong>Payment verified:</strong> $400 Sofrito Session paid${paidOn ? ' on ' + escapeHtml(paidOn) : ''}.</div>`
     : `<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:12px 16px;font-size:14px;color:#991B1B;margin:0 0 16px;"><strong>⚠ No payment found:</strong> no $400 session payment matches this email. Verify in Stripe before the session — or collect it then.</div>`;
   const paymentFooterNote = paymentIsPaid
-    ? 'The $400 Stripe payment is recorded against this lead. The remaining $597 is due after written direction lock if the client starts the $997 Brand & Web Sprint.'
+    ? await (async () => {
+        // 30-day credit window — same rule as /api/invoice-trigger and the
+        // unbilled-final sweep: the footer must not promise a $597 remainder
+        // when the session credit has already expired (then it is $997).
+        const sprintCents = (PACKAGE_FALLBACK.sprint || {}).price_cents || 99700;
+        let creditExpired = false;
+        try {
+          const firstBooking = await env.DB.prepare(
+            `SELECT scheduled_for FROM calendly_bookings
+             WHERE lead_id = ? AND (status IS NULL OR status != 'cancelled')
+             ORDER BY scheduled_for ASC LIMIT 1`
+          )
+            .bind(bookingLeadId)
+            .first();
+          const anchor = (firstBooking && firstBooking.scheduled_for) || paidLead.paid_at;
+          if (anchor) creditExpired = Math.floor((Date.now() - paidAtMs(anchor)) / 86400000) > 30;
+        } catch (e) {
+          // Unknown anchor: fall through to the standard $597 remainder.
+        }
+        const sessionPriceCents = Number(await getSessionPriceCents(env));
+        const sessionCents = creditExpired ? 0 : sessionPriceCents;
+        const remaining = `$${(splitMilestoneAmounts(sprintCents, sessionCents).final / 100).toFixed(0)}`;
+        return `The $${(sessionPriceCents / 100).toFixed(0)} Stripe payment is recorded against this lead. The remaining ${remaining} is due after written direction lock if the client starts the $${(sprintCents / 100).toFixed(0)} Brand & Web Sprint.`;
+      })()
     : 'No $400 payment is linked to this booking yet. If the client paid under a different email, link it manually before the session.';
   ctx.waitUntil(
     Promise.all([
@@ -2302,6 +2348,28 @@ async function handleUnbilledFinalSweep(env) {
   if (!rows.results?.length) return;
   for (const row of rows.results) {
     if (await sentAlready(env, 'unbilled-final-notify.html', row.id)) continue;
+    // 30-day credit window — the same rule /api/invoice-trigger enforces:
+    // the $400 session credit only counts toward the sprint when the
+    // session was within the last 30 days. Past the window the true
+    // collectible final balance is the full $997 sprint price, not $597.
+    // Quoting $597 here would risk under-billing a late session.
+    let creditExpired = false;
+    const booking = await env.DB.prepare(
+      `SELECT scheduled_for FROM calendly_bookings
+       WHERE lead_id = ? AND (status IS NULL OR status != 'cancelled')
+       ORDER BY scheduled_for ASC LIMIT 1`
+    )
+      .bind(row.id)
+      .first();
+    const anchor = (booking && booking.scheduled_for) || row.paid_at;
+    if (anchor) creditExpired = Math.floor((Date.now() - paidAtMs(anchor)) / 86400000) > 30;
+    const sprintCents = (PACKAGE_FALLBACK.sprint || {}).price_cents || 99700;
+    const sessionCents = creditExpired ? 0 : Number(await getSessionPriceCents(env));
+    const finalCents = splitMilestoneAmounts(sprintCents, sessionCents).final;
+    const finalBalance = `$${(finalCents / 100).toFixed(0)}`;
+    const creditNote = creditExpired
+      ? `The 30-day session-credit window has passed, so the full $${(sprintCents / 100).toFixed(0)} sprint price applies (no $400 credit).`
+      : '';
     const days = row.paid_at
       ? Math.floor((Date.now() - paidAtMs(row.paid_at)) / 86400000)
       : null;
@@ -2309,7 +2377,7 @@ async function handleUnbilledFinalSweep(env) {
       kind: 'email',
       to: env.NOTIFICATION_EMAIL || '',
       template: 'unbilled-final-notify.html',
-      subject: `[Unbilled $597] ${row.name || row.email} — final Sprint invoice not triggered`,
+      subject: `[Unbilled ${finalBalance}] ${row.name || row.email} — final Sprint invoice not triggered`,
       data: {
         lead: {
           name: row.name || row.email,
@@ -2317,6 +2385,8 @@ async function handleUnbilledFinalSweep(env) {
           paid_at: row.paid_at ? new Date(paidAtMs(row.paid_at)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
         },
         days_since_paid: days == null ? '—' : String(days),
+        final_balance: finalBalance,
+        credit_note: creditNote,
         project: { id: row.project_id || '', name: row.project_name || '(no project row yet)' },
         siteUrl: env.SITE_URL || '',
       },
@@ -2356,11 +2426,13 @@ async function handleBookingSafetyNet(env) {
       });
     }
     if (days >= 7 && !(await sentAlready(env, 'unbooked-session-notify.html', lead.id))) {
+      // The paid amount, not a hardcoded $400: SESSION_PRICE_CENTS may be overridden.
+      const paidDollars = `$${(Number(await getSessionPriceCents(env)) / 100).toFixed(0)}`;
       await enqueueEmail(env, {
         kind: 'email',
         to: env.NOTIFICATION_EMAIL || '',
         template: 'unbooked-session-notify.html',
-        subject: `[Unbooked session] ${lead.name || lead.email} paid $400, never booked`,
+        subject: `[Unbooked session] ${lead.name || lead.email} paid ${paidDollars}, never booked`,
         data: {
           lead: {
             name: lead.name || lead.email,
@@ -2385,8 +2457,11 @@ async function handleBookingSafetyNet(env) {
        AND b.created_at < datetime('now', '-1 day')
        AND NOT EXISTS (
          SELECT 1 FROM leads l
-         WHERE l.id = b.lead_id AND l.status = 'paid' AND l.paid_at IS NOT NULL
+         WHERE l.id = b.lead_id AND l.paid_at IS NOT NULL
        )`
+    // NOTE: paid_at (not status) is the exclusion: paid_at is never cleared,
+    // so a refunded or dispute-lost lead still counts as "already paid" and
+    // never receives a false "Complete your payment" demand.
   ).all();
   for (const booking of unpaid.results || []) {
     if (await emailRecordedByEvent(env, 'payment-nudge.html', booking.booking_uuid)) continue;
