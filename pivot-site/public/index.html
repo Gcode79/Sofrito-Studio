@@ -286,7 +286,7 @@
         <div class="space-y-4">
             <details class="glass-panel p-6">
                 <summary class="font-bold text-white cursor-pointer hover:text-zinc-200 transition-colors">Q: Is the $400 refundable?</summary>
-                <p class="mt-3 text-zinc-400">A: Yes — in full, if you request it within 7 days after your session and before direction lock. Email <a href="mailto:support@sofritostudio.com" class="underline hover:text-zinc-200">support@sofritostudio.com</a>. Once the sprint starts, the fee is non-refundable and credited toward your $997 sprint.</p>
+                <p class="mt-3 text-zinc-400">A: Yes — in full, if you request it within 7 days after your session and before direction lock. Paid but never had the session? Full refund within 30 days of payment. Email <a href="mailto:support@sofritostudio.com" class="underline hover:text-zinc-200">support@sofritostudio.com</a>. Once the sprint starts, the fee is non-refundable and credited toward your $997 sprint.</p>
             </details>
             <details class="glass-panel p-6">
                 <summary class="font-bold text-white cursor-pointer hover:text-zinc-200 transition-colors">Q: How fast is "48 hours"?</summary>
@@ -298,7 +298,7 @@
             </details>
             <details class="glass-panel p-6">
                 <summary class="font-bold text-white cursor-pointer hover:text-zinc-200 transition-colors">Q: What happens after I pay?</summary>
-                <p class="mt-3 text-zinc-400">A: Pick your Sofrito Session time right after payment. We set the direction on the call — then you approve it in writing (that's direction lock), and we build and launch within 48 hours.</p>
+                <p class="mt-3 text-zinc-400">A: Pick your Sofrito Session time right after payment. We set the direction on the call — then you approve it in writing (that's direction lock; we confirm it by email within one business day), and we build and launch within 48 hours.</p>
             </details>
             <details class="glass-panel p-6">
                 <summary class="font-bold text-white cursor-pointer hover:text-zinc-200 transition-colors">Q: What does hosting cost?</summary>
@@ -375,7 +375,7 @@
                 </form>
                 <p class="text-xs text-zinc-500 text-center leading-relaxed mt-4">
                     Your $400 Sofrito Session is credited in full toward your $997 Sprint when you start the sprint within 30 days of your session.<br>
-                    The $400 session is refundable in full within 7 days after your session and before direction lock. Email <a href="mailto:support@sofritostudio.com" class="underline hover:text-zinc-200">support@sofritostudio.com</a> to request a refund. <a href="/terms" class="underline hover:text-zinc-200">Full terms</a>
+                    The $400 session is refundable in full within 7 days after your session and before direction lock — or within 30 days of payment if you never had the session. Email <a href="mailto:support@sofritostudio.com" class="underline hover:text-zinc-200">support@sofritostudio.com</a> to request a refund. <a href="/terms" class="underline hover:text-zinc-200">Full terms</a>
                 </p>
                 <div id="success-view" class="hidden text-center py-8">
                     <svg class="w-16 h-16 mx-auto mb-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -534,6 +534,18 @@
         const container = document.getElementById('form-container');
         const form = document.getElementById('lead-form');
         const retryBtn = document.getElementById('retry-btn');
+
+        // Prefill from payment-nudge links (?name=&email=) so returning
+        // bookers don't re-type what we already know.
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const preName = (params.get('name') || '').slice(0, 120);
+            const preEmail = (params.get('email') || '').slice(0, 160);
+            const nameEl = document.getElementById('name');
+            const emailEl = document.getElementById('email');
+            if (preName && nameEl && !nameEl.value) nameEl.value = preName;
+            if (preEmail && emailEl && !emailEl.value && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(preEmail)) emailEl.value = preEmail;
+        } catch (e) { /* prefill is best-effort */ }
 
         if (retryBtn) {
             retryBtn.addEventListener('click', () => {

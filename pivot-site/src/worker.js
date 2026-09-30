@@ -49,6 +49,7 @@ import paymentNudge from './emails/payment-nudge.html';
 import priceOverrideNotify from './emails/price-override-notify.html';
 import receipt from './emails/receipt.html';
 import referralInvite from './emails/referral-invite.html';
+import refundNotify from './emails/refund-notify.html';
 import revenueNotify from './emails/revenue-notify.html';
 import sessionReminder from './emails/session-reminder.html';
 import unbilledFinalNotify from './emails/unbilled-final-notify.html';
@@ -78,6 +79,7 @@ const REPO_EMAIL_TEMPLATES = Object.freeze({
   'price-override-notify.html': priceOverrideNotify,
   'receipt.html': receipt,
   'referral-invite.html': referralInvite,
+  'refund-notify.html': refundNotify,
   'revenue-notify.html': revenueNotify,
   'session-reminder.html': sessionReminder,
   'unbilled-final-notify.html': unbilledFinalNotify,
@@ -198,6 +200,10 @@ const substitute = (html, data = {}) =>
 const uuid = () => crypto.randomUUID();
 const nowIso = () => new Date().toISOString();
 const nowEpoch = () => Math.floor(Date.now() / 1000);
+// leads.paid_at is INTEGER epoch seconds (migration 0009). Never feed it to
+// new Date() directly — epoch seconds read as milliseconds land in Jan 1970.
+// paidAtMs() normalizes both epoch seconds and ISO strings to milliseconds.
+const paidAtMs = (v) => (typeof v === 'number' ? v * 1000 : new Date(v).getTime());
 
 async function verifyTurnstile(env, token) {
   if (!token) return false;
@@ -430,7 +436,10 @@ async function processEmailMessage(env, job) {
   let result = null;
   try {
     const kvOverride = await env.CONFIG.get(`templates/emails/${job.template}`);
-    const htmlRaw = kvOverride || REPO_EMAIL_TEMPLATES[job.template];
+    // job.html is the escape hatch for server-composed bodies (pipeline
+    // digest); template registry otherwise. Without this, the digest would
+    // send only the fallback subject line and the founder would get no numbers.
+    const htmlRaw = kvOverride || REPO_EMAIL_TEMPLATES[job.template] || job.html;
     const html = substitute(htmlRaw || `<p>${escapeHtml(job.subject)}</p>`, { ...job.data, siteUrl: env.SITE_URL || '' });
     result = await sendResend(env, { to: job.to, subject: job.subject, html });
     let providerId = null;
@@ -675,8 +684,11 @@ async function handleApiLead(request, env, ctx) {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !name) {
     return fail('Please include a valid email and your name.', 422);
   }
-  if (phone && phone.replace(/\D/g, '').length < 7) {
-    return fail('Please include a valid phone number.', 422);
+  // Phone is required: the founder personally calls every lead before the
+  // session, especially out-of-state ones. The form marks it required; the
+  // API enforces it so a direct POST can't create a phoneless lead.
+  if (phone.replace(/\D/g, '').length < 7) {
+    return fail('Please include a valid phone number so we can reach you before your session.', 422);
   }
   if (business_type && !BUSINESS_TYPES.includes(business_type)) {
     return fail('Invalid business type.', 422);
@@ -770,6 +782,19 @@ async function handleApiLead(request, env, ctx) {
   )
     .bind(id, lead.created_at, lead.name, lead.email, lead.phone, lead.business_name, lead.business_type, lead.package_interest, lead.budget, lead.message, lead.channel, now, submitKey)
     .run();
+
+  // Already-paid guard: the lead id is deterministic from the email, so a
+  // resubmission lands on the same row with status preserved. Without this
+  // check a paid client would get a second $400 checkout — and paying it
+  // records revenue with no receipt, because the webhook only marks leads
+  // whose status isn't already 'paid'. A deliberate re-purchase after 90
+  // days still works.
+  const paidRow = await env.DB.prepare(
+    `SELECT 1 FROM leads WHERE id = ? AND status = 'paid' AND paid_at > unixepoch() - 7776000 LIMIT 1`
+  ).bind(id).first();
+  if (paidRow) {
+    return fail('This email already has a paid Sofrito Session. Check your inbox for your booking link, or reply to any of our emails if you need it resent.', 409);
+  }
 
   const siteUrl = env.SITE_URL || new URL(request.url).origin;
   const checkout = await createStripeCheckoutSession(env, siteUrl, lead, submitKey, ctx);
@@ -1240,7 +1265,7 @@ async function handleInvoiceTrigger(request, env, ctx) {
     ).bind(project.lead_id).first();
     const anchor = (booking && booking.scheduled_for) || project.session_paid_at;
     if (anchor) {
-      daysSinceSession = Math.floor((Date.now() - new Date(anchor).getTime()) / 86400000);
+      daysSinceSession = Math.floor((Date.now() - paidAtMs(anchor)) / 86400000);
       creditExpired = daysSinceSession > 30;
     }
   }
@@ -1459,6 +1484,7 @@ async function handleStripeWebhook(request, env, ctx) {
   let amountCents = 0;
   let description = event.type;
   let stripeInvoiceId = null;
+  let refundCharge = null;
   if (event.type.startsWith('checkout.session.completed')) {
     amountCents = event.data.object.amount_total || 0;
     description = 'stripe checkout';
@@ -1470,6 +1496,7 @@ async function handleStripeWebhook(request, env, ctx) {
   } else if (event.type === 'charge.refunded') {
     amountCents = -(event.data.object.amount_refunded || 0);
     description = 'refund';
+    refundCharge = event.data.object;
   }
   if (!amountCents) return json({ ok: true, handled: false });
 
@@ -1517,6 +1544,40 @@ async function handleStripeWebhook(request, env, ctx) {
     }, leadData);
   } else {
     console.log('stripe webhook skipped (test mode)', event.type, event.id);
+  }
+
+  // Refunds: a refunded client must not keep status='paid', or the sweeps
+  // keep nudging them to book and the founder gets false "unbooked" alerts.
+  // Full refunds (amount_refunded >= amount) flip the lead to 'refunded' and
+  // alert the founder. Partial refunds leave the lead paid.
+  if (isLive && refundCharge && refundCharge.amount_refunded >= refundCharge.amount) {
+    const refundEmail = String(
+      refundCharge.receipt_email ||
+      (refundCharge.billing_details && refundCharge.billing_details.email) ||
+      ''
+    ).trim().toLowerCase();
+    if (refundEmail) {
+      const updated = await env.DB.prepare(
+        `UPDATE leads SET status = 'refunded' WHERE email = ? AND status = 'paid'`
+      ).bind(refundEmail).run();
+      if (updated.meta.changes > 0) {
+        const refundedLead = await env.DB.prepare(
+          `SELECT id, name, email FROM leads WHERE email = ? AND status = 'refunded' ORDER BY paid_at DESC LIMIT 1`
+        ).bind(refundEmail).first();
+        await enqueueEmail(env, {
+          kind: 'email',
+          to: env.NOTIFICATION_EMAIL || '',
+          template: 'refund-notify.html',
+          subject: `[Refund] ${refundedLead?.name || refundEmail} — session refunded`,
+          data: {
+            lead: refundedLead || { name: refundEmail, email: refundEmail },
+            amount: (refundCharge.amount_refunded / 100).toFixed(2),
+            siteUrl: env.SITE_URL || '',
+          },
+          lead_id: refundedLead?.id,
+        });
+      }
+    }
   }
 
   // Receipt + booking emails only for live-mode payments: a test event must
@@ -1697,7 +1758,9 @@ async function handleCalendlyCreated(env, ctx, payload, bookingUuid) {
     calendlyField(invitee, ['name']) ||
     `${calendlyField(payload, ['first_name'])} ${calendlyField(payload, ['last_name'])}`.trim() ||
     answerFor('name', 'tu nombre');
-  const email = calendlyField(invitee, ['email']) || calendlyField(payload, ['email']);
+  // Normalized to match leads.email, which /api/lead stores lowercased —
+  // otherwise a case difference silently breaks the paid-lead match below.
+  const email = String(calendlyField(invitee, ['email']) || calendlyField(payload, ['email']) || '').trim().toLowerCase();
   if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     return json({ ok: true, handled: false, reason: 'incomplete invitee' });
   }
@@ -1809,7 +1872,7 @@ async function handleCalendlyCreated(env, ctx, payload, bookingUuid) {
   // paidLead fields are Stripe-verified, never lead input) so the
   // notification can never claim a payment that was not found.
   const paidOn = paidLead && paidLead.paid_at
-    ? new Date(paidLead.paid_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    ? new Date(paidAtMs(paidLead.paid_at)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     : '';
   const paymentBanner = paymentIsPaid
     ? `<div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:8px;padding:12px 16px;font-size:14px;color:#065F46;margin:0 0 16px;"><strong>Payment verified:</strong> $400 Sofrito Session paid${paidOn ? ' on ' + escapeHtml(paidOn) : ''}.</div>`
@@ -1979,7 +2042,7 @@ async function handleUnbilledFinalSweep(env) {
      LEFT JOIN projects p ON p.lead_id = l.id
      WHERE l.status = 'paid'
        AND l.paid_at IS NOT NULL
-       AND l.paid_at < datetime('now', '-7 days')
+       AND l.paid_at < unixepoch() - 604800
        AND NOT EXISTS (
          SELECT 1 FROM invoices i WHERE i.project_id = p.id AND i.milestone = 'final'
        )`
@@ -1988,7 +2051,7 @@ async function handleUnbilledFinalSweep(env) {
   for (const row of rows.results) {
     if (await sentAlready(env, 'unbilled-final-notify.html', row.id)) continue;
     const days = row.paid_at
-      ? Math.floor((Date.now() - new Date(row.paid_at).getTime()) / 86400000)
+      ? Math.floor((Date.now() - paidAtMs(row.paid_at)) / 86400000)
       : null;
     await enqueueEmail(env, {
       kind: 'email',
@@ -1999,7 +2062,7 @@ async function handleUnbilledFinalSweep(env) {
         lead: {
           name: row.name || row.email,
           email: row.email,
-          paid_at: row.paid_at ? new Date(row.paid_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+          paid_at: row.paid_at ? new Date(paidAtMs(row.paid_at)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
         },
         days_since_paid: days == null ? '—' : String(days),
         project: { id: row.project_id || '', name: row.project_name || '(no project row yet)' },
@@ -2029,7 +2092,7 @@ async function handleBookingSafetyNet(env) {
        )`
   ).all();
   for (const lead of unbooked.results || []) {
-    const days = (Date.now() - new Date(lead.paid_at).getTime()) / 86400000;
+    const days = (Date.now() - paidAtMs(lead.paid_at)) / 86400000;
     if (days >= 2 && !(await sentAlready(env, 'booking-nudge.html', lead.id))) {
       await enqueueEmail(env, {
         kind: 'email',
@@ -2052,7 +2115,7 @@ async function handleBookingSafetyNet(env) {
             email: lead.email,
             phone: lead.phone || '—',
             paid_at: lead.paid_at
-              ? new Date(lead.paid_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+              ? new Date(paidAtMs(lead.paid_at)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
               : '',
           },
           days_since_paid: String(Math.floor(days)),
@@ -2087,6 +2150,7 @@ async function handleBookingSafetyNet(env) {
         lead: { name: booking.invitee_name || 'there', email: booking.invitee_email },
         scheduled_for: when,
         siteUrl: env.SITE_URL || '',
+        book_url: `${env.SITE_URL || ''}/#book?email=${encodeURIComponent(booking.invitee_email)}&name=${encodeURIComponent(booking.invitee_name || '')}`,
       },
       metadata: { event_id: booking.booking_uuid },
     });
