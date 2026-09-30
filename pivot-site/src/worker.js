@@ -47,6 +47,7 @@ import leadWon from './emails/lead-won.html';
 import leadAcknowledgement from './emails/lead_acknowledgement.html';
 import newLeadNotify from './emails/new-lead-notify.html';
 import onboardingPack from './emails/onboarding-pack.html';
+import paymentFailedNotify from './emails/payment-failed-notify.html';
 import paymentNudge from './emails/payment-nudge.html';
 import priceOverrideNotify from './emails/price-override-notify.html';
 import receipt from './emails/receipt.html';
@@ -78,6 +79,7 @@ const REPO_EMAIL_TEMPLATES = Object.freeze({
   'lead_acknowledgement.html': leadAcknowledgement,
   'new-lead-notify.html': newLeadNotify,
   'onboarding-pack.html': onboardingPack,
+  'payment-failed-notify.html': paymentFailedNotify,
   'payment-nudge.html': paymentNudge,
   'price-override-notify.html': priceOverrideNotify,
   'receipt.html': receipt,
@@ -593,7 +595,7 @@ async function createStripeCheckoutSession(env, siteUrl, lead, submitKey = null,
       'line_items[0][price_data][product_data][description]': '45-minute brand strategy session; credited in full toward the $997 Sprint when the sprint starts within 30 days of your session',
       'line_items[0][price_data][unit_amount]': sessionPriceCents,
       'line_items[0][quantity]': '1',
-      success_url: `${siteUrl}/success.html?session_id={CHECKOUT_SESSION_ID}&name=${encodeURIComponent(lead.name)}&email=${encodeURIComponent(lead.email)}`,
+      success_url: `${siteUrl}/success.html?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/cancelled.html`,
       'metadata[lead_id]': lead.id,
     }),
@@ -626,7 +628,7 @@ async function getStripeCheckoutSession(env, sessionId) {
 // name/email ARE returned on a verified paid session — only to prefill the
 // payer's own Calendly booking, and only matched by session id in our DB
 // (never from editable URL params).
-async function handleCheckoutStatus(request, env) {
+async function handleCheckoutStatus(request, env, ctx) {
   let sessionId = '';
   try {
     const body = await readJson(request);
@@ -637,6 +639,15 @@ async function handleCheckoutStatus(request, env) {
   if (!/^cs_(test|live)_[A-Za-z0-9]+$/.test(sessionId) || sessionId.length > 255) {
     return json({ status: 'unknown' }, 400);
   }
+  // Rate limit: 10/min per IP. Every valid-format request burns a live
+  // Stripe API call, so throttle exactly like /api/lead.
+  const xff = request.headers.get('x-forwarded-for') || '';
+  const firstForwardedIp = xff.split(',')[0].trim();
+  const ip = request.headers.get('cf-connecting-ip') || firstForwardedIp || 'unknown';
+  const rlKey = `rl:checkout-status:${ip}`;
+  const rlCount = parseInt(await env.CONFIG.get(rlKey) || '0', 10);
+  if (rlCount >= 10) return json({ status: 'unknown' }, 429);
+  if (ctx) ctx.waitUntil(env.CONFIG.put(rlKey, String(rlCount + 1), { expirationTtl: 60 }));
   const session = await getStripeCheckoutSession(env, sessionId);
   if (!session || session.missing || session.unavailable) return json({ status: 'unknown' });
   if (session.payment_status === 'paid') {
@@ -1755,7 +1766,37 @@ async function handleStripeWebhook(request, env, ctx) {
   let description = event.type;
   let stripeInvoiceId = null;
   let refundCharge = null;
-  if (event.type.startsWith('checkout.session.completed')) {
+  // checkout.session.completed and checkout.session.async_payment_succeeded
+  // both mean collected funds. A completed session with payment_status
+  // 'unpaid' is an async method (bank redirect etc.) whose money hasn't
+  // arrived — ignore it until async_payment_succeeded / _failed arrives.
+  const completedPaymentEvent =
+    event.type.startsWith('checkout.session.completed') ||
+    event.type === 'checkout.session.async_payment_succeeded';
+  if (completedPaymentEvent && event.data.object.payment_status === 'unpaid') {
+    return json({ ok: true, handled: false, reason: 'async_payment_pending' });
+  }
+  if (event.type === 'checkout.session.async_payment_failed') {
+    const failedSession = event.data.object || {};
+    const failedEmail = String((failedSession.customer_details && failedSession.customer_details.email) || '').trim().toLowerCase();
+    console.error('stripe async payment failed', failedSession.id, failedEmail);
+    if (event.livemode === true && env.NOTIFICATION_EMAIL) {
+      await enqueueEmail(env, {
+        kind: 'email',
+        to: env.NOTIFICATION_EMAIL,
+        template: 'payment-failed-notify.html',
+        subject: `[Payment failed] ${failedEmail || failedSession.id} — async payment failed`,
+        data: {
+          email: failedEmail || '—',
+          session_id: failedSession.id || '—',
+          amount: ((failedSession.amount_total || 0) / 100).toFixed(2),
+          siteUrl: env.SITE_URL || '',
+        },
+      });
+    }
+    return json({ ok: true, handled: event.livemode === true });
+  }
+  if (completedPaymentEvent) {
     amountCents = event.data.object.amount_total || 0;
     description = 'stripe checkout';
     stripeInvoiceId = event.data.object.invoice || null;
@@ -1774,7 +1815,7 @@ async function handleStripeWebhook(request, env, ctx) {
   // Test-mode events (livemode:false) must never mutate production lead state.
   const isLive = event.livemode === true;
   let leadData = null;
-  if (isLive && event.type.startsWith('checkout.session.completed')) {
+  if (isLive && completedPaymentEvent) {
     const sessionId = event.data.object.id;
     const leadRow = await env.DB.prepare(
       `SELECT id FROM leads WHERE stripe_session_id = ? AND status != 'paid' LIMIT 1`
@@ -1793,6 +1834,18 @@ async function handleStripeWebhook(request, env, ctx) {
       )
         .bind(sessionId)
         .first();
+      // Cycle-2 P1-1: the visitor may have booked via the public Calendly
+      // URL BEFORE paying. That booking points at a throwaway uuid lead
+      // row; re-link it to the paid deterministic row so the safety-net
+      // nudges and the 30-day anchors see the real booking. Both emails
+      // are stored lowercased.
+      if (leadData && leadData.email) {
+        await env.DB.prepare(
+          `UPDATE calendly_bookings SET lead_id = ?
+           WHERE lower(invitee_email) = lower(?) AND lead_id != ?
+             AND (status IS NULL OR status != 'cancelled')`
+        ).bind(leadData.id, leadData.email, leadData.id).run();
+      }
     }
   }
 
@@ -1805,7 +1858,7 @@ async function handleStripeWebhook(request, env, ctx) {
       occurred_at: new Date(event.created * 1000).toISOString(),
       source: 'stripe',
       source_id: event.id,
-      session_id: event.type.startsWith('checkout.session.completed') ? event.data.object.id : '',
+      session_id: completedPaymentEvent ? event.data.object.id : '',
       amount_cents: amountCents,
       currency: event.data.object.currency,
       description,
@@ -1828,7 +1881,7 @@ async function handleStripeWebhook(request, env, ctx) {
     ).trim().toLowerCase();
     if (refundEmail) {
       const updated = await env.DB.prepare(
-        `UPDATE leads SET status = 'refunded' WHERE email = ? AND status = 'paid'`
+        `UPDATE leads SET status = 'refunded' WHERE email = ? AND status IN ('paid','disputed')`
       ).bind(refundEmail).run();
       if (updated.meta.changes > 0) {
         const refundedLead = await env.DB.prepare(
@@ -1852,24 +1905,34 @@ async function handleStripeWebhook(request, env, ctx) {
 
   // Receipt + booking emails only for live-mode payments: a test event must
   // never email a customer as if they paid.
-  if (isLive && leadData) {
+  // Cycle-2 P2-4: if a transient failure (e.g. the revenue insert threw)
+  // 500'd the first delivery after the lead was marked paid, Stripe's retry
+  // finds leadData null. Re-fetch the paid lead and send unless the receipt
+  // already went out.
+  let receiptLead = leadData;
+  if (isLive && !receiptLead && completedPaymentEvent) {
+    receiptLead = await env.DB.prepare(
+      `SELECT id, name, email FROM leads WHERE stripe_session_id = ? AND status = 'paid' LIMIT 1`
+    ).bind(event.data.object.id).first();
+  }
+  if (isLive && receiptLead && !(await sentAlready(env, 'receipt.html', receiptLead.id))) {
     const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     ctx.waitUntil(Promise.all([
       enqueueEmail(env, {
         kind: 'email',
-        to: leadData.email,
+        to: receiptLead.email,
         template: 'receipt.html',
         subject: 'Your Sofrito Session receipt',
-        data: { lead_id: leadData.id, lead: leadData, date, booking_url: calendlyPrefillUrl(leadData.name, leadData.email), amount: (amountCents / 100).toFixed(2) },
-        lead_id: leadData.id,
+        data: { lead_id: receiptLead.id, lead: receiptLead, date, booking_url: calendlyPrefillUrl(receiptLead.name, receiptLead.email), amount: (amountCents / 100).toFixed(2) },
+        lead_id: receiptLead.id,
       }),
       enqueueEmail(env, {
         kind: 'email',
-        to: leadData.email,
+        to: receiptLead.email,
         template: 'booking-link.html',
         subject: 'Book your Sofrito Session',
-        data: { lead_id: leadData.id, lead: leadData, booking_url: calendlyPrefillUrl(leadData.name, leadData.email) },
-        lead_id: leadData.id,
+        data: { lead_id: receiptLead.id, lead: receiptLead, booking_url: calendlyPrefillUrl(receiptLead.name, receiptLead.email) },
+        lead_id: receiptLead.id,
       }),
     ]));
   }
@@ -2443,6 +2506,7 @@ async function handleBookingSafetyNet(env) {
               : '',
           },
           days_since_paid: String(Math.floor(days)),
+          paid_dollars: paidDollars,
           siteUrl: env.SITE_URL || '',
         },
         lead_id: lead.id,
@@ -2989,7 +3053,7 @@ export default {
           return handleStripeWebhook(request, env, ctx);
 
         if (p === '/api/checkout-status' && request.method === 'POST')
-          return handleCheckoutStatus(request, env);
+          return handleCheckoutStatus(request, env, ctx);
 
         if (p === '/api/calendly-webhook' && request.method === 'POST')
           return handleCalendlyWebhook(request, env, ctx);
