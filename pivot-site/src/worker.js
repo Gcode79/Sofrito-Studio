@@ -657,11 +657,25 @@ async function handleCheckoutStatus(request, env, ctx) {
     let name = '';
     let email = '';
     try {
-      const lead = await env.DB.prepare(
+      let lead = await env.DB.prepare(
         `SELECT name, email FROM leads WHERE stripe_session_id = ? LIMIT 1`
       )
         .bind(sessionId)
         .first();
+      // P2-5: after a session-id rotation the success URL carries the
+      // superseded session id, so the lookup above misses and Calendly
+      // prefill goes blank. Fall back to the deterministic lead_id in the
+      // session metadata (returned by the Stripe retrieve above).
+      if (!lead) {
+        const metaLeadId = session.metadata && session.metadata.lead_id;
+        if (metaLeadId) {
+          lead = await env.DB.prepare(
+            `SELECT name, email FROM leads WHERE id = ? LIMIT 1`
+          )
+            .bind(metaLeadId)
+            .first();
+        }
+      }
       if (lead) {
         name = lead.name || '';
         email = lead.email || '';
@@ -1425,9 +1439,17 @@ async function handleInvoiceTrigger(request, env, ctx) {
     }
   }
   const honorExpired = String(body.honor_expired_credit || '').toLowerCase() === 'true';
+  // P2-3: credit what the client actually paid, not the current KV price —
+  // the founder may have changed SESSION_PRICE_CENTS since the payment.
+  // Falls back to the KV price for pre-existing paid rows (or pre-migration).
+  let sessionCreditCents = Number(await getSessionPriceCents(env));
+  if (milestone === 'final' && project.lead_id) {
+    const paidCents = await getLeadPaidAmountCents(env, project.lead_id);
+    if (paidCents) sessionCreditCents = paidCents;
+  }
   const sessionPriceForSplit = (milestone === 'final' && creditExpired && !honorExpired)
     ? 0
-    : Number(await getSessionPriceCents(env));
+    : sessionCreditCents;
   const amountCents = splitMilestoneAmounts(priceCents, sessionPriceForSplit)[milestone];
   const invoiceId = uuid();
   const stamp = milestone === 'final' ? 'files_delivered_at' : null;
@@ -1707,18 +1729,29 @@ async function handleCheckoutExpired(env, ctx, event) {
     .run();
   if (!result.meta?.changes) return false;
   const lead = await env.DB.prepare(
-    `SELECT id, name, email, checkout_url FROM leads WHERE stripe_session_id = ? LIMIT 1`
+    `SELECT id, name, email, stripe_session_id, checkout_url FROM leads WHERE stripe_session_id = ? LIMIT 1`
   )
     .bind(sessionId)
     .first();
   if (!lead) return false;
+  // P2-2: the stored checkout_url is the just-expired session's link — mint
+  // or refresh a live one so the nudge's call to action never opens Stripe's
+  // expired-session page. Skip the nudge when no live URL exists, exactly
+  // like the second checkout nudge does.
+  let checkoutUrl = null;
+  try {
+    checkoutUrl = await ensureFreshCheckoutUrl(env, lead);
+  } catch (e) {
+    console.error('expired-session nudge checkout recovery failed', lead.id, e.message);
+  }
+  if (!checkoutUrl) return false;
   ctx.waitUntil(
     enqueueEmail(env, {
       kind: 'email',
       to: lead.email,
       template: 'abandoned-nudge.html',
       subject: 'Your Sofrito Session — still interested?',
-      data: { lead_id: lead.id, name: lead.name, checkout_url: lead.checkout_url },
+      data: { lead_id: lead.id, name: lead.name, checkout_url: checkoutUrl },
       lead_id: lead.id,
     })
   );
@@ -1815,8 +1848,10 @@ async function handleStripeWebhook(request, env, ctx) {
   // Test-mode events (livemode:false) must never mutate production lead state.
   const isLive = event.livemode === true;
   let leadData = null;
+  let repurchasePaymentKey = null;
   if (isLive && completedPaymentEvent) {
     const sessionId = event.data.object.id;
+    const metaLeadId = event.data.object.metadata && event.data.object.metadata.lead_id;
     let leadRow = await env.DB.prepare(
       `SELECT id FROM leads WHERE stripe_session_id = ? AND status != 'paid' LIMIT 1`
     )
@@ -1828,23 +1863,33 @@ async function handleStripeWebhook(request, env, ctx) {
     // marked paid. Fall back to the deterministic lead_id written into the
     // session's metadata at creation (guarded: metadata may be absent on
     // non-checkout event types).
-    if (!leadRow) {
-      const metaLeadId = event.data.object.metadata && event.data.object.metadata.lead_id;
-      if (metaLeadId) {
-        leadRow = await env.DB.prepare(
-          `SELECT id FROM leads WHERE id = ? AND status != 'paid' LIMIT 1`
-        )
-          .bind(metaLeadId)
-          .first();
-      }
+    if (!leadRow && metaLeadId) {
+      leadRow = await env.DB.prepare(
+        `SELECT id FROM leads WHERE id = ? AND status != 'paid' LIMIT 1`
+      )
+        .bind(metaLeadId)
+        .first();
+    }
+    // P2-1: deliberate re-purchase — the lead paid 90+ days ago, so both
+    // lookups above miss (status is already 'paid'). Treat it as a fresh
+    // paid lead: refresh paid_at (re-anchoring the 30-day credit window),
+    // persist the new paid amount, and send receipt + booking emails keyed
+    // on this payment so the original purchase's sends can't duplicate.
+    // A redelivery of the same event is safe: revenue UNIQUE(source_id)
+    // dedupes the ledger row, and the per-payment email guard below makes
+    // the sends a no-op.
+    let repurchaseRow = null;
+    if (!leadRow && metaLeadId) {
+      repurchaseRow = await env.DB.prepare(
+        `SELECT id, name, email FROM leads WHERE id = ? AND status = 'paid' LIMIT 1`
+      )
+        .bind(metaLeadId)
+        .first();
     }
     if (leadRow) {
       const paidAt = nowEpoch();
-      await env.DB.prepare(
-        `UPDATE leads SET status = 'paid', paid_at = ? WHERE id = ?`
-      )
-        .bind(paidAt, leadRow.id)
-        .run();
+      // P2-3: persist the actual paid amount for the final-invoice credit.
+      await updateLeadPaidState(env, leadRow.id, paidAt, amountCents);
       leadData = await env.DB.prepare(
         `SELECT id, name, email FROM leads WHERE id = ? LIMIT 1`
       )
@@ -1856,6 +1901,26 @@ async function handleStripeWebhook(request, env, ctx) {
       // nudges and the 30-day anchors see the real booking. Both emails
       // are stored lowercased.
       if (leadData && leadData.email) {
+        await env.DB.prepare(
+          `UPDATE calendly_bookings SET lead_id = ?
+           WHERE lower(invitee_email) = lower(?) AND lead_id != ?
+             AND (status IS NULL OR status != 'cancelled')`
+        ).bind(leadData.id, leadData.email, leadData.id).run();
+      }
+    } else if (repurchaseRow) {
+      // P2-1: a redelivery of the same payment must not refresh the paid_at
+      // anchor again — only the first processing of this payment re-anchors
+      // the 30-day credit window. If the first delivery failed after the
+      // update but before the receipt was tracked, the retry re-runs the
+      // full flow, which is the desired recovery path.
+      const alreadyProcessed = await sentPaymentEmailAlready(env, 'receipt.html', repurchaseRow.id, sessionId);
+      leadData = repurchaseRow;
+      repurchasePaymentKey = sessionId;
+      if (!alreadyProcessed) {
+        const paidAt = nowEpoch();
+        await updateLeadPaidState(env, repurchaseRow.id, paidAt, amountCents);
+      }
+      if (leadData.email) {
         await env.DB.prepare(
           `UPDATE calendly_bookings SET lead_id = ?
            WHERE lower(invitee_email) = lower(?) AND lead_id != ?
@@ -1942,26 +2007,38 @@ async function handleStripeWebhook(request, env, ctx) {
       }
     }
   }
-  if (isLive && receiptLead && !(await sentAlready(env, 'receipt.html', receiptLead.id))) {
-    const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    ctx.waitUntil(Promise.all([
-      enqueueEmail(env, {
-        kind: 'email',
-        to: receiptLead.email,
-        template: 'receipt.html',
-        subject: 'Your Sofrito Session receipt',
-        data: { lead_id: receiptLead.id, lead: receiptLead, date, booking_url: calendlyPrefillUrl(receiptLead.name, receiptLead.email), amount: (amountCents / 100).toFixed(2) },
-        lead_id: receiptLead.id,
-      }),
-      enqueueEmail(env, {
-        kind: 'email',
-        to: receiptLead.email,
-        template: 'booking-link.html',
-        subject: 'Book your Sofrito Session',
-        data: { lead_id: receiptLead.id, lead: receiptLead, booking_url: calendlyPrefillUrl(receiptLead.name, receiptLead.email) },
-        lead_id: receiptLead.id,
-      }),
-    ]));
+  if (isLive && receiptLead) {
+    // P2-1: a re-purchase keys the receipt/booking sends on the payment
+    // (Stripe session id) — the lead-level guard would wrongly suppress
+    // them because the first purchase already mailed. A first purchase
+    // keeps the original lead-level guard.
+    const receiptDone = repurchasePaymentKey
+      ? await sentPaymentEmailAlready(env, 'receipt.html', receiptLead.id, repurchasePaymentKey)
+      : await sentAlready(env, 'receipt.html', receiptLead.id);
+    if (!receiptDone) {
+      const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      const paymentMeta = repurchasePaymentKey ? { payment_key: repurchasePaymentKey } : undefined;
+      ctx.waitUntil(Promise.all([
+        enqueueEmail(env, {
+          kind: 'email',
+          to: receiptLead.email,
+          template: 'receipt.html',
+          subject: 'Your Sofrito Session receipt',
+          data: { lead_id: receiptLead.id, lead: receiptLead, date, booking_url: calendlyPrefillUrl(receiptLead.name, receiptLead.email), amount: (amountCents / 100).toFixed(2) },
+          metadata: paymentMeta,
+          lead_id: receiptLead.id,
+        }),
+        enqueueEmail(env, {
+          kind: 'email',
+          to: receiptLead.email,
+          template: 'booking-link.html',
+          subject: 'Book your Sofrito Session',
+          data: { lead_id: receiptLead.id, lead: receiptLead, booking_url: calendlyPrefillUrl(receiptLead.name, receiptLead.email) },
+          metadata: paymentMeta,
+          lead_id: receiptLead.id,
+        }),
+      ]));
+    }
   }
 
   // S14: close the invoice ledger on payment. Match by our own
@@ -1977,6 +2054,14 @@ async function handleStripeWebhook(request, env, ctx) {
       .first();
     if (found) {
       await env.DB.prepare(`UPDATE invoices SET status = 'paid', paid_at = ? WHERE id = ?`).bind(paidAt, found.id).run();
+      // P2-4: Stripe delivers webhooks at-least-once. The UPDATE above is
+      // idempotent, but the founder email + Zapier webhook below are not —
+      // guard them on the sent record so a redelivery is a no-op. (The
+      // webhook has no tracking row of its own; it is enqueued atomically
+      // with the email, so the email record covers both.)
+      if (await sentAlready(env, 'invoice-paid-notify.html', `invoice-${found.id}`)) {
+        return json({ ok: true, handled: inserted });
+      }
       const project = await env.DB.prepare(`SELECT name FROM projects WHERE id = ?`).bind(found.project_id).first();
       ctx.waitUntil(
         Promise.all([
@@ -2259,7 +2344,10 @@ async function handleCalendlyCreated(env, ctx, payload, bookingUuid) {
         } catch (e) {
           // Unknown anchor: fall through to the standard $597 remainder.
         }
-        const sessionPriceCents = Number(await getSessionPriceCents(env));
+        // P2-3: the recorded payment is what the client actually paid, not
+        // the current KV price — the founder may have changed it since.
+        const paidCents = await getLeadPaidAmountCents(env, bookingLeadId);
+        const sessionPriceCents = paidCents || Number(await getSessionPriceCents(env));
         const sessionCents = creditExpired ? 0 : sessionPriceCents;
         const remaining = `$${(splitMilestoneAmounts(sprintCents, sessionCents).final / 100).toFixed(0)}`;
         return `The $${(sessionPriceCents / 100).toFixed(0)} Stripe payment is recorded against this lead. The remaining ${remaining} is due after written direction lock if the client starts the $${(sprintCents / 100).toFixed(0)} Brand & Web Sprint.`;
@@ -2421,6 +2509,62 @@ async function emailRecordedByEvent(env, template, eventId) {
   return !!row;
 }
 
+// P2-1: per-payment email idempotency. The lead-level sentAlready guard is
+// correct for a first purchase (one receipt per lead), but a deliberate
+// re-purchase must mail again — keyed on the Stripe session id so the
+// original payment's sends and Stripe redeliveries can't duplicate.
+async function sentPaymentEmailAlready(env, template, leadId, paymentKey) {
+  const row = await env.DB.prepare(
+    `SELECT 1 FROM emails_sent WHERE template = ? AND json_extract(metadata, '$.lead_id') = ? AND json_extract(metadata, '$.payment_key') = ? AND status IN ('queued','sent') LIMIT 1`
+  )
+    .bind(template, leadId, paymentKey)
+    .first();
+  return !!row;
+}
+
+// P2-3: persist the actual paid amount on the lead at mark-paid time, so the
+// final-invoice session credit uses what the client paid instead of the
+// current SESSION_PRICE_CENTS KV value. Tolerant: paid_amount_cents may not
+// exist in D1 yet (no migration applied) — a missing column must never break
+// the webhook, so fall back to the column-less write and rethrow anything else.
+async function updateLeadPaidState(env, leadId, paidAt, amountCents) {
+  try {
+    await env.DB.prepare(
+      `UPDATE leads SET status = 'paid', paid_at = ?, paid_amount_cents = ? WHERE id = ?`
+    )
+      .bind(paidAt, amountCents, leadId)
+      .run();
+  } catch (e) {
+    if (/no such column/i.test(String((e && e.message) || ''))) {
+      await env.DB.prepare(
+        `UPDATE leads SET status = 'paid', paid_at = ? WHERE id = ?`
+      )
+        .bind(paidAt, leadId)
+        .run();
+    } else {
+      throw e;
+    }
+  }
+}
+
+// P2-3 reader: the amount the lead actually paid, or null when unknown
+// (pre-existing paid rows, or the column absent pre-migration). Callers fall
+// back to getSessionPriceCents(env).
+async function getLeadPaidAmountCents(env, leadId) {
+  if (!leadId) return null;
+  try {
+    const row = await env.DB.prepare(
+      `SELECT paid_amount_cents FROM leads WHERE id = ? LIMIT 1`
+    )
+      .bind(leadId)
+      .first();
+    const v = Number(row && row.paid_amount_cents);
+    return Number.isFinite(v) && v > 0 ? Math.round(v) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
 // Founder nudge for the larger half of every deal: a paid $400 session with
 // no final $997-split invoice 7+ days after payment. One nudge per lead
 // (deduped through emails_sent), sent only if direction could plausibly be
@@ -2456,11 +2600,14 @@ async function handleUnbilledFinalSweep(env) {
     const anchor = (booking && booking.scheduled_for) || row.paid_at;
     if (anchor) creditExpired = Math.floor((Date.now() - paidAtMs(anchor)) / 86400000) > 30;
     const sprintCents = (PACKAGE_FALLBACK.sprint || {}).price_cents || 99700;
-    const sessionCents = creditExpired ? 0 : Number(await getSessionPriceCents(env));
+    // P2-3: credit what the client actually paid (falls back to the KV
+    // price for pre-existing paid rows or pre-migration).
+    const paidCents = await getLeadPaidAmountCents(env, row.id);
+    const sessionCents = creditExpired ? 0 : (paidCents || Number(await getSessionPriceCents(env)));
     const finalCents = splitMilestoneAmounts(sprintCents, sessionCents).final;
     const finalBalance = `$${(finalCents / 100).toFixed(0)}`;
     const creditNote = creditExpired
-      ? `The 30-day session-credit window has passed, so the full $${(sprintCents / 100).toFixed(0)} sprint price applies (no $400 credit).`
+      ? `The 30-day session-credit window has passed, so the full $${(sprintCents / 100).toFixed(0)} sprint price applies (no session credit).`
       : '';
     const days = row.paid_at
       ? Math.floor((Date.now() - paidAtMs(row.paid_at)) / 86400000)
@@ -2580,7 +2727,7 @@ async function handleBookingSafetyNet(env) {
 async function handleCheckoutSafetyNet(env, ctx) {
   const threshold = nowEpoch() - 7200;
   const leads = await env.DB.prepare(
-    `SELECT id, email, name, checkout_url FROM leads
+    `SELECT id, email, name, stripe_session_id, checkout_url FROM leads
      WHERE status = 'checkout_started' AND checkout_started_at < ? AND nudge_sent_at IS NULL`
   )
     .bind(threshold)
@@ -2595,12 +2742,21 @@ async function handleCheckoutSafetyNet(env, ctx) {
       .bind(nudgeAt, lead.id)
       .run();
     if (!result.meta?.changes) continue;
+    // P2-2: the stored checkout_url may be expired or superseded — refresh
+    // it so the nudge links a live session. Skip when none exists.
+    let checkoutUrl = null;
+    try {
+      checkoutUrl = await ensureFreshCheckoutUrl(env, lead);
+    } catch (e) {
+      console.error('safety-net nudge checkout recovery failed', lead.id, e.message);
+    }
+    if (!checkoutUrl) continue;
     await enqueueEmail(env, {
       kind: 'email',
       to: lead.email,
       template: 'abandoned-nudge.html',
       subject: 'Your Sofrito Session — still interested?',
-      data: { lead_id: lead.id, name: lead.name, checkout_url: lead.checkout_url },
+      data: { lead_id: lead.id, name: lead.name, checkout_url: checkoutUrl },
       lead_id: lead.id,
     });
   }
