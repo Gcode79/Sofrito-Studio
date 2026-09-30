@@ -44,10 +44,12 @@ import leadWon from './emails/lead-won.html';
 import leadAcknowledgement from './emails/lead_acknowledgement.html';
 import newLeadNotify from './emails/new-lead-notify.html';
 import onboardingPack from './emails/onboarding-pack.html';
+import priceOverrideNotify from './emails/price-override-notify.html';
 import receipt from './emails/receipt.html';
 import referralInvite from './emails/referral-invite.html';
 import revenueNotify from './emails/revenue-notify.html';
 import sessionReminder from './emails/session-reminder.html';
+import unbilledFinalNotify from './emails/unbilled-final-notify.html';
 import welcome1 from './emails/welcome-1.html';
 import welcome2 from './emails/welcome-2.html';
 import welcome3 from './emails/welcome-3.html';
@@ -68,10 +70,12 @@ const REPO_EMAIL_TEMPLATES = Object.freeze({
   'lead_acknowledgement.html': leadAcknowledgement,
   'new-lead-notify.html': newLeadNotify,
   'onboarding-pack.html': onboardingPack,
+  'price-override-notify.html': priceOverrideNotify,
   'receipt.html': receipt,
   'referral-invite.html': referralInvite,
   'revenue-notify.html': revenueNotify,
   'session-reminder.html': sessionReminder,
+  'unbilled-final-notify.html': unbilledFinalNotify,
   'welcome-1.html': welcome1,
   'welcome-2.html': welcome2,
   'welcome-3.html': welcome3,
@@ -516,11 +520,41 @@ async function getSessionPriceCents(env) {
   }
   return String(n);
 }
-async function createStripeCheckoutSession(env, siteUrl, lead, submitKey = null) {
+
+// Alerts the founder once per distinct SESSION_PRICE_CENTS override value.
+// The advertised price ($400) lives in the site, terms, Stripe description
+// and email copy; a KV override changes what clients are actually charged,
+// so the founder must update the copy or unset the key.
+async function alertOnSessionPriceOverride(env, ctx, priceCents) {
+  if (String(priceCents) === '40000') return;
+  const flagKey = `price_override_alerted:${priceCents}`;
+  try {
+    if (await env.CONFIG.get(flagKey)) return;
+    await env.CONFIG.put(flagKey, nowIso());
+  } catch (e) {
+    console.error('price override flag KV failed', e.message);
+  }
+  const dollars = (Number(priceCents) / 100).toFixed(2);
+  ctx.waitUntil(
+    enqueueEmail(env, {
+      kind: 'email',
+      to: env.NOTIFICATION_EMAIL || '',
+      template: 'price-override-notify.html',
+      subject: `[Price override] Charging $${dollars} — site advertises $400`,
+      data: { charged_dollars: dollars, siteUrl: env.SITE_URL || '' },
+      lead_id: 'system',
+    })
+  );
+}
+async function createStripeCheckoutSession(env, siteUrl, lead, submitKey = null, ctx = null) {
   const stripeKey = env.STRIPE_API_KEY;
   if (!stripeKey) return null;
   // Deriving the key from the per-render submit_key means a retry with the same
   // key replays the original session at Stripe instead of creating a new one.
+  // Resolve the charge amount once; a KV override that diverges from the
+  // advertised $400 pages the founder so the copy can be updated.
+  const sessionPriceCents = await getSessionPriceCents(env);
+  if (ctx) await alertOnSessionPriceOverride(env, ctx, sessionPriceCents);
   const headers = {
     Authorization: `Bearer ${stripeKey}`,
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -534,7 +568,7 @@ async function createStripeCheckoutSession(env, siteUrl, lead, submitKey = null)
       'line_items[0][price_data][currency]': 'usd',
       'line_items[0][price_data][product_data][name]': 'Sofrito Session',
       'line_items[0][price_data][product_data][description]': '45-minute brand strategy session; credited in full toward the $997 Sprint when booked within 30 days',
-      'line_items[0][price_data][unit_amount]': (await getSessionPriceCents(env)),
+      'line_items[0][price_data][unit_amount]': sessionPriceCents,
       'line_items[0][quantity]': '1',
       success_url: `${siteUrl}/success.html?session_id={CHECKOUT_SESSION_ID}&name=${encodeURIComponent(lead.name)}&email=${encodeURIComponent(lead.email)}`,
       cancel_url: `${siteUrl}/cancelled.html`,
@@ -680,7 +714,7 @@ async function handleApiLead(request, env, ctx) {
       // Retry checkout creation for the existing lead instead of returning 202 with a null URL.
       if (byKey.status !== 'paid') {
         const retrySiteUrl = env.SITE_URL || new URL(request.url).origin;
-        const retryCheckout = await createStripeCheckoutSession(env, retrySiteUrl, { id: byKey.id, name, email }, submitKey);
+        const retryCheckout = await createStripeCheckoutSession(env, retrySiteUrl, { id: byKey.id, name, email }, submitKey, ctx);
         if (retryCheckout && retryCheckout.url) {
           await env.DB.prepare(
             `UPDATE leads SET stripe_session_id = ?, checkout_url = ? WHERE id = ? AND paid_at IS NULL`
@@ -732,7 +766,7 @@ async function handleApiLead(request, env, ctx) {
     .run();
 
   const siteUrl = env.SITE_URL || new URL(request.url).origin;
-  const checkout = await createStripeCheckoutSession(env, siteUrl, lead, submitKey);
+  const checkout = await createStripeCheckoutSession(env, siteUrl, lead, submitKey, ctx);
   const checkoutUrl = checkout?.url || null;
   if (checkout) {
     await env.DB.prepare(
@@ -1171,7 +1205,7 @@ async function handleInvoiceTrigger(request, env, ctx) {
   if (!MILESTONES.some((m) => m.key === milestone)) return fail('milestone must be session|final', 422);
 
   const project = await env.DB.prepare(
-    `SELECT p.id, p.name, p.package_name, p.price_cents, p.status, p.lead_id, l.email AS client_email
+    `SELECT p.id, p.name, p.package_name, p.price_cents, p.status, p.lead_id, l.email AS client_email, l.paid_at AS session_paid_at
      FROM projects p LEFT JOIN leads l ON l.id = p.lead_id WHERE p.id = ?`
   )
     .bind(projectId)
@@ -1184,7 +1218,21 @@ async function handleInvoiceTrigger(request, env, ctx) {
   const priceCents = project.price_cents && project.price_cents > 0 ? project.price_cents : pkgFallback.price_cents || 0;
   if (!priceCents) return fail(`no price on record for ${project.name}; fix projects.price_cents first`, 422);
 
-  const amountCents = splitMilestoneAmounts(priceCents, Number(await getSessionPriceCents(env)))[milestone];
+  // 30-day credit window: the advertised term credits the $400 session
+  // toward the $997 sprint only when the sprint is booked within 30 days of
+  // the session. Past the window the final invoice bills the full sprint
+  // price unless the founder explicitly passes honor_expired_credit: true.
+  let daysSinceSession = null;
+  let creditExpired = false;
+  if (milestone === 'final' && project.session_paid_at) {
+    daysSinceSession = Math.floor((Date.now() - new Date(project.session_paid_at).getTime()) / 86400000);
+    creditExpired = daysSinceSession > 30;
+  }
+  const honorExpired = String(body.honor_expired_credit || '').toLowerCase() === 'true';
+  const sessionPriceForSplit = (milestone === 'final' && creditExpired && !honorExpired)
+    ? 0
+    : Number(await getSessionPriceCents(env));
+  const amountCents = splitMilestoneAmounts(priceCents, sessionPriceForSplit)[milestone];
   const invoiceId = uuid();
   const stamp = milestone === 'final' ? 'files_delivered_at' : null;
   const stampVal = stamp ? nowIso() : null;
@@ -1265,13 +1313,30 @@ async function handleInvoiceTrigger(request, env, ctx) {
         files_delivered_at: finalRow.files_delivered_at,
         stripe_invoice_id: finalRow.stripe_invoice_id || null,
         note: finalRow.notes || null,
+        days_since_session: daysSinceSession,
+        credit_expired: creditExpired,
+        credit_honored_override: honorExpired,
       }),
       enqueueEmail(env, {
         kind: 'email',
         to: env.NOTIFICATION_EMAIL || '',
         template: 'invoice-trigger-notify.html',
-        subject: `[Milestone] ${MILESTONE_LABELS[milestone]} — ${project.name} ($${(amountCents / 100).toFixed(2)})`,
-        data: { invoice: finalRow, project, milestone_label: MILESTONE_LABELS[milestone], amount_dollars: (amountCents / 100).toFixed(2) },
+        subject: `[Milestone] ${MILESTONE_LABELS[milestone]} — ${project.name} ($${(amountCents / 100).toFixed(2)})${creditExpired && !honorExpired ? ' — credit expired' : ''}`,
+        data: {
+          invoice: finalRow,
+          project,
+          milestone_label: MILESTONE_LABELS[milestone],
+          amount_dollars: (amountCents / 100).toFixed(2),
+          credit_note: milestone === 'final'
+            ? (creditExpired
+              ? (honorExpired
+                ? `Session paid ${daysSinceSession} days ago — 30-day credit window expired, but the $400 credit was honored by explicit override.`
+                : `Session paid ${daysSinceSession} days ago — 30-day credit window expired, so the full sprint price was billed (no $400 credit).`)
+              : (daysSinceSession == null
+                ? 'No session payment date on record — $400 credit applied.'
+                : `Session paid ${daysSinceSession} days ago — inside the 30-day window, $400 credit applied.`))
+            : '',
+        },
         lead_id: `invoice-${finalRow.id}`,
       }),
     ])
@@ -1655,19 +1720,31 @@ async function handleCalendlyCreated(env, ctx, payload, bookingUuid) {
     cancel_url: calendlyField(payload, ['cancel_url']) || calendlyField(invitee, ['cancel_url']),
   };
 
+  // Payment matching: if the invitee email already has a paid session lead,
+  // link the booking to that paid lead instead of minting a duplicate row.
+  // This also drives the paid/unpaid flag in the owner notification so an
+  // unpaid booking can never look like a paying client.
+  const paidLead = await env.DB.prepare(
+    `SELECT id, name, email, paid_at FROM leads WHERE email = ? AND status = 'paid' LIMIT 1`
+  ).bind(email).first();
+  const bookingLeadId = paidLead ? paidLead.id : lead.id;
+  const paymentIsPaid = !!paidLead;
+
   // D1 batch is a transaction: the lead insert is keyed to NOT EXISTS so a
-  // retry race can never mint a second lead for the same booking.
+  // retry race can never mint a second lead for the same booking, and it is
+  // skipped entirely when the email already has a paid lead.
   const batchResults = await env.DB.batch([
     env.DB.prepare(
       `INSERT INTO leads (id, created_at, name, email, phone, business_name, business_type, package_interest, budget, message, channel, score, status, source)
        SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'calendly', ?, 'contacted', 'calendly_booking'
-       WHERE NOT EXISTS (SELECT 1 FROM calendly_bookings WHERE booking_uuid = ?)`
-    ).bind(lead.id, now, lead.name, lead.email, lead.phone, lead.business_name, lead.business_type, lead.package_interest, lead.budget, lead.message, lead.score, bookingUuid),
+       WHERE NOT EXISTS (SELECT 1 FROM calendly_bookings WHERE booking_uuid = ?)
+         AND NOT EXISTS (SELECT 1 FROM leads WHERE email = ? AND status = 'paid')`
+    ).bind(lead.id, now, lead.name, lead.email, lead.phone, lead.business_name, lead.business_type, lead.package_interest, lead.budget, lead.message, lead.score, bookingUuid, email),
     env.DB.prepare(
       `INSERT INTO calendly_bookings (id, created_at, booking_uuid, invitee_email, invitee_name, scheduled_for, timezone, event_name, answers, reschedule_url, cancel_url, lead_id, status)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')
        ON CONFLICT(booking_uuid) DO NOTHING`
-    ).bind(uuid(), now, booking.booking_uuid, booking.invitee_email, booking.invitee_name, booking.scheduled_for, booking.timezone, booking.event_name, booking.answers, booking.reschedule_url, booking.cancel_url, lead.id),
+    ).bind(uuid(), now, booking.booking_uuid, booking.invitee_email, booking.invitee_name, booking.scheduled_for, booking.timezone, booking.event_name, booking.answers, booking.reschedule_url, booking.cancel_url, bookingLeadId),
   ]);
   const bookingCreated = batchResults[1]?.meta?.changes === 1;
 
@@ -1712,17 +1789,31 @@ async function handleCalendlyCreated(env, ctx, payload, bookingUuid) {
   };
 
   const answersText = answers.map((qa) => `${qa.q}: ${qa.a}`).join('\n');
+  // Owner-facing payment banner: server-rendered (trusted values only —
+  // paidLead fields are Stripe-verified, never lead input) so the
+  // notification can never claim a payment that was not found.
+  const paidOn = paidLead && paidLead.paid_at
+    ? new Date(paidLead.paid_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : '';
+  const paymentBanner = paymentIsPaid
+    ? `<div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:8px;padding:12px 16px;font-size:14px;color:#065F46;margin:0 0 16px;"><strong>Payment verified:</strong> $400 Sofrito Session paid${paidOn ? ' on ' + escapeHtml(paidOn) : ''}.</div>`
+    : `<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:12px 16px;font-size:14px;color:#991B1B;margin:0 0 16px;"><strong>⚠ No payment found:</strong> no $400 session payment matches this email. Verify in Stripe before the session — or collect it then.</div>`;
+  const paymentFooterNote = paymentIsPaid
+    ? 'The $400 Stripe payment is recorded against this lead. The remaining $597 is due after written direction lock if the client starts the $997 Brand & Web Sprint.'
+    : 'No $400 payment is linked to this booking yet. If the client paid under a different email, link it manually before the session.';
   ctx.waitUntil(
     Promise.all([
-      enqueueWebhook(env, 'booking.new', flat),
+      enqueueWebhook(env, 'booking.new', { ...flat, payment_status: paymentIsPaid ? 'paid' : 'unpaid' }),
       enqueueEmail(env, {
         kind: 'email',
         to: env.NOTIFICATION_EMAIL || '',
         template: 'booking-notify.html',
-        subject: `[Booking] ${lead.name} — Sofrito Session${scheduledFor ? ' · ' + scheduledFor : ''}`,
+        subject: `[Booking${paymentIsPaid ? '' : ' — UNPAID'}] ${lead.name} — Sofrito Session${scheduledFor ? ' · ' + scheduledFor : ''}`,
         data: {
           lead: { name: lead.name, email: lead.email, phone: lead.phone, business_name: lead.business_name },
           booking: { ...booking, booking_id: saved.id, answers_text: answersText },
+          payment_banner: paymentBanner,
+          payment_footer_note: paymentFooterNote,
           siteUrl: env.SITE_URL || '',
         },
         lead_id: `booking-${bookingUuid}`,
@@ -1859,6 +1950,48 @@ async function emailRecordedByEvent(env, template, eventId) {
     .bind(template, eventId)
     .first();
   return !!row;
+}
+
+// Founder nudge for the larger half of every deal: a paid $400 session with
+// no final $997-split invoice 7+ days after payment. One nudge per lead
+// (deduped through emails_sent), sent only if direction could plausibly be
+// locked — the founder still decides when to trigger /api/invoice-trigger.
+async function handleUnbilledFinalSweep(env) {
+  const rows = await env.DB.prepare(
+    `SELECT l.id, l.name, l.email, l.paid_at, p.id AS project_id, p.name AS project_name
+     FROM leads l
+     LEFT JOIN projects p ON p.lead_id = l.id
+     WHERE l.status = 'paid'
+       AND l.paid_at IS NOT NULL
+       AND l.paid_at < datetime('now', '-7 days')
+       AND NOT EXISTS (
+         SELECT 1 FROM invoices i WHERE i.project_id = p.id AND i.milestone = 'final'
+       )`
+  ).all();
+  if (!rows.results?.length) return;
+  for (const row of rows.results) {
+    if (await sentAlready(env, 'unbilled-final-notify.html', row.id)) continue;
+    const days = row.paid_at
+      ? Math.floor((Date.now() - new Date(row.paid_at).getTime()) / 86400000)
+      : null;
+    await enqueueEmail(env, {
+      kind: 'email',
+      to: env.NOTIFICATION_EMAIL || '',
+      template: 'unbilled-final-notify.html',
+      subject: `[Unbilled $597] ${row.name || row.email} — final Sprint invoice not triggered`,
+      data: {
+        lead: {
+          name: row.name || row.email,
+          email: row.email,
+          paid_at: row.paid_at ? new Date(row.paid_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+        },
+        days_since_paid: days == null ? '—' : String(days),
+        project: { id: row.project_id || '', name: row.project_name || '(no project row yet)' },
+        siteUrl: env.SITE_URL || '',
+      },
+      lead_id: row.id,
+    });
+  }
 }
 
 async function handleCheckoutSafetyNet(env, ctx) {
@@ -2521,6 +2654,13 @@ export default {
       await handleSecondCheckoutNudge(env);
     } catch (e) {
       console.error('second checkout nudge failed', e.message);
+    }
+
+    // ── Unbilled final-balance sweep (paid session, no $597 invoice) ──
+    try {
+      await handleUnbilledFinalSweep(env);
+    } catch (e) {
+      console.error('unbilled final sweep failed', e.message);
     }
 
     // ── Weekly digest (Monday 17:00 UTC) ──

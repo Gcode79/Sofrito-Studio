@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Session price override active</title></head>
+<body style="margin:0;background:#F9FAFB;font-family:Arial,Helvetica,sans-serif;color:#0F172A;">
+  <div style="max-width:600px;margin:0 auto;padding:24px;">
+    <p style="font-family:Georgia,serif;font-size:20px;color:#0F172A;margin:0 0 20px;">Sofrito<span style="color:#EA580C;">Studio</span></p>
+    <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:28px;">
+      <h1 style="font-family:Georgia,serif;font-size:22px;color:#0F172A;margin:0 0 4px;">Price override active: ${{charged_dollars}}</h1>
+      <p style="font-size:14px;color:#64748B;margin:0 0 16px;">SESSION_PRICE_CENTS is set in KV</p>
+      <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:16px;font-size:14px;color:#92400E;margin-top:12px;">
+        <p style="margin:0;line-height:1.5;">Checkout is charging <strong>${{charged_dollars}}</strong>, but the site, terms, and email copy all advertise <strong>$400</strong>. Update the copy to match — or delete the <code>SESSION_PRICE_CENTS</code> key to return to $400. This alert fires once per override value.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
