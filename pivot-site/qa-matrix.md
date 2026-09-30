@@ -8,11 +8,10 @@
 | 4 | End-to-end, Stripe test card 4242… | Stripe → pay → webhook → D1 `paid` → receipt + booking emails → `/success.html` with working prefilled Calendly link |
 | 5 | Declined card 4000…0002 | Stripe decline; lead stays `checkout_started`; no emails; cancel path works |
 | 6 | Replay `checkout.session.completed` ×2 | Exactly one receipt + one booking email |
-| 7 | Webhook bad signature (well-formed, wrong HMAC) | 401, no state change |
-| 7b | Webhook malformed/missing signature | 400, no state change |
+| 7 | Webhook missing, malformed, or invalid signature | 400 when missing/malformed; 401 when well-formed but invalid; no state change |
 | 8 | Abandon 2h+ | One nudge email, lead `abandoned` |
 | 9 | Double-submit same email < 15 min | One lead row |
-| 10 | Both A/B variants | `sprint.html` → `sprint_page`, `sprint-boh.html` → `boh_sprint_page` in D1 |
+| 10 | Both A/B variants | Each variant label from the running page test is assigned, persisted in `ab_assignments`, and carried to the lead record |
 | 11 | Mobile 375px | Form + Turnstile usable, no horizontal scroll |
 | 12 | All 4 business types | Pitch line changes; correct value stored |
 | 13 | Turnstile secret unset | POST /api/lead → 400 fail-closed, no DB write |
