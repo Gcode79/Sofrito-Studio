@@ -10,6 +10,7 @@
 //   GET  /api/health                 -> liveness
 //   GET  /api/packages               -> service tiers (KV truth)
 //   POST /api/contact                -> lead capture + scoring (D1 + queues)
+//   POST /api/founding-application   -> founding round application (D1 leads, founder notify + applicant ack)
 //   POST /api/newsletter             -> Buttondown subscribe
 //   POST /api/events                 -> server-side analytics events
 //   GET  /api/dashboard              -> CRM summary (admin)
@@ -244,7 +245,7 @@ async function verifyTurnstile(env, token) {
 }
 
 const BUSINESS_TYPES = ['food_truck', 'restaurant', 'cpg', 'other'];
-const CHANNELS = ['sprint_page', 'boh_sprint_page', 'sprint_boh', 'api', 'calendly', 'google_my_business', 'social', 'referral', 'other'];
+const CHANNELS = ['sprint_page', 'boh_sprint_page', 'sprint_boh', 'api', 'calendly', 'google_my_business', 'social', 'referral', 'founding_application', 'other'];
 
 // ------------------------------------------------------------
 // Legacy retail redirects (shelved 2026-09-05)
@@ -859,6 +860,119 @@ async function handleApiLead(request, env, ctx) {
   );
 
   return json({ ok: true, id: lead.id, created_at: lead.created_at, checkout_url: checkoutUrl }, 201);
+}
+
+// POST /api/founding-application — founding client round applications
+// ------------------------------------------------------------------
+// Same trust stack as /api/lead (Turnstile, 10/min IP rate limit, strict
+// validation). Applications land in the leads table with
+// channel='founding_application' so the CRM, the admin dashboard, and the
+// lead.new webhook (Zapier → Sheets) treat them as leads — no D1 migration
+// needed. There is deliberately no founding checkout: the founder reviews
+// every application personally and accepted founders get a private booking
+// path, which keeps the 10-spot scarcity claim honest.
+async function handleFoundingApplication(request, env, ctx) {
+  let body;
+  try {
+    body = await readJson(request);
+  } catch (e) {
+    return badBody(e);
+  }
+  const email = String(body.email || '').trim().toLowerCase();
+  const name = String(body.name || '').trim();
+  const phone = String(body.phone || '').trim();
+  const business_name = String(body.business_name || '').trim();
+  const business_type = String(body.business_type || '').trim();
+  const instagram = String(body.instagram || '').trim().replace(/^@/, '').slice(0, 40);
+  const website = String(body.website || '').trim().slice(0, 200);
+  const fit_reason = String(body.fit_reason || '').trim();
+  const turnstileToken = String(body.turnstile_token || body['cf-turnstile-response'] || '').trim();
+  const submitKey = String(body.submit_key || '').trim().slice(0, 64) || null;
+
+  const turnstileOk = await verifyTurnstile(env, turnstileToken);
+  if (!turnstileOk) return fail('Turnstile verification failed.', 422);
+
+  // Strict validation — every message is user-facing copy.
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !name) {
+    return fail('Please include a valid email and your name.', 422);
+  }
+  if (!business_name) {
+    return fail('Please include your business name.', 422);
+  }
+  // We need to see the business: at least one public presence is required.
+  if (!instagram && !website) {
+    return fail('Please include your Instagram handle or website so we can see your business.', 422);
+  }
+  if (fit_reason.length < 10) {
+    return fail('Please tell us a little about why the timing is right — a sentence or two is enough.', 422);
+  }
+  if (business_type && !BUSINESS_TYPES.includes(business_type)) {
+    return fail('Invalid business type.', 422);
+  }
+  if (phone && phone.replace(/\D/g, '').length < 7) {
+    return fail('That phone number looks incomplete — you can also leave it blank.', 422);
+  }
+
+  // Rate limit: 10/min per IP (same budget as /api/lead, separate key).
+  const xff = request.headers.get('x-forwarded-for') || '';
+  const firstForwardedIp = xff.split(',')[0].trim();
+  const ip = request.headers.get('cf-connecting-ip') || firstForwardedIp || 'unknown';
+  const ipRlKey = `rl:founding:${ip}`;
+  const ipCount = parseInt(await env.CONFIG.get(ipRlKey) || '0', 10);
+  if (ipCount >= 10) return fail('You just submitted. Check your inbox.', 429);
+  ctx.waitUntil(env.CONFIG.put(ipRlKey, String(ipCount + 1), { expirationTtl: 60 }));
+
+  // Deterministic id from the email → re-posts refresh the same application
+  // instead of creating duplicates. The founding_ prefix keeps applications
+  // distinct from checkout leads even for the same email address.
+  const id = `founding_${(await sha256Hex(email)).slice(0, 24)}`;
+  const created_at = nowIso();
+  const notes = `Instagram: ${instagram ? '@' + instagram : '—'} | Website: ${website || '—'}`;
+
+  const existing = await env.DB.prepare(`SELECT id FROM leads WHERE id = ? LIMIT 1`).bind(id).first();
+  if (existing) {
+    await env.DB.prepare(
+      `UPDATE leads SET name = ?, phone = COALESCE(NULLIF(?, ''), phone),
+        business_name = ?, business_type = COALESCE(NULLIF(?, ''), business_type),
+        message = ?, notes = ?, updated_at = ?, submit_key = COALESCE(?, submit_key)
+       WHERE id = ?`
+    ).bind(name, phone, business_name, business_type, fit_reason, notes, created_at, submitKey, id).run();
+    return json({ ok: true, id, duplicate: true }, 200);
+  }
+
+  await env.DB.prepare(
+    `INSERT INTO leads (id, created_at, name, email, phone, business_name, business_type,
+      package_interest, message, channel, status, source, notes, updated_at, submit_key)
+     VALUES (?, ?, ?, ?, ?, ?, ?, 'founding_round', ?, 'founding_application', 'new', 'founding_round', ?, ?, ?)`
+  ).bind(id, created_at, name, email, phone || null, business_name, business_type || null, fit_reason, notes, created_at, submitKey).run();
+
+  const app = { id, created_at, name, email, phone, business_name, business_type, instagram, website, fit_reason };
+
+  // The existing lead.new consumer (Zapier → Sheets) picks this up as a lead;
+  // the channel field distinguishes founding applications downstream.
+  ctx.waitUntil(enqueueWebhook(env, 'lead.new', { ...app, channel: 'founding_application', source: 'founding_round' }));
+  ctx.waitUntil(
+    Promise.all([
+      enqueueEmail(env, {
+        kind: 'email',
+        to: env.NOTIFICATION_EMAIL || '',
+        template: 'founding-application-notify.html',
+        subject: `New founding application: ${name} — ${business_name}`,
+        data: { app },
+        lead_id: id,
+      }),
+      enqueueEmail(env, {
+        kind: 'email',
+        to: email,
+        template: 'founding-application-ack.html',
+        subject: 'We got your founding application — Sofrito Studio',
+        data: { name },
+        lead_id: id,
+      }),
+    ])
+  );
+
+  return json({ ok: true, id, created_at }, 201);
 }
 
 async function handleContact(request, env, ctx) {
@@ -2676,6 +2790,37 @@ async function putAbCache(env, visitorId, variantLabel) {
   }
 }
 
+// Cache the running page-test lookup (including the negative "no running
+// test" outcome) in KV with a short TTL, so cookieless first visits don't
+// each burn a D1 read on the same empty result. A newly started test goes
+// live within AB_RUNNING_TEST_TTL_SECONDS.
+const AB_RUNNING_TEST_TTL_SECONDS = 300;
+
+async function getRunningPageTestId(env) {
+  try {
+    const cached = await env.CONFIG.get('ab:running_page_test');
+    if (cached === 'none') return null;
+    if (cached) return cached;
+  } catch (e) {
+    console.error('ab running-test cache read failed', e.message);
+  }
+  try {
+    const testRow = await env.DB.prepare(
+      "SELECT id FROM ab_tests WHERE entity = 'page' AND status = 'running' LIMIT 1"
+    ).first();
+    const id = testRow ? testRow.id : null;
+    try {
+      await env.CONFIG.put('ab:running_page_test', id || 'none', { expirationTtl: AB_RUNNING_TEST_TTL_SECONDS });
+    } catch (e) {
+      console.error('ab running-test cache write failed', e.message);
+    }
+    return id;
+  } catch (e) {
+    console.error('ab running test lookup failed', e.message);
+    return null;
+  }
+}
+
 async function abTestTerminated(env) {
   try {
     const flag = await env.CONFIG.get('ab_test_terminated');
@@ -2715,6 +2860,7 @@ export default {
         if (p === '/api/config' && request.method === 'GET') return handleSiteConfig(env);
         if (p === '/api/contact' && request.method === 'POST') return handleContact(request, env, ctx);
         if (p === '/api/lead' && request.method === 'POST') return handleApiLead(request, env, ctx);
+        if (p === '/api/founding-application' && request.method === 'POST') return handleFoundingApplication(request, env, ctx);
         if (p === '/api/newsletter' && request.method === 'POST') return handleNewsletter(request, env, ctx);
         if ((p === '/api/events' || p === '/api/analytics') && request.method === 'POST')
           return handleEvent(request, env, ctx);
@@ -2816,12 +2962,9 @@ export default {
         variantLabel = await getAbCache(env, visitorId);
         if (!variantLabel) {
           try {
-            const testRow = await env.DB.prepare(
-              "SELECT id FROM ab_tests WHERE entity = 'page' AND status = 'running' LIMIT 1"
-            ).first();
+            const testId = await getRunningPageTestId(env);
 
-            if (testRow) {
-              const testId = testRow.id;
+            if (testId) {
               const existingAssignment = await env.DB.prepare(
                 `SELECT v.label
                  FROM ab_assignments a
@@ -2895,6 +3038,23 @@ export default {
       }
 
       return res;
+    }
+// Pretty URLs: serve the .html asset internally at the canonical pretty
+// path (200, URL unchanged, no redirect chain) so the served URL always
+// matches the canonical tag. The .html URLs keep serving directly — Stripe's
+// success_url/cancel_url point at /success.html and /cancelled.html with
+// query params (?session_id=), so those must never 301.
+const PRETTY_URLS = {
+  '/terms': '/terms.html',
+  '/privacy': '/privacy.html',
+  '/success': '/success.html',
+  '/cancelled': '/cancelled.html',
+};
+    if ((request.method === 'GET' || request.method === 'HEAD') && PRETTY_URLS[pathname]) {
+      const assetReq = new Request(assetUrl.origin + PRETTY_URLS[pathname], request);
+      const prettyRes = await env.ASSETS.fetch(assetReq);
+      if (prettyRes.status !== 404) return prettyRes;
+      // Fall through to the legacy/404 handling below if the file is missing.
     }
 // Legacy retail redirects that the _redirects engine can't express (its globs
     // hit real files). Probe ASSETS first: if the path is an actual file, serve
