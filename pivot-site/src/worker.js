@@ -1817,22 +1817,38 @@ async function handleStripeWebhook(request, env, ctx) {
   let leadData = null;
   if (isLive && completedPaymentEvent) {
     const sessionId = event.data.object.id;
-    const leadRow = await env.DB.prepare(
+    let leadRow = await env.DB.prepare(
       `SELECT id FROM leads WHERE stripe_session_id = ? AND status != 'paid' LIMIT 1`
     )
       .bind(sessionId)
       .first();
+    // Cycle-3 P1: resubmission rotates stripe_session_id while the previous
+    // session stays payable at Stripe for 24h. A payment completing on the
+    // superseded session matches no row above, so the lead would never be
+    // marked paid. Fall back to the deterministic lead_id written into the
+    // session's metadata at creation (guarded: metadata may be absent on
+    // non-checkout event types).
+    if (!leadRow) {
+      const metaLeadId = event.data.object.metadata && event.data.object.metadata.lead_id;
+      if (metaLeadId) {
+        leadRow = await env.DB.prepare(
+          `SELECT id FROM leads WHERE id = ? AND status != 'paid' LIMIT 1`
+        )
+          .bind(metaLeadId)
+          .first();
+      }
+    }
     if (leadRow) {
       const paidAt = nowEpoch();
       await env.DB.prepare(
-        `UPDATE leads SET status = 'paid', paid_at = ? WHERE stripe_session_id = ?`
+        `UPDATE leads SET status = 'paid', paid_at = ? WHERE id = ?`
       )
-        .bind(paidAt, sessionId)
+        .bind(paidAt, leadRow.id)
         .run();
       leadData = await env.DB.prepare(
-        `SELECT id, name, email FROM leads WHERE stripe_session_id = ? LIMIT 1`
+        `SELECT id, name, email FROM leads WHERE id = ? LIMIT 1`
       )
-        .bind(sessionId)
+        .bind(leadRow.id)
         .first();
       // Cycle-2 P1-1: the visitor may have booked via the public Calendly
       // URL BEFORE paying. That booking points at a throwaway uuid lead
@@ -1914,6 +1930,17 @@ async function handleStripeWebhook(request, env, ctx) {
     receiptLead = await env.DB.prepare(
       `SELECT id, name, email FROM leads WHERE stripe_session_id = ? AND status = 'paid' LIMIT 1`
     ).bind(event.data.object.id).first();
+    // Cycle-3 P1: same superseded-session gap as the paid-marking block —
+    // a retry after a partial first delivery can't match the rotated
+    // session id, so fall back to metadata.lead_id.
+    if (!receiptLead) {
+      const metaLeadId = event.data.object.metadata && event.data.object.metadata.lead_id;
+      if (metaLeadId) {
+        receiptLead = await env.DB.prepare(
+          `SELECT id, name, email FROM leads WHERE id = ? AND status = 'paid' LIMIT 1`
+        ).bind(metaLeadId).first();
+      }
+    }
   }
   if (isLive && receiptLead && !(await sentAlready(env, 'receipt.html', receiptLead.id))) {
     const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -2207,9 +2234,11 @@ async function handleCalendlyCreated(env, ctx, payload, bookingUuid) {
   const paidOn = paidLead && paidLead.paid_at
     ? new Date(paidAtMs(paidLead.paid_at)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     : '';
+  // Cycle-3 P2: the session price is KV-overridable — never hardcode $400.
+  const sessionPriceDollars = `$${(Number(await getSessionPriceCents(env)) / 100).toFixed(0)}`;
   const paymentBanner = paymentIsPaid
-    ? `<div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:8px;padding:12px 16px;font-size:14px;color:#065F46;margin:0 0 16px;"><strong>Payment verified:</strong> $400 Sofrito Session paid${paidOn ? ' on ' + escapeHtml(paidOn) : ''}.</div>`
-    : `<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:12px 16px;font-size:14px;color:#991B1B;margin:0 0 16px;"><strong>⚠ No payment found:</strong> no $400 session payment matches this email. Verify in Stripe before the session — or collect it then.</div>`;
+    ? `<div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:8px;padding:12px 16px;font-size:14px;color:#065F46;margin:0 0 16px;"><strong>Payment verified:</strong> ${sessionPriceDollars} Sofrito Session paid${paidOn ? ' on ' + escapeHtml(paidOn) : ''}.</div>`
+    : `<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:12px 16px;font-size:14px;color:#991B1B;margin:0 0 16px;"><strong>⚠ No payment found:</strong> no ${sessionPriceDollars} session payment matches this email. Verify in Stripe before the session — or collect it then.</div>`;
   const paymentFooterNote = paymentIsPaid
     ? await (async () => {
         // 30-day credit window — same rule as /api/invoice-trigger and the
@@ -2235,7 +2264,7 @@ async function handleCalendlyCreated(env, ctx, payload, bookingUuid) {
         const remaining = `$${(splitMilestoneAmounts(sprintCents, sessionCents).final / 100).toFixed(0)}`;
         return `The $${(sessionPriceCents / 100).toFixed(0)} Stripe payment is recorded against this lead. The remaining ${remaining} is due after written direction lock if the client starts the $${(sprintCents / 100).toFixed(0)} Brand & Web Sprint.`;
       })()
-    : 'No $400 payment is linked to this booking yet. If the client paid under a different email, link it manually before the session.';
+    : `No ${sessionPriceDollars} payment is linked to this booking yet. If the client paid under a different email, link it manually before the session.`;
   ctx.waitUntil(
     Promise.all([
       enqueueWebhook(env, 'booking.new', { ...flat, payment_status: paymentIsPaid ? 'paid' : 'unpaid' }),
@@ -2622,6 +2651,8 @@ async function runSessionAutomations(env) {
       AND julianday(b.scheduled_for) BETWEEN julianday('now', '+20 hours') AND julianday('now', '+28 hours')
     ORDER BY b.scheduled_for ASC`;
   const reminders = await env.DB.prepare(reminderQuery).all();
+  // Cycle-3 P2: the session price is KV-overridable — never hardcode $400.
+  const sessionPriceDollars = `$${(Number(await getSessionPriceCents(env)) / 100).toFixed(0)}`;
   for (const booking of reminders.results || []) {
     if (await emailRecordedByEvent(env, 'session-reminder.html', booking.booking_uuid)) continue;
     const lead = bookingLead(booking);
@@ -2632,7 +2663,7 @@ async function runSessionAutomations(env) {
     const payUrl = `${env.SITE_URL || ''}/#book?email=${encodeURIComponent(lead.email || '')}&name=${encodeURIComponent(lead.name === 'there' ? '' : lead.name)}`;
     const paymentBanner = bookingIsPaid
       ? ''
-      : `<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:14px 16px;font-size:14px;color:#991B1B;margin:0 0 16px;"><strong>Heads up:</strong> we haven't received your $400 payment yet, so your session time isn't held. <a href="${payUrl}" style="color:#991B1B;font-weight:700;">Complete your payment</a> to lock it in.</div>`;
+      : `<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:14px 16px;font-size:14px;color:#991B1B;margin:0 0 16px;"><strong>Heads up:</strong> we haven't received your ${sessionPriceDollars} payment yet, so your session time isn't held. <a href="${payUrl}" style="color:#991B1B;font-weight:700;">Complete your payment</a> to lock it in.</div>`;
     const scheduledLabel = formatSessionDate(booking.scheduled_for, booking.timezone, {
       weekday: 'long',
       month: 'long',
