@@ -1,0 +1,17 @@
+-- Migration 0016 — leads.paid_amount_cents
+--
+-- Supports the P2-3 premium fix: the worker persists the Checkout Session's
+-- amount_total on the lead at mark-paid time (see updateLeadPaidState in
+-- src/worker.js) so the final-invoice session credit uses what the client
+-- actually paid instead of the current SESSION_PRICE_CENTS KV value.
+--
+-- The column is NULLABLE and the worker code is schema-tolerant: reads and
+-- writes fall back gracefully when the column is absent, so applying this
+-- migration is safe at any time and old code keeps working until then.
+-- Pre-existing paid rows keep NULL (unknown historical amount) — the
+-- invoice paths fall back to the KV price for those rows.
+--
+-- STATUS: NOT APPLIED to remote D1. Apply only with explicit approval:
+--   npx wrangler d1 execute sofrito-db --remote --file pivot-site/migrations/0016_leads_paid_amount.sql
+--
+ALTER TABLE leads ADD COLUMN paid_amount_cents INTEGER;
