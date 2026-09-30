@@ -6,21 +6,21 @@
     <title>You're In — Sofrito Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 text-slate-900 antialiased min-h-screen flex flex-col">
+<body class="bg-zinc-950 text-zinc-50 antialiased min-h-screen flex flex-col">
     <main class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div class="max-w-2xl mx-auto text-center">
 
             <!-- Verifying state (shown first, fail-closed: the confirmation only appears after the API says "paid") -->
             <div id="state-verifying">
-                <h1 class="font-serif tracking-tight text-3xl sm:text-4xl text-slate-900 mb-6">
-                    Confirming your payment…
+                <h1 class="font-serif tracking-tight text-3xl sm:text-4xl text-white mb-6">
+                    Confirming your payment&hellip;
                 </h1>
-                <p class="text-slate-600">One moment while we verify your session booking.</p>
+                <p class="text-zinc-400">One moment while we verify your session booking.</p>
             </div>
 
             <!-- Paid state -->
             <div id="state-paid" class="hidden">
-                <h1 class="font-serif tracking-tight text-3xl sm:text-4xl text-slate-900 mb-6">
+                <h1 class="font-serif tracking-tight text-3xl sm:text-4xl text-white mb-6">
                     You're in. Check your email for your receipt and session scheduling link.
                 </h1>
                 <a href="https://calendly.com/sofrito-studio/sofrito-strategy-session"
@@ -28,19 +28,19 @@
                    class="inline-block bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-md transition-colors mb-6">
                     Schedule Your Session on Calendly
                 </a>
-                <ul class="text-left max-w-md mx-auto text-slate-700 space-y-3 mt-8">
-                    <li class="flex items-start gap-2"><span class="text-orange-600 font-bold">•</span> Check your email for your receipt</li>
-                    <li class="flex items-start gap-2"><span class="text-orange-600 font-bold">•</span> Pick your session time on Calendly</li>
-                    <li class="flex items-start gap-2"><span class="text-orange-600 font-bold">•</span> Show up with your brand questions</li>
+                <ul class="text-left max-w-md mx-auto text-zinc-400 space-y-3 mt-8">
+                    <li class="flex items-start gap-2"><span class="text-orange-500 font-bold">&bull;</span> Check your email for your receipt</li>
+                    <li class="flex items-start gap-2"><span class="text-orange-500 font-bold">&bull;</span> Pick your session time on Calendly</li>
+                    <li class="flex items-start gap-2"><span class="text-orange-500 font-bold">&bull;</span> Show up with your brand questions</li>
                 </ul>
             </div>
 
             <!-- Payment incomplete (3-D Secure abandoned, etc.) -->
             <div id="state-action" class="hidden">
-                <h1 class="font-serif tracking-tight text-3xl sm:text-4xl text-slate-900 mb-6">
+                <h1 class="font-serif tracking-tight text-3xl sm:text-4xl text-white mb-6">
                     Your payment didn't complete.
                 </h1>
-                <p class="text-slate-600 mb-6">Your card wasn't charged. Pick up where you left off to finish booking your Sofrito Session.</p>
+                <p class="text-zinc-400 mb-6">Your card wasn't charged. Pick up where you left off to finish booking your Sofrito Session.</p>
                 <a href="#"
                    id="resume-btn"
                    class="inline-block bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-md transition-colors mb-6">
@@ -50,13 +50,13 @@
 
             <!-- Unknown / could not verify -->
             <div id="state-unknown" class="hidden">
-                <h1 class="font-serif tracking-tight text-3xl sm:text-4xl text-slate-900 mb-6">
+                <h1 class="font-serif tracking-tight text-3xl sm:text-4xl text-white mb-6">
                     We couldn't confirm your payment.
                 </h1>
-                <p class="text-slate-600 mb-6">
-                    If you just paid, check your email for the receipt — it can take a minute to arrive.
+                <p class="text-zinc-400 mb-6">
+                    If you just paid, check your email for the receipt &mdash; it can take a minute to arrive.
                     If you were charged and never got a receipt, email
-                    <a href="mailto:support@sofritostudio.com" class="text-orange-600 underline">support@sofritostudio.com</a>
+                    <a href="mailto:support@sofritostudio.com" class="text-zinc-200 underline">support@sofritostudio.com</a>
                     and we'll sort it out.
                 </p>
             </div>

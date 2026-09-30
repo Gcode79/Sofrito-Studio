@@ -2266,6 +2266,9 @@ async function weeklyDigest(env) {
   const abandoned = await env.DB.prepare(
     `SELECT COUNT(*) AS n FROM leads WHERE checkout_started_at IS NOT NULL AND paid_at IS NULL AND checkout_started_at < unixepoch() - 7200`
   ).first();
+  const booked7d = await env.DB.prepare(
+    `SELECT COUNT(*) AS n FROM calendly_bookings WHERE created_at >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-7 days') AND (status IS NULL OR status != 'cancelled')`
+  ).first();
   const mtdRev = await env.DB.prepare(
     `SELECT COALESCE(SUM(amount_cents),0) AS total FROM revenue WHERE strftime('%Y-%m', occurred_at) = strftime('%Y-%m','now') AND paid = 1`
   ).first();
@@ -2280,6 +2283,7 @@ async function weeklyDigest(env) {
     `<p><strong>Payments completed (24h):</strong> ${paid24h.n || 0}</p>`,
     `<p><strong>Revenue collected (24h):</strong> $${((rev24h.total || 0) / 100).toFixed(2)}</p>`,
     `<p><strong>Abandoned checkouts:</strong> ${abandoned.n || 0}</p>`,
+    `<p><strong>Sessions booked (7d):</strong> ${booked7d.n || 0}</p>`,
     `<p><strong>MTD revenue:</strong> $${((mtdRev.total || 0) / 100).toFixed(2)}</p>`,
     `<p><strong>MTD orders:</strong> ${mtdOrders.n || 0}</p>`,
     '<p><a href="https://dash.cloudflare.com" style="color:#EA580C">Open Cloudflare</a> to dig in.</p>',
