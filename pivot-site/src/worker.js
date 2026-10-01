@@ -1698,6 +1698,11 @@ async function handleDisputeEvent(env, ctx, event) {
     ? new Date(dispute.evidence_details.due_by * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     : '—';
   const outcome = isCreated ? 'opened' : won ? 'WON — funds returned' : 'LOST — funds withdrawn';
+  // Stripe delivers webhooks at-least-once: the ledger row above is deduped
+  // by UNIQUE(source_id) and the lead-status transitions are conditional, so
+  // the founder email is the only non-idempotent step — guard it on the
+  // Stripe event id so a redelivery can't duplicate it.
+  if (await emailRecordedByEvent(env, 'dispute-notify.html', event.id)) return;
   await enqueueEmail(env, {
     kind: 'email',
     to: env.NOTIFICATION_EMAIL || '',
@@ -1712,6 +1717,7 @@ async function handleDisputeEvent(env, ctx, event) {
       charge_id: chargeId,
       siteUrl: env.SITE_URL || '',
     },
+    metadata: { event_id: event.id },
     lead_id: lead?.id,
   });
 }
@@ -1812,8 +1818,13 @@ async function handleStripeWebhook(request, env, ctx) {
   if (event.type === 'checkout.session.async_payment_failed') {
     const failedSession = event.data.object || {};
     const failedEmail = String((failedSession.customer_details && failedSession.customer_details.email) || '').trim().toLowerCase();
-    console.error('stripe async payment failed', failedSession.id, failedEmail);
+    console.error('stripe async payment failed', failedSession.id);
     if (event.livemode === true && env.NOTIFICATION_EMAIL) {
+      // At-least-once delivery: guard the founder email on the Stripe event
+      // id so a redelivery can't duplicate it.
+      if (await emailRecordedByEvent(env, 'payment-failed-notify.html', event.id)) {
+        return json({ ok: true, handled: true });
+      }
       await enqueueEmail(env, {
         kind: 'email',
         to: env.NOTIFICATION_EMAIL,
@@ -1825,6 +1836,7 @@ async function handleStripeWebhook(request, env, ctx) {
           amount: ((failedSession.amount_total || 0) / 100).toFixed(2),
           siteUrl: env.SITE_URL || '',
         },
+        metadata: { event_id: event.id },
       });
     }
     return json({ ok: true, handled: event.livemode === true });
