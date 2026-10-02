@@ -30,3 +30,6 @@ jobs:
 
       - name: Syntax check
         run: npm run check
+
+      - name: Queue regression tests
+        run: npm run test:queue

@@ -425,18 +425,24 @@ async function tiktokTrack(env, { event, eventId, user, page, contents, value, c
   }
 }
 
-async function sendResend(env, { to, subject, html }) {
+async function sendResend(env, { to, subject, html, idempotencyKey }) {
   const key = env.RESEND_API_KEY;
   if (!key) return { ok: false, status: 503, body: '{}' };
+  // Idempotency-Key makes queue redeliveries safe: the same job retried
+  // within Resend's 24h window will not send twice. The key must be stable
+  // per job — callers pass job.emails_sent_id (generated once at enqueue).
+  const headers = { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' };
+  if (idempotencyKey) headers['Idempotency-Key'] = idempotencyKey;
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
-    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({
       from: `${env.RESEND_FROM_NAME} <${env.RESEND_FROM}>`,
       to: [to],
       subject,
       html,
     }),
+    signal: AbortSignal.timeout(15000),
   });
   const body = await res.text();
   return { ok: res.ok, status: res.status, body };
@@ -451,7 +457,13 @@ async function processEmailMessage(env, job) {
     // send only the fallback subject line and the founder would get no numbers.
     const htmlRaw = kvOverride || REPO_EMAIL_TEMPLATES[job.template] || job.html;
     const html = substitute(htmlRaw || `<p>${escapeHtml(job.subject)}</p>`, { ...job.data, siteUrl: env.SITE_URL || '' });
-    result = await sendResend(env, { to: job.to, subject: job.subject, html });
+    result = await sendResend(env, {
+      to: job.to,
+      subject: job.subject,
+      html,
+      // Stable per job (generated once at enqueue): redeliveries dedupe at Resend.
+      idempotencyKey: job.emails_sent_id || job.id || null,
+    });
     let providerId = null;
     if (result.ok) {
       try {
@@ -471,24 +483,42 @@ async function processEmailMessage(env, job) {
 async function processWebhookMessage(env, job) {
   const url = env.WEBHOOK_URL;
   if (!url) {
-    console.warn('webhook: WEBHOOK_URL not set, dropping');
-    return;
+    // Explicit opt-out is quiet; a missing URL without the flag is a
+    // misconfiguration and must be loud, never a silent drop.
+    if (env.WEBHOOK_DISABLED === 'true') {
+      console.log('webhook: disabled by WEBHOOK_DISABLED flag, skipping');
+      return;
+    }
+    throw new Error('webhook: WEBHOOK_URL is not set and WEBHOOK_DISABLED is not true');
   }
   // POST the flat payload (the lead object) so Zapier sees name/email/score at
   // the top level — not wrapped under { topic, payload, ts }.
+  const id = job.payload?.id ?? job.id;
   try {
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(job.payload),
+      signal: AbortSignal.timeout(15000),
     });
-    console.log(`webhook: POST ${res.status} ${res.statusText} topic=${job.topic} id=${job.payload?.id ?? job.id}`);
-    if (res.status !== 200 && res.status !== 201 && res.status !== 202) {
-      const body = await res.text().catch(() => '');
-      console.warn(`webhook: non-ok response: ${body.slice(0, 200)}`);
+    if (res.ok) {
+      console.log(`webhook: POST ${res.status} topic=${job.topic} id=${id}`);
+      return;
     }
+    const body = await res.text().catch(() => '');
+    if (res.status === 429 || res.status >= 500) {
+      // Retryable: throw so the queue retries with backoff, then dead-letters.
+      // Never silently acknowledge a delivery that did not happen.
+      const err = new Error(`webhook: retryable status ${res.status} topic=${job.topic} id=${id}`);
+      err.retryable = true;
+      throw err;
+    }
+    // Permanent client error: retrying cannot help. Loud log, acknowledged.
+    console.error(`webhook: permanent failure ${res.status} topic=${job.topic} id=${id} body=${body.slice(0, 200)}`);
   } catch (e) {
-    console.error('webhook: fetch failed', e.message);
+    // Network errors, aborts, and retryable statuses all land here: rethrow
+    // so the queue consumer retries, then routes to the dead-letter queue.
+    if (!e.retryable) console.error('webhook: delivery failed', e.message);
     throw e;
   }
 }
@@ -3492,3 +3522,7 @@ const PRETTY_URLS = {
     }
   },
 };
+
+// Exported for regression tests (scripts/test-queue.js). No runtime effect:
+// the worker entry point remains the default export above.
+export { processEmailMessage, processWebhookMessage, sendResend };
