@@ -95,7 +95,7 @@
                 <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
             </button>
-            <a href="#book-now" class="bg-orange-600 text-white text-xs font-bold uppercase tracking-widest px-5 py-3 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors">
+            <a href="#book-now" class="rounded-full bg-orange-600 text-white text-center text-xs font-bold uppercase tracking-widest px-5 py-3 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors">
                 Book Your Sofrito Session
             </a>
         </div>
@@ -121,7 +121,7 @@
             <p class="text-xl text-zinc-400 mb-10 max-w-2xl leading-relaxed">
                 We build clear brand identities and one-page websites for independent food businesses at one fixed price.
             </p>
-            <a href="#book-now" class="inline-block bg-orange-600 text-white font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
+            <a href="#book-now" class="rounded-full inline-block bg-orange-600 text-white text-center font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
                 Book Your Sofrito Session
             </a>
             <p class="text-sm text-zinc-500 mt-4">Your $400 Sofrito Session is credited in full toward your $997 Brand &amp; Web Sprint when you start the sprint within 30 days of your session.</p>
@@ -508,86 +508,54 @@
             </div>
         </div>
         <p class="max-w-3xl mx-auto text-center text-sm text-zinc-500 mb-16">Independent food businesses only &mdash; food trucks, restaurants, specialty food brands. No chains, no franchises. Ready to start within 30 days.</p>
-        <div class="max-w-3xl mx-auto">
-            <h3 class="text-3xl font-bold tracking-tighter text-white font-serif text-center mb-3">Apply for a founding spot</h3>
-            <p class="text-center text-zinc-400 mb-8">We read every application personally and reply within two business days. Ten spots &mdash; when they&rsquo;re filled, the round closes.</p>
-            <div class="glass-panel p-8 md:p-12">
-                <form id="founding-form" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="founding-name" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Name <span class="text-zinc-500">*</span></label>
-                            <input type="text" id="founding-name" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors" required>
-                        </div>
-                        <div>
-                            <label for="founding-email" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Email <span class="text-zinc-500">*</span></label>
-                            <input type="email" id="founding-email" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors" required>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="founding-business-name" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Business Name <span class="text-zinc-500">*</span></label>
-                            <input type="text" id="founding-business-name" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors" required>
-                        </div>
-                        <div>
-                            <label for="founding-phone" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Cell Phone <span class="text-zinc-500">(Optional)</span></label>
-                            <input type="tel" id="founding-phone" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors">
-                        </div>
-                    </div>
-                    <div>
-                        <label for="founding-business-type" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Business Type</label>
-                        <select id="founding-business-type" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors appearance-none">
-                            <option value="" class="bg-zinc-900">Select...</option>
-                            <option value="food_truck" class="bg-zinc-900">Food Truck</option>
-                            <option value="restaurant" class="bg-zinc-900">Restaurant</option>
-                            <option value="cpg" class="bg-zinc-900">Specialty CPG / Goods</option>
-                            <option value="other" class="bg-zinc-900">Other</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="founding-instagram" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Instagram</label>
-                            <input type="text" id="founding-instagram" placeholder="@yourbusiness" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors">
-                        </div>
-                        <div>
-                            <label for="founding-website" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Website</label>
-                            <input type="text" id="founding-website" placeholder="https://" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors">
-                        </div>
-                    </div>
-                    <p class="text-xs text-zinc-500 -mt-2">At least one of the two &mdash; we need to see your business.</p>
-                    <div>
-                        <label for="founding-fit" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Why you&rsquo;re a fit <span class="text-zinc-500">*</span></label>
-                        <textarea id="founding-fit" rows="4" placeholder="Tell us about your business and why the timing is right." class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors" required></textarea>
-                    </div>
-                    <div id="founding-turnstile"></div>
-                    <div id="founding-form-error" class="hidden text-red-400 text-sm"></div>
-                    <div id="founding-form-success" class="hidden text-center py-8">
-                        <p class="text-2xl font-bold text-white font-serif mb-3">Application received.</p>
-                        <p class="text-zinc-400">We read every one personally &mdash; you&rsquo;ll hear from us within two business days.</p>
-                    </div>
-                    <button type="submit" id="founding-submit-btn" class="w-full bg-orange-600 text-white font-bold text-sm py-5 uppercase tracking-widest hover:bg-orange-700 transition-colors disabled:opacity-50 shadow-[0_0_20px_rgba(234,88,12,0.2)]">Submit application</button>
-                </form>
-            </div>
+        <div class="max-w-3xl mx-auto text-center">
+            <p class="text-zinc-400 mb-8">We read every application personally and reply within two business days. Ten spots &mdash; when they&rsquo;re filled, the round closes.</p>
+            <a href="#book-now" data-select-founding class="rounded-full inline-block bg-orange-600 text-white text-center font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
+                Apply for a founding spot
+            </a>
         </div>
-    </section>
     <!-- Objection flip -->
     <section aria-label="The alternative" class="py-24 px-6 max-w-3xl mx-auto text-center border-t border-white/5">
         <blockquote class="font-serif italic text-2xl md:text-3xl text-zinc-300 leading-relaxed mb-6">&ldquo;I love apologizing for my website before showing the menu.&rdquo;</blockquote>
         <p class="text-sm font-bold tracking-widest uppercase text-zinc-500 mb-10">&mdash; Said no one ever.</p>
-        <a href="#book-now" class="inline-block bg-orange-600 text-white text-center font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
+        <a href="#book-now" class="rounded-full inline-block bg-orange-600 text-white text-center font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
             Fix it in 48 hours
         </a>
     </section>
     <!-- Lead Capture — Glassmorphic Container -->
     <section id="book-now" class="py-32 px-6 max-w-3xl mx-auto">
-        <div class="text-center mb-16">
+        <div class="text-center mb-12">
             <h2 class="text-5xl font-bold tracking-tighter text-chrome mb-4">Book your Sofrito Session now — $400, credited in full toward your $997 sprint.</h2>
-            <p class="text-xl text-zinc-400">Choose your 45-minute Session time after payment.</p>
-            <p class="text-sm text-zinc-500 mt-3">We take on up to 3 sprints a week &mdash; booking reserves your build slot.</p>
+            <p class="text-xl text-zinc-400 leading-relaxed mb-6">Every client starts with a Sofrito Session. Book yours today &mdash; or apply for one of the 10 founding spots: same session, plus slot priority and a case-study feature, reviewed personally.</p>
+            <div id="path-help-booking">
+                <p class="text-xl text-zinc-400">Choose your 45-minute Session time after payment.</p>
+                <p class="text-sm text-zinc-500 mt-3">We take on up to 3 sprints a week &mdash; booking reserves your build slot.</p>
+            </div>
+            <div id="path-help-founding" class="hidden">
+                <p class="text-xl text-zinc-400">No charge today. We read every application personally and reply within two business days.</p>
+                <p class="text-sm text-zinc-500 mt-3">Ten spots &mdash; when they&rsquo;re filled, the round closes.</p>
+            </div>
         </div>
 
         <div class="glass-panel p-8 md:p-12">
             <div id="form-container">
                 <form id="lead-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" role="radiogroup" aria-label="Choose your path">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="booking-path" value="booking" class="peer sr-only" checked>
+                            <div class="border border-white/10 bg-black/40 p-5 h-full transition-colors peer-checked:border-orange-500 peer-checked:bg-orange-500/10">
+                                <p class="font-bold text-white text-sm uppercase tracking-widest mb-1">Book my session</p>
+                                <p class="text-sm text-zinc-400">$400 &rarr; secure checkout via Stripe</p>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="booking-path" value="founding" class="peer sr-only">
+                            <div class="border border-white/10 bg-black/40 p-5 h-full transition-colors peer-checked:border-orange-500 peer-checked:bg-orange-500/10">
+                                <p class="font-bold text-white text-sm uppercase tracking-widest mb-1">Apply for founding</p>
+                                <p class="text-sm text-zinc-400">10 spots &middot; no charge today</p>
+                            </div>
+                        </label>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="name" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Name <span class="text-zinc-500">*</span></label>
@@ -624,19 +592,40 @@
                         <label for="message" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Message (Optional)</label>
                         <textarea id="message" rows="3" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors"></textarea>
                     </div>
+                    <div id="founding-fields" class="hidden space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="instagram" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Instagram</label>
+                                <input type="text" id="instagram" placeholder="@yourbusiness" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors">
+                            </div>
+                            <div>
+                                <label for="website" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Website</label>
+                                <input type="text" id="website" placeholder="https://" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors">
+                            </div>
+                        </div>
+                        <p class="text-xs text-zinc-500 -mt-2">At least one of the two &mdash; we need to see your business.</p>
+                        <div>
+                            <label for="fit_reason" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Why you&rsquo;re a fit <span class="text-zinc-500">*</span></label>
+                            <textarea id="fit_reason" rows="4" placeholder="Tell us about your business and why the timing is right." class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors"></textarea>
+                        </div>
+                    </div>
                     <div id="lead-turnstile"></div>
                     <div id="form-error" class="hidden text-red-500 text-sm mt-3 text-center" aria-live="polite"></div>
-                    <div class="flex items-center justify-center gap-2 text-sm text-zinc-300 text-center mt-4">
+                    <div id="secure-checkout-row" class="flex items-center justify-center gap-2 text-sm text-zinc-300 text-center mt-4">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                         <span>Secure checkout via Stripe</span>
                     </div>
-                    <div class="text-xs text-zinc-500 text-center mt-2">Your $400 Sofrito Session is credited in full toward the $997 Brand &amp; Web Sprint when you start the sprint within 30 days of your session · Questions? <a href="mailto:hello@sofritostudio.com" class="underline hover:text-zinc-200">hello@sofritostudio.com</a></div>
-                    <button type="submit" id="submit-btn" class="w-full bg-orange-600 text-white font-bold text-sm py-5 uppercase tracking-widest hover:bg-orange-700 transition-colors disabled:opacity-50 mt-6 shadow-[0_0_20px_rgba(234,88,12,0.2)]">
+                    <div id="booking-fine-print" class="text-xs text-zinc-500 text-center mt-2">Your $400 Sofrito Session is credited in full toward the $997 Brand &amp; Web Sprint when you start the sprint within 30 days of your session &middot; Questions? <a href="mailto:hello@sofritostudio.com" class="underline hover:text-zinc-200">hello@sofritostudio.com</a></div>
+                    <button type="submit" id="submit-btn" class="rounded-full w-full bg-orange-600 text-white font-bold text-sm py-5 uppercase tracking-widest hover:bg-orange-700 transition-colors disabled:opacity-50 mt-6 shadow-[0_0_20px_rgba(234,88,12,0.2)]">
                         Book Your Sofrito Session
                     </button>
-                    <p class="text-xs text-zinc-500 text-center leading-relaxed mt-3">Secure checkout via Stripe. Choose your Sofrito Session time right after payment.</p>
+                    <p id="checkout-note" class="text-xs text-zinc-500 text-center leading-relaxed mt-3">Secure checkout via Stripe. Choose your Sofrito Session time right after payment.</p>
                 </form>
-                <p class="text-xs text-zinc-500 text-center leading-relaxed mt-4">
+                <div id="founding-success" class="hidden text-center py-8">
+                    <p class="text-2xl font-bold text-white font-serif mb-3">Application received.</p>
+                    <p class="text-zinc-400">We read every one personally &mdash; you&rsquo;ll hear from us within two business days.</p>
+                </div>
+                <p id="refund-note" class="text-xs text-zinc-500 text-center leading-relaxed mt-4">
                     Your $400 Sofrito Session is credited in full toward your $997 Sprint when you start the sprint within 30 days of your session.<br>
                     The $400 session is refundable in full within 7 days after your session and before direction lock — or within 30 days of payment if you never had the session. Email <a href="mailto:support@sofritostudio.com" class="underline hover:text-zinc-200">support@sofritostudio.com</a> to request a refund. <a href="/terms" class="underline hover:text-zinc-200">Full terms</a>
                 </p>
@@ -700,12 +689,62 @@
 
     <!-- Funnel Logic Scripts -->
     <script>
-        let awaitingTurnstile = false;
+        // Unified booking form: one form, two paths. "booking" posts to
+        // /api/lead (Stripe checkout); "founding" posts to
+        // /api/founding-application (personal review, no charge today).
+        // A single Turnstile widget serves both paths.
         let turnstileToken = null;
+        let awaitingTurnstile = false;
+
+        const form = document.getElementById('lead-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const foundingFields = document.getElementById('founding-fields');
+        const pathHelpBooking = document.getElementById('path-help-booking');
+        const pathHelpFounding = document.getElementById('path-help-founding');
+        const secureRow = document.getElementById('secure-checkout-row');
+        const bookingFinePrint = document.getElementById('booking-fine-print');
+        const checkoutNote = document.getElementById('checkout-note');
+        const refundNote = document.getElementById('refund-note');
+        const foundingSuccess = document.getElementById('founding-success');
+
+        function currentPath() {
+            const checked = document.querySelector('input[name="booking-path"]:checked');
+            return checked ? checked.value : 'booking';
+        }
+
+        function applyPath() {
+            const isFounding = currentPath() === 'founding';
+            foundingFields.classList.toggle('hidden', !isFounding);
+            pathHelpBooking.classList.toggle('hidden', isFounding);
+            pathHelpFounding.classList.toggle('hidden', !isFounding);
+            secureRow.classList.toggle('hidden', isFounding);
+            bookingFinePrint.classList.toggle('hidden', isFounding);
+            checkoutNote.classList.toggle('hidden', isFounding);
+            refundNote.classList.toggle('hidden', isFounding);
+            submitBtn.innerText = isFounding ? 'Submit founding application' : 'Book Your Sofrito Session';
+        }
+
+        document.querySelectorAll('input[name="booking-path"]').forEach((radio) => {
+            radio.addEventListener('change', applyPath);
+        });
+        applyPath();
+
+        // The founding pitch section's CTA scrolls here and pre-selects founding.
+        document.querySelectorAll('[data-select-founding]').forEach((a) => {
+            a.addEventListener('click', () => {
+                const radio = document.querySelector('input[name="booking-path"][value="founding"]');
+                if (radio) { radio.checked = true; applyPath(); }
+            });
+        });
 
         function showError(message) {
             const el = document.getElementById('form-error');
             if (el) { el.textContent = message; el.classList.remove('hidden'); }
+        }
+
+        function hideError() {
+            const el = document.getElementById('form-error');
+            if (el) { el.classList.add('hidden'); el.textContent = ''; }
         }
 
         function getCookie(name) {
@@ -721,11 +760,8 @@
             form.requestSubmit();
         };
 
-        // Explicit Turnstile rendering: the page now hosts two widgets (lead
-        // form + founding form), so no-arg turnstile.reset()/execute() would
-        // hit the wrong one. Each flow targets its own widget id.
-        (function renderLeadTurnstile() {
-            if (!window.turnstile || !document.getElementById('lead-turnstile')) { setTimeout(renderLeadTurnstile, 250); return; }
+        (function renderTurnstile() {
+            if (!window.turnstile || !document.getElementById('lead-turnstile')) { setTimeout(renderTurnstile, 250); return; }
             if (window.leadWidgetId !== undefined) return;
             window.leadWidgetId = turnstile.render('#lead-turnstile', {
                 sitekey: '0x4AAAAAAFAfcfVLJKtjbuO8',
@@ -760,8 +796,6 @@
             }
         });
 
-        const form = document.getElementById('lead-form');
-
         // Prefill from payment-nudge links (?name=&email=) so returning
         // bookers don't re-type what we already know.
         try {
@@ -776,173 +810,106 @@
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            hideError();
 
-            const btn = document.getElementById('submit-btn');
-            const originalText = btn.innerText;
+            const isFounding = currentPath() === 'founding';
+            const originalText = submitBtn.innerText;
+
+            // Founding-only client validation mirrors the server: at least one
+            // of Instagram/website, and a fit reason of 10+ characters.
+            let foundingExtras = null;
+            if (isFounding) {
+                const instagram = document.getElementById('instagram').value.trim();
+                const website = document.getElementById('website').value.trim();
+                const fit_reason = document.getElementById('fit_reason').value.trim();
+                if (!instagram && !website) { showError('Add your Instagram or website \u2014 we need to see your business.'); return; }
+                if (fit_reason.length < 10) { showError('Tell us a little more about why the timing is right (10+ characters).'); return; }
+                foundingExtras = { instagram, website, fit_reason };
+            }
 
             const token = turnstileToken || document.querySelector('#lead-form textarea[name="cf-turnstile-response"]')?.value;
 
             if (!token) {
                 if (awaitingTurnstile) return;
                 awaitingTurnstile = true;
-                btn.innerText = 'VERIFYING…'; btn.disabled = true;
+                submitBtn.innerText = 'VERIFYING…'; submitBtn.disabled = true;
                 try {
                     if (!window.turnstile || window.leadWidgetId === undefined) throw new Error('turnstile not ready');
                     turnstile.reset(window.leadWidgetId); turnstile.execute(window.leadWidgetId);
                 }
-
-                catch (err) { awaitingTurnstile = false; showError('Verification failed to load. Please refresh and try again.'); btn.innerText = originalText; btn.disabled = false; if (window.turnstile && window.leadWidgetId !== undefined) turnstile.reset(window.leadWidgetId);; }
+                catch (err) { awaitingTurnstile = false; showError('Verification failed to load. Please refresh and try again.'); submitBtn.innerText = originalText; submitBtn.disabled = false; if (window.turnstile && window.leadWidgetId !== undefined) turnstile.reset(window.leadWidgetId); }
                 return;
             }
             awaitingTurnstile = false;
 
-            btn.innerText = 'REDIRECTING TO SECURE CHECKOUT…';
-            btn.disabled = true;
+            submitBtn.innerText = isFounding ? 'SENDING…' : 'REDIRECTING TO SECURE CHECKOUT…';
+            submitBtn.disabled = true;
 
-            const cookieVal = getCookie('sofrito_ab_page');
-            const payload = {
-                name: document.getElementById('name').value.trim(),
-                email: document.getElementById('email').value.trim(),
-                phone: document.getElementById('phone').value.trim(),
-                business_name: document.getElementById('business_name').value.trim(),
-                business_type: document.getElementById('business_type').value,
-                message: document.getElementById('message').value.trim(),
-                channel: (cookieVal && cookieVal !== 'unknown') ? decodeURIComponent(cookieVal) : 'sprint_page',
-                turnstile_token: token,
-                submit_key: submitKey
-            };
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const business_name = document.getElementById('business_name').value.trim();
+            const business_type = document.getElementById('business_type').value;
+
+            let endpoint, payload;
+            if (isFounding) {
+                endpoint = '/api/founding-application';
+                payload = {
+                    name, email, phone, business_name, business_type,
+                    instagram: foundingExtras.instagram,
+                    website: foundingExtras.website,
+                    fit_reason: foundingExtras.fit_reason,
+                    turnstile_token: token,
+                    submit_key: submitKey
+                };
+            } else {
+                const cookieVal = getCookie('sofrito_ab_page');
+                endpoint = '/api/lead';
+                payload = {
+                    name, email, phone, business_name, business_type,
+                    message: document.getElementById('message').value.trim(),
+                    channel: (cookieVal && cookieVal !== 'unknown') ? decodeURIComponent(cookieVal) : 'sprint_page',
+                    turnstile_token: token,
+                    submit_key: submitKey
+                };
+            }
 
             try {
-                const res = await fetch('/api/lead', {
+                const res = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-
-                if (res.ok) {
-                    const data = await res.json().catch(() => ({}));
-                    if (data.ok && data.checkout_url) {
-                        btn.innerText = 'REDIRECTING TO SECURE CHECKOUT…';
-                        btn.disabled = true;
+                const data = await res.json().catch(() => ({}));
+                if (res.ok && data.ok) {
+                    if (isFounding) {
+                        form.querySelectorAll('input, select, textarea, button, .cf-turnstile').forEach((el) => { el.style.display = 'none'; });
+                        foundingSuccess.classList.remove('hidden');
+                    } else if (data.checkout_url) {
                         window.location.href = data.checkout_url;
                     } else {
                         showError(data.error || 'Something went wrong. Please try again.');
-                        btn.innerText = originalText;
-                        btn.disabled = false;
+                        submitBtn.innerText = originalText;
+                        submitBtn.disabled = false;
                         if (window.turnstile && window.leadWidgetId !== undefined) turnstile.reset(window.leadWidgetId);
+                        turnstileToken = null;
                     }
                 } else {
-                    const data = await res.json().catch(() => ({}));
                     showError(data.error || 'Something went wrong. Please try again.');
-                    btn.innerText = originalText;
-                    btn.disabled = false;
+                    submitBtn.innerText = originalText;
+                    submitBtn.disabled = false;
+                    if (window.turnstile && window.leadWidgetId !== undefined) turnstile.reset(window.leadWidgetId);
+                    turnstileToken = null;
                 }
             } catch (error) {
                 showError(error.message || 'Something went wrong. Please try again.');
-                btn.innerText = originalText;
-                btn.disabled = false;
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
                 if (window.turnstile && window.leadWidgetId !== undefined) turnstile.reset(window.leadWidgetId);
+                turnstileToken = null;
             }
         });
     </script>
-    <script>
-        // Founding Client Round application form — posts to /api/founding-application.
-        // Mirrors the lead form's Turnstile flow with its own widget callback and
-        // token so the two forms never share verification state.
-        (function () {
-            const form = document.getElementById('founding-form');
-            if (!form) return;
-            let foundingTurnstileToken = null;
-            let awaitingFoundingTurnstile = false;
-            const submitKey = crypto.randomUUID();
-
-            function showFoundingError(message) {
-                const el = document.getElementById('founding-form-error');
-                if (el) { el.textContent = message; el.classList.remove('hidden'); }
-            }
-            function hideFoundingError() {
-                const el = document.getElementById('founding-form-error');
-                if (el) { el.classList.add('hidden'); el.textContent = ''; }
-            }
-
-            window.turnstileCallbackFounding = function (token) {
-                foundingTurnstileToken = token;
-                awaitingFoundingTurnstile = false;
-                form.requestSubmit();
-            };
-
-            // Explicit render for the founding widget (see lead form note above).
-            (function renderFoundingTurnstile() {
-                if (!window.turnstile || !document.getElementById('founding-turnstile')) { setTimeout(renderFoundingTurnstile, 250); return; }
-                if (window.foundingWidgetId !== undefined) return;
-                window.foundingWidgetId = turnstile.render('#founding-turnstile', {
-                    sitekey: '0x4AAAAAAFAfcfVLJKtjbuO8',
-                    callback: window.turnstileCallbackFounding
-                });
-            })();
-
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                hideFoundingError();
-
-                const btn = document.getElementById('founding-submit-btn');
-                const originalText = btn.innerText;
-
-                const token = foundingTurnstileToken || document.querySelector('#founding-form textarea[name="cf-turnstile-response"]')?.value;
-                if (!token) {
-                    if (awaitingFoundingTurnstile) return;
-                    awaitingFoundingTurnstile = true;
-                    btn.innerText = 'VERIFYING…'; btn.disabled = true;
-                    try {
-                        if (!window.turnstile || window.foundingWidgetId === undefined) throw new Error('turnstile not ready');
-                        turnstile.reset(window.foundingWidgetId); turnstile.execute(window.foundingWidgetId);
-                    }
-                    catch (err) { awaitingFoundingTurnstile = false; showFoundingError('Verification failed to load. Please refresh and try again.'); btn.innerText = originalText; btn.disabled = false; if (window.turnstile && window.foundingWidgetId !== undefined) turnstile.reset(window.foundingWidgetId); }
-                    return;
-                }
-                awaitingFoundingTurnstile = false;
-
-                btn.innerText = 'SENDING…'; btn.disabled = true;
-
-                const payload = {
-                    name: document.getElementById('founding-name').value.trim(),
-                    email: document.getElementById('founding-email').value.trim(),
-                    phone: document.getElementById('founding-phone').value.trim(),
-                    business_name: document.getElementById('founding-business-name').value.trim(),
-                    business_type: document.getElementById('founding-business-type').value,
-                    instagram: document.getElementById('founding-instagram').value.trim(),
-                    website: document.getElementById('founding-website').value.trim(),
-                    fit_reason: document.getElementById('founding-fit').value.trim(),
-                    turnstile_token: token,
-                    submit_key: submitKey
-                };
-
-                try {
-                    const res = await fetch('/api/founding-application', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    const data = await res.json().catch(() => ({}));
-                    if (res.ok && data.ok) {
-                        form.querySelectorAll('input, select, textarea, button, .cf-turnstile').forEach((el) => { el.style.display = 'none'; });
-                        document.getElementById('founding-form-success').classList.remove('hidden');
-                    } else {
-                        showFoundingError(data.error || 'Something went wrong. Please try again.');
-                        btn.innerText = originalText; btn.disabled = false;
-                        if (window.turnstile && window.foundingWidgetId !== undefined) turnstile.reset(window.foundingWidgetId);
-                        foundingTurnstileToken = null;
-                    }
-                } catch (error) {
-                    showFoundingError(error.message || 'Something went wrong. Please try again.');
-                    btn.innerText = originalText; btn.disabled = false;
-                    if (window.turnstile && window.foundingWidgetId !== undefined) turnstile.reset(window.foundingWidgetId);
-                    foundingTurnstileToken = null;
-                }
-            });
-        })();
-    </script>
-    <script>
         // Competitor-study mods: hero audience rotator + scroll-fill process text.
         // Both degrade gracefully: no-JS keeps the static first phrase and
         // readable zinc-400 paragraphs; reduced-motion disables the animation.
