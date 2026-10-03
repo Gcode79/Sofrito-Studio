@@ -59,7 +59,7 @@ Form prefilled from Calendly where possible (name, email). Keep to 4 questions �
 - **Timing:** immediately after the Strategy Session concludes, before the 48-hour sprint starts (per offer: "$400 Sofrito Session … pay the remaining $597 and we launch").
 - **Mechanism:** Stripe invoice (payment processor per D2). **Blocked today:** `STRIPE_API_KEY` / `STRIPE_WEBHOOK_SECRET` are NOT deployed to the live worker (D10, verified), so no automated invoice path exists yet. Until the founder sets those secrets + the Stripe dashboard webhook, invoices must be sent manually from the Stripe dashboard (or an approved invoicing tool).
 - **Data discipline:** record every invoice/payment in D1 as it occurs; never fabricate numbers (standing rule).
-- **Template content:** `$597 — remaining balance, Brand & Web Sprint («Client»). $400 session fee already credited. Includes: logo suite, Brand in a Box folder, 1-page website, one revision round, domain connect + hand-off.`
+- **Template content:** `$597 — remaining balance, Brand & Web Sprint («Client»). $400 session fee already credited. Includes: logo suite, Brand in a Box folder, 1-page website, two refinement rounds, domain connect + hand-off.`
 
 ## Step 3 — Post-launch upsell (optional, not yet priced/approved)
 
