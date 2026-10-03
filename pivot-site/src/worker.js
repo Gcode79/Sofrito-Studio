@@ -541,7 +541,7 @@ async function handleSiteConfig(env) {
     socials: {
       instagram: 'https://instagram.com/sofritostudio',
       facebook: 'https://facebook.com/sofritostudio',
-      pinterest: 'https://pinterest.com/sofritostudio',
+      // pinterest disconnected until the account is fixed: 'https://pinterest.com/sofritostudio',
       tiktok: 'https://tiktok.com/@sofritostudio',
     },
     session_url: null,
