@@ -89,13 +89,13 @@
             <div class="hidden md:flex space-x-8 text-xs tracking-widest uppercase font-semibold text-zinc-400">
                 <a href="#sprint" class="hover:text-zinc-200 transition-colors">The Sprint</a>
                 <a href="#process" class="hover:text-zinc-200 transition-colors">Process</a>
-                <a href="#book-now" class="hover:text-zinc-200 transition-colors">Book Your Sofrito Session</a>
+                <a href="#book-now" data-select-booking class="hover:text-zinc-200 transition-colors">Book Your Sofrito Session</a>
             </div>
             <button type="button" data-theme-toggle class="theme-toggle" aria-label="Toggle light and dark theme">
                 <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
             </button>
-            <a href="#book-now" class="rounded-full bg-orange-600 text-white text-center text-xs font-bold uppercase tracking-widest px-5 py-3 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors">
+            <a href="#book-now" data-select-booking class="rounded-full bg-orange-600 text-white text-center text-xs font-bold uppercase tracking-widest px-5 py-3 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors">
                 Book Your Sofrito Session
             </a>
         </div>
@@ -121,7 +121,7 @@
             <p class="text-xl text-zinc-400 mb-10 max-w-2xl leading-relaxed">
                 We build clear brand identities and one-page websites for independent food businesses at one fixed price.
             </p>
-            <a href="#book-now" class="rounded-full inline-block bg-orange-600 text-white text-center font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
+            <a href="#book-now" data-select-booking class="rounded-full inline-block bg-orange-600 text-white text-center font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
                 Book Your Sofrito Session
             </a>
             <p class="text-sm text-zinc-500 mt-4">Your $400 Sofrito Session is credited in full toward your $997 Brand &amp; Web Sprint when you start the sprint within 30 days of your session.</p>
@@ -537,7 +537,7 @@
     <section aria-label="The alternative" class="py-16 px-6 max-w-3xl mx-auto text-center border-t border-white/5">
         <blockquote class="font-serif italic text-2xl md:text-3xl text-zinc-300 leading-relaxed mb-6">&ldquo;I love apologizing for my website before showing the menu.&rdquo;</blockquote>
         <p class="text-sm font-bold tracking-widest uppercase text-zinc-500 mb-10">&mdash; Said no one ever.</p>
-        <a href="#book-now" class="rounded-full inline-block bg-orange-600 text-white text-center font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
+        <a href="#book-now" data-select-booking class="rounded-full inline-block bg-orange-600 text-white text-center font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
             Fix it in 48 hours
         </a>
     </section>
@@ -674,7 +674,7 @@
                     <li><a href="#sprint" class="text-zinc-400 hover:text-zinc-200 transition-colors">The Sprint</a></li>
                     <li><a href="#process" class="text-zinc-400 hover:text-zinc-200 transition-colors">Process</a></li>
                     <li><a href="#faq" class="text-zinc-400 hover:text-zinc-200 transition-colors">FAQ</a></li>
-                    <li><a href="#book-now" class="text-zinc-400 hover:text-zinc-200 transition-colors">Book Your Session</a></li>
+                    <li><a href="#book-now" data-select-booking class="text-zinc-400 hover:text-zinc-200 transition-colors">Book Your Session</a></li>
                 </ul>
             </div>
             <!-- Legal Column -->
@@ -751,6 +751,16 @@
         document.querySelectorAll('[data-select-founding]').forEach((a) => {
             a.addEventListener('click', () => {
                 const radio = document.querySelector('input[name="booking-path"][value="founding"]');
+                if (radio) { radio.checked = true; applyPath(); }
+            });
+        });
+
+        // Session-intent CTAs ("Fix it in 48 hours", nav/hero/footer booking
+        // links) scroll here and pre-select the booking path. Without this, a
+        // visitor who previously picked founding would land on the wrong path.
+        document.querySelectorAll('[data-select-booking]').forEach((a) => {
+            a.addEventListener('click', () => {
+                const radio = document.querySelector('input[name="booking-path"][value="booking"]');
                 if (radio) { radio.checked = true; applyPath(); }
             });
         });
