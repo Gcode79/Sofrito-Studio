@@ -1,4 +1,4 @@
-# Sofrito Studio CI — validates code on every push to main.
+# Sofrito Studio CI — validates code on every push to main and every pull request.
 #
 # Green checkmark = code is syntactically valid, safe to deploy.
 # Red X = something broke, do not deploy.
@@ -6,6 +6,8 @@ name: Sofrito CI
 
 on:
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
   workflow_dispatch:
 
@@ -21,7 +23,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: pivot-site/package-lock.json
 
@@ -33,3 +35,6 @@ jobs:
 
       - name: Queue regression tests
         run: npm run test:queue
+
+      - name: Payment regression tests
+        run: npm run test:payments

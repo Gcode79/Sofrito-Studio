@@ -12,9 +12,10 @@
     "generate:social": "node scripts/generate-social-batch.js",
     "generate:newsletter": "node scripts/generate-newsletter.js",
     "generate:case-study": "node scripts/generate-case-study.js",
-    "check": "node --check src/worker.js && node --check scripts/ai-lib.js && node --check scripts/generate-blog-post.js && node --check scripts/generate-social-batch.js && node --check scripts/generate-newsletter.js && node --check scripts/generate-case-study.js && node --check scripts/smoke-test-apis.js && node --check public/js/site.js && node --check scripts/test-queue.js && node --check scripts/html-loader.mjs",
+    "check": "node --check src/worker.js && node --check src/lib/pure.js && node --check src/lib/http.js && node --check src/lib/email.js && node --check src/lib/billing.js && node --check src/lib/booking.js && node --check src/lib/automations.js && node --check scripts/ai-lib.js && node --check scripts/generate-blog-post.js && node --check scripts/generate-social-batch.js && node --check scripts/generate-newsletter.js && node --check scripts/generate-case-study.js && node --check scripts/smoke-test-apis.js && node --check public/js/site.js && node --check scripts/test-queue.js && node --check scripts/test-payments.js && node --check scripts/html-loader.mjs",
     "smoke:api": "node scripts/smoke-test-apis.js",
-    "test:queue": "node scripts/test-queue.js"
+    "test:queue": "node scripts/test-queue.js",
+    "test:payments": "node scripts/test-payments.js"
   },
   "devDependencies": {
     "sharp": "^0.35.4",

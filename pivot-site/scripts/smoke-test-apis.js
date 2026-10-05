@@ -28,7 +28,7 @@ async function main() {
   expect(nl.status === 200 && nl.json && nl.json.ok === true && /digital-guide/.test(nl.json.guide_url || ''), 'newsletter -> ok + guide_url');
 
   const ct = await post('/api/contact', { name: 'Smoke Test', email, message: 'This is a local smoke test submission.', source: 'smoke-test' });
-  expect(ct.status === 200 && ct.json && ct.json.ok === true && typeof ct.json.id === 'string', 'contact -> ok + lead id');
+  expect(ct.status === 201 && ct.json && ct.json.ok === true && typeof ct.json.id === 'string', 'contact -> 201 + lead id');
 
   const bad = await post('/api/newsletter', { email: 'nope' });
   expect(bad.status === 422, 'invalid email -> 422');

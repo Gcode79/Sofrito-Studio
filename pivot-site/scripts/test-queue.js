@@ -10,7 +10,7 @@ import { register } from 'node:module';
 // (mirrors Wrangler's behavior; plain Node cannot import .html).
 register('./html-loader.mjs', import.meta.url);
 
-const { processEmailMessage, processWebhookMessage } = await import('../src/worker.js');
+const { processEmailMessage, processWebhookMessage } = await import('../src/lib/email.js');
 
 let passed = 0;
 function ok(name, cond) {
