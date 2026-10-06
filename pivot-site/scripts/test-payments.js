@@ -94,8 +94,10 @@ function ok(name, cond) {
   const db = new DatabaseSync(':memory:');
   db.exec('CREATE TABLE leads (id TEXT, created_at TEXT)');
   const nowMs = Date.now();
-  const today = new Date(nowMs).toISOString().slice(0, 10);
-  const oldIso = `${today}T00:30:00.000Z`; // ~11h old, same day: the exact bug shape
+  // 11h old, relative to now (midnight-safe): the exact bug shape. A fixed
+  // wall-clock time like `${today}T00:30` breaks when the suite runs near
+  // 00:00 UTC — the "stale" row lands inside the 15-minute window.
+  const oldIso = new Date(nowMs - 11 * 60 * 60 * 1000).toISOString();
   const newIso = new Date(nowMs - 10 * 60 * 1000).toISOString();
   db.prepare('INSERT INTO leads VALUES (?, ?), (?, ?)').run('old', oldIso, 'new', newIso);
   const rows = db
@@ -105,7 +107,11 @@ function ok(name, cond) {
   const buggy = db
     .prepare(`SELECT id FROM leads WHERE created_at >= datetime('now', '-15 minutes')`)
     .all();
-  ok('timestamps: old datetime() form demonstrably leaks the stale row', buggy.length === 2);
+  // Root-cause demo (clock-independent): 'T' (0x54) sorts after ' ' (0x20), so an
+  // ISO-8601 timestamp always compares >= the space-separated datetime('now')
+  // at the same instant — the old comparison could never exclude a same-day row.
+  const leak = db.prepare(`SELECT '2000-01-01T00:00:00.000Z' >= '2000-01-01 00:00:00' AS gte`).get();
+  ok("timestamps: 'T' > ' ' lets ISO strings leak past the space-form cutoff", leak.gte === 1);
   db.close();
 }
 
