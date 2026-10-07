@@ -95,6 +95,9 @@
                 <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
             </button>
+            <button type="button" id="sofrito-share-nav" aria-label="Share Sofrito Studio" title="Share this site" class="text-zinc-400 hover:text-zinc-200 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            </button>
             <a href="#book-now" data-select-booking class="rounded-full bg-orange-600 text-white text-center text-xs font-bold uppercase tracking-widest px-5 py-3 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors">
                 Book Your Sofrito Session
             </a>
@@ -1022,34 +1025,38 @@
             window.sofritoRefCode = function () { return getCookie('sofrito_ref'); };
         })();
 
-        /* Share button: native share sheet on mobile, clipboard fallback on desktop. */
+        /* Share buttons (nav + footer): native share sheet on mobile, clipboard fallback on desktop. */
         (function () {
-            var btn = document.getElementById('sofrito-share');
-            if (!btn) return;
             var data = {
                 title: 'Sofrito Studio — Brand & Web Sprint for food businesses',
                 text: 'Brand identity + one-page website for your food business. $997 flat, live in 48 hours.',
                 url: 'https://sofritostudio.com/'
             };
-            btn.addEventListener('click', function () {
-                function fallback() {
-                    var done = function (msg) {
-                        btn.setAttribute('title', msg);
-                        setTimeout(function () { btn.setAttribute('title', 'Share this site'); }, 2500);
-                    };
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(data.url).then(function () { done('Link copied'); }, function () { done('Copy this link: sofritostudio.com'); });
-                    } else {
-                        done('Copy this link: sofritostudio.com');
+            function bindShare(btn) {
+                btn.addEventListener('click', function () {
+                    function fallback() {
+                        var done = function (msg) {
+                            btn.setAttribute('title', msg);
+                            setTimeout(function () { btn.setAttribute('title', 'Share this site'); }, 2500);
+                        };
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(data.url).then(function () { done('Link copied'); }, function () { done('Copy this link: sofritostudio.com'); });
+                        } else {
+                            done('Copy this link: sofritostudio.com');
+                        }
                     }
-                }
-                if (navigator.share) {
-                    navigator.share(data).catch(function (err) {
-                        if (err && err.name !== 'AbortError') fallback();
-                    });
-                } else {
-                    fallback();
-                }
+                    if (navigator.share) {
+                        navigator.share(data).catch(function (err) {
+                            if (err && err.name !== 'AbortError') fallback();
+                        });
+                    } else {
+                        fallback();
+                    }
+                });
+            }
+            ['sofrito-share', 'sofrito-share-nav'].forEach(function (id) {
+                var btn = document.getElementById(id);
+                if (btn) bindShare(btn);
             });
         })();
     </script>
