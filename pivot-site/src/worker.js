@@ -38,6 +38,7 @@ import { CORS, stripCors, json, fail, authorized, readJson, verifyTurnstile, now
 import { enqueueEmail, enqueueWebhook, tiktokTrack } from './lib/email.js';
 import { createStripeCheckoutSession, ensureFreshCheckoutUrl, getSessionPriceCents, handleStripeWebhook, handleInvoiceStatus, handleInvoiceReconcile, handleInvoiceTrigger } from './lib/billing.js';
 import { handleCalendlyWebhook } from './lib/booking.js';
+import { handlePartnerSignup, handlePartnerClick, handlePartnerPayouts, recordAttributionForPaidLead, normalizeRefCode } from './lib/affiliates.js';
 import { handleUnbilledFinalSweep, handleBookingSafetyNet, handleCheckoutSafetyNet, handleSecondCheckoutNudge, runSessionAutomations, runWonLeadFallbacks, runLeadAutomations, weeklyDigest, handleFlowGenerate, getAbCache, putAbCache, getRunningPageTestId, abTestTerminated } from './lib/automations.js';
 
 // ------------------------------------------------------------
@@ -195,6 +196,9 @@ async function handleApiLead(request, env, ctx) {
   // concurrent double-submit cannot open two checkout sessions. Optional: a
   // request without it still works, it just loses the race protection.
   const submitKey = String(body.submit_key || '').trim().slice(0, 64) || null;
+  // Sofrito Partners: referral code carried from the ?ref= cookie by the
+  // lead form. Normalized (uppercase A-Z0-9-) so typed codes match.
+  const refCode = normalizeRefCode(body.ref_code) || null;
 
   // Turnstile verification
   const turnstileOk = await verifyTurnstile(env, turnstileToken);
@@ -291,8 +295,8 @@ async function handleApiLead(request, env, ctx) {
   // stale one. created_at, status, source, and checkout timestamps are
   // preserved; empty resubmitted values do not wipe existing data.
   await env.DB.prepare(
-    `INSERT INTO leads (id, created_at, name, email, phone, business_name, business_type, package_interest, budget, message, channel, status, source, checkout_started_at, submit_key)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'checkout_started', 'lead_api', ?, ?)
+    `INSERT INTO leads (id, created_at, name, email, phone, business_name, business_type, package_interest, budget, message, channel, status, source, checkout_started_at, submit_key, ref_code)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'checkout_started', 'lead_api', ?, ?, ?)
      ON CONFLICT(id) DO UPDATE SET
        name = COALESCE(NULLIF(excluded.name, ''), leads.name),
        phone = COALESCE(NULLIF(excluded.phone, ''), leads.phone),
@@ -301,9 +305,10 @@ async function handleApiLead(request, env, ctx) {
        package_interest = COALESCE(NULLIF(excluded.package_interest, ''), leads.package_interest),
        budget = COALESCE(NULLIF(excluded.budget, ''), leads.budget),
        message = COALESCE(NULLIF(excluded.message, ''), leads.message),
-       channel = COALESCE(NULLIF(excluded.channel, ''), leads.channel)`
+       channel = COALESCE(NULLIF(excluded.channel, ''), leads.channel),
+       ref_code = COALESCE(NULLIF(excluded.ref_code, ''), leads.ref_code)`
   )
-    .bind(id, lead.created_at, lead.name, lead.email, lead.phone, lead.business_name, lead.business_type, lead.package_interest, lead.budget, lead.message, lead.channel, now, submitKey)
+    .bind(id, lead.created_at, lead.name, lead.email, lead.phone, lead.business_name, lead.business_type, lead.package_interest, lead.budget, lead.message, lead.channel, now, submitKey, refCode)
     .run();
 
   // Already-paid guard: the lead id is deterministic from the email, so a
@@ -403,6 +408,7 @@ async function handleFoundingApplication(request, env, ctx) {
   const fit_reason = String(body.fit_reason || '').trim();
   const turnstileToken = String(body.turnstile_token || body['cf-turnstile-response'] || '').trim();
   const submitKey = String(body.submit_key || '').trim().slice(0, 64) || null;
+  const refCode = normalizeRefCode(body.ref_code) || null;
 
   const turnstileOk = await verifyTurnstile(env, turnstileToken);
   if (!turnstileOk) return fail('Turnstile verification failed.', 422);
@@ -457,9 +463,9 @@ async function handleFoundingApplication(request, env, ctx) {
 
   await env.DB.prepare(
     `INSERT INTO leads (id, created_at, name, email, phone, business_name, business_type,
-      package_interest, message, channel, status, source, notes, updated_at, submit_key)
-     VALUES (?, ?, ?, ?, ?, ?, ?, 'founding_round', ?, 'founding_application', 'new', 'founding_round', ?, ?, ?)`
-  ).bind(id, created_at, name, email, phone || null, business_name, business_type || null, fit_reason, notes, created_at, submitKey).run();
+      package_interest, message, channel, status, source, notes, updated_at, submit_key, ref_code)
+     VALUES (?, ?, ?, ?, ?, ?, ?, 'founding_round', ?, 'founding_application', 'new', 'founding_round', ?, ?, ?, ?)`
+  ).bind(id, created_at, name, email, phone || null, business_name, business_type || null, fit_reason, notes, created_at, submitKey, refCode).run();
 
   const app = { id, created_at, name, email, phone, business_name, business_type, instagram, website, fit_reason };
 
@@ -525,15 +531,16 @@ async function handleContact(request, env, ctx) {
     message,
     source: String(body.source || 'organic').trim(),
     channel: 'contact_form',
+    ref_code: normalizeRefCode(body.ref_code) || null,
   };
   lead.score = await scoreLead(env, lead);
   const lang = (request.headers.get('accept-language') || '').toLowerCase().startsWith('es') ? 'es' : 'en';
 
   await env.DB.prepare(
-    `INSERT INTO leads (id, created_at, name, email, phone, business_name, business_type, package_interest, budget, stage, timeline, city, decision, message, channel, score, status, source)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?)`
+    `INSERT INTO leads (id, created_at, name, email, phone, business_name, business_type, package_interest, budget, stage, timeline, city, decision, message, channel, score, status, source, ref_code)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?)`
   )
-    .bind(lead.id, lead.created_at, name, email, lead.phone, lead.business_name, lead.business_type, lead.package_interest, lead.budget, lead.stage, lead.timeline, lead.city, lead.decision, message, 'contact_form', lead.score, lead.source)
+    .bind(lead.id, lead.created_at, name, email, lead.phone, lead.business_name, lead.business_type, lead.package_interest, lead.budget, lead.stage, lead.timeline, lead.city, lead.decision, message, 'contact_form', lead.score, lead.source, lead.ref_code)
     .run();
 
   const baseData = { lead, lang, siteUrl: env.SITE_URL || '' };
@@ -831,6 +838,16 @@ export default {
         if (p === '/api/calendly-webhook' && request.method === 'POST')
           return await handleCalendlyWebhook(request, env, ctx);
 
+        if (p === '/api/partners/signup' && request.method === 'POST')
+          return await handlePartnerSignup(request, env, ctx);
+        if (p === '/api/partners/click' && request.method === 'POST')
+          return await handlePartnerClick(request, env);
+        if (p === '/api/partners/payouts' && (request.method === 'GET' || request.method === 'PATCH')) {
+          const g = adm();
+          if (g) return g;
+          return stripCors(await handlePartnerPayouts(request, env, url));
+        }
+
         return fail('not_found', 404);
       } catch (e) {
         return fail(`server_error: ${e.message}`, 500);
@@ -961,6 +978,7 @@ const PRETTY_URLS = {
   '/privacy': '/privacy.html',
   '/success': '/success.html',
   '/cancelled': '/cancelled.html',
+  '/partners': '/partners.html',
 };
     if ((request.method === 'GET' || request.method === 'HEAD') && PRETTY_URLS[pathname]) {
       const assetReq = new Request(assetUrl.origin + PRETTY_URLS[pathname], request);

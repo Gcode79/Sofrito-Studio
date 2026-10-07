@@ -7,6 +7,7 @@
 import { flattenInvoiceMetadata, extractIndividualRefund, shouldAttemptStripeInvoice, resolvePaymentKey, isoCutoffSql } from './pure.js';
 import { json, fail, nowIso, nowEpoch, uuid, calendlyPrefillUrl } from './http.js';
 import { enqueueEmail, enqueueWebhook, sentAlready, emailRecordedByEvent, sentPaymentEmailAlready, updateLeadPaidState, getLeadPaidAmountCents } from './email.js';
+import { recordAttributionForPaidLead } from './affiliates.js';
 
 // SESSION_PRICE_CENTS lives in KV so the price can change without a deploy,
 // but a bad value must never reach Stripe (unit_amount requires a positive
@@ -793,6 +794,9 @@ async function handleStripeWebhook(request, env, ctx) {
       const paidAt = nowEpoch();
       // P2-3: persist the actual paid amount for the final-invoice credit.
       await updateLeadPaidState(env, leadRow.id, paidAt, amountCents);
+      // Sofrito Partners: first payment triggers the $100 commission.
+      // Idempotent — the UNIQUE index on attributions(lead_id) no-ops redeliveries.
+      await recordAttributionForPaidLead(env, leadRow.id, amountCents);
       leadData = await env.DB.prepare(
         `SELECT id, name, email FROM leads WHERE id = ? LIMIT 1`
       )
@@ -821,6 +825,8 @@ async function handleStripeWebhook(request, env, ctx) {
       if (!alreadyProcessed) {
         const paidAt = nowEpoch();
         await updateLeadPaidState(env, repurchaseRow.id, paidAt, amountCents);
+        // Sofrito Partners: see the leadRow path above — same idempotency.
+        await recordAttributionForPaidLead(env, repurchaseRow.id, amountCents);
       }
       if (leadData.email) {
         await env.DB.prepare(

@@ -674,6 +674,7 @@
                     <li><a href="#process" class="text-zinc-400 hover:text-zinc-200 transition-colors">Process</a></li>
                     <li><a href="#faq" class="text-zinc-400 hover:text-zinc-200 transition-colors">FAQ</a></li>
                     <li><a href="#book-now" data-select-booking class="text-zinc-400 hover:text-zinc-200 transition-colors">Book Your Session</a></li>
+                    <li><a href="/partners" class="text-zinc-400 hover:text-zinc-200 transition-colors">Partners — get $100 per referral</a></li>
                 </ul>
             </div>
             <!-- Legal Column -->
@@ -694,6 +695,9 @@
                     <a href="https://facebook.com/sofritostudio" aria-label="Facebook" class="text-zinc-400 hover:text-zinc-200 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
                     </a>
+                    <button type="button" id="sofrito-share" aria-label="Share Sofrito Studio" class="text-zinc-400 hover:text-zinc-200 transition-colors" title="Share this site">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    </button>
                     <!-- Pinterest temporarily disconnected until the account is fixed.
                          Restore: <a href="https://pinterest.com/sofritostudio" aria-label="Pinterest">…</a> -->
                 </div>
@@ -887,7 +891,8 @@
                     website: foundingExtras.website,
                     fit_reason: foundingExtras.fit_reason,
                     turnstile_token: token,
-                    submit_key: submitKey
+                    submit_key: submitKey,
+                    ref_code: (window.sofritoRefCode ? window.sofritoRefCode() : ''),
                 };
             } else {
                 const cookieVal = getCookie('sofrito_ab_page');
@@ -897,7 +902,8 @@
                     message: document.getElementById('message').value.trim(),
                     channel: (cookieVal && cookieVal !== 'unknown') ? decodeURIComponent(cookieVal) : 'sprint_page',
                     turnstile_token: token,
-                    submit_key: submitKey
+                    submit_key: submitKey,
+                    ref_code: (window.sofritoRefCode ? window.sofritoRefCode() : ''),
                 };
             }
 
@@ -986,6 +992,65 @@
                 });
             }, { threshold: 0.4 });
             blocks.forEach(function (p) { io.observe(p); });
+        })();
+
+        /* Sofrito Partners: capture ?ref=CODE -> 30-day cookie + click beacon. */
+        (function () {
+            function getParam(name) {
+                try { return new URLSearchParams(window.location.search).get(name); } catch (e) { return null; }
+            }
+            function getCookie(name) {
+                var parts = ('; ' + document.cookie).split('; ' + name + '=');
+                return parts.length === 2 ? parts.pop().split(';').shift() : '';
+            }
+            var ref = getParam('ref');
+            if (ref) {
+                ref = ref.toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 24);
+                if (ref) {
+                    var exp = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+                    document.cookie = 'sofrito_ref=' + ref + '; expires=' + exp + '; path=/; SameSite=Lax';
+                    try {
+                        fetch('/api/partners/click', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ code: ref, landing_page: window.location.pathname })
+                        });
+                    } catch (e) { /* beacon is best-effort */ }
+                }
+            }
+            // Expose for the lead form: read the cookie at submit time.
+            window.sofritoRefCode = function () { return getCookie('sofrito_ref'); };
+        })();
+
+        /* Share button: native share sheet on mobile, clipboard fallback on desktop. */
+        (function () {
+            var btn = document.getElementById('sofrito-share');
+            if (!btn) return;
+            var data = {
+                title: 'Sofrito Studio — Brand & Web Sprint for food businesses',
+                text: 'Brand identity + one-page website for your food business. $997 flat, live in 48 hours.',
+                url: 'https://sofritostudio.com/'
+            };
+            btn.addEventListener('click', function () {
+                function fallback() {
+                    var done = function (msg) {
+                        btn.setAttribute('title', msg);
+                        setTimeout(function () { btn.setAttribute('title', 'Share this site'); }, 2500);
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(data.url).then(function () { done('Link copied'); }, function () { done('Copy this link: sofritostudio.com'); });
+                    } else {
+                        done('Copy this link: sofritostudio.com');
+                    }
+                }
+                if (navigator.share) {
+                    navigator.share(data).catch(function (err) {
+                        if (err && err.name !== 'AbortError') fallback();
+                    });
+                } else {
+                    fallback();
+                }
+            });
         })();
     </script>
 </body>

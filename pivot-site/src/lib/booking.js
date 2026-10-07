@@ -5,6 +5,7 @@
 // ============================================================
 
 import { json, fail, nowIso } from './http.js';
+import { normalizeRefCode } from './affiliates.js';
 import { enqueueEmail, enqueueWebhook, sentAlready } from './email.js';
 
 // ------------------------------------------------------------
@@ -123,6 +124,9 @@ async function handleCalendlyCreated(env, ctx, payload, bookingUuid) {
 
   const scheduledFor = event.start_time || calendlyField(payload, ['scheduled_for', 'start_time']) || calendlyField(invitee, ['scheduled_for', 'start_time']);
   const timezone = calendlyField(invitee, ['timezone']) || calendlyField(event, ['timezone']) || calendlyField(payload, ['timezone']);
+  // Sofrito Partners: referral code from the "referral code" invitee question
+  // (Calendly dashboard custom question). Empty when the booker has no code.
+  const refCode = normalizeRefCode(answerFor('referral', 'referral code', 'codigo')) || null;
 
   const now = nowIso();
   const lead = {
@@ -170,11 +174,11 @@ async function handleCalendlyCreated(env, ctx, payload, bookingUuid) {
   // skipped entirely when the email already has a paid lead.
   const batchResults = await env.DB.batch([
     env.DB.prepare(
-      `INSERT INTO leads (id, created_at, name, email, phone, business_name, business_type, package_interest, budget, message, channel, score, status, source)
-       SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'calendly', ?, 'contacted', 'calendly_booking'
+      `INSERT INTO leads (id, created_at, name, email, phone, business_name, business_type, package_interest, budget, message, channel, score, status, source, ref_code)
+       SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'calendly', ?, 'contacted', 'calendly_booking', ?
        WHERE NOT EXISTS (SELECT 1 FROM calendly_bookings WHERE booking_uuid = ?)
          AND NOT EXISTS (SELECT 1 FROM leads WHERE email = ? AND status = 'paid')`
-    ).bind(lead.id, now, lead.name, lead.email, lead.phone, lead.business_name, lead.business_type, lead.package_interest, lead.budget, lead.message, lead.score, bookingUuid, email),
+    ).bind(lead.id, now, lead.name, lead.email, lead.phone, lead.business_name, lead.business_type, lead.package_interest, lead.budget, lead.message, lead.score, refCode, bookingUuid, email),
     env.DB.prepare(
       `INSERT INTO calendly_bookings (id, created_at, booking_uuid, invitee_email, invitee_name, scheduled_for, timezone, event_name, answers, reschedule_url, cancel_url, lead_id, status)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')
