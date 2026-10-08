@@ -4,7 +4,7 @@
 // Split from worker.js 2026-10-04. No behavior change.
 // ============================================================
 
-import { escapeHtml, substitute, uuid, nowIso, json, fail } from './http.js';
+import { escapeHtml, substitute, uuid, nowIso, json, fail, sha256Hex } from './http.js';
 
 import abandonedNudge from '../emails/abandoned-nudge.html';
 import abandonedNudge2 from '../emails/abandoned-nudge-2.html';

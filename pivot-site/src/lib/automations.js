@@ -4,9 +4,10 @@
 // Split from worker.js 2026-10-04. No behavior change.
 // ============================================================
 
-import { json, fail, uuid, nowIso, daySince, formatSessionDate } from './http.js';
-import { enqueueEmail, enqueueWebhook, sentAlready } from './email.js';
-import { getSessionPriceCents } from './billing.js';
+import { json, fail, uuid, nowIso, daySince, formatSessionDate, paidAtMs, PACKAGE_FALLBACK, calendlyPrefillUrl, nowEpoch, readWebhookText } from './http.js';
+import { isoCutoffSql } from './pure.js';
+import { enqueueEmail, enqueueWebhook, sentAlready, emailRecordedByEvent, trackEmailQueued, sendResend, updateEmailTracking, getLeadPaidAmountCents } from './email.js';
+import { getSessionPriceCents, ensureFreshCheckoutUrl, splitMilestoneAmounts } from './billing.js';
 import { bookingLead } from './booking.js';
 
 // ------------------------------------------------------------

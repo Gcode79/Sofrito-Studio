@@ -4,9 +4,10 @@
 // Split from worker.js 2026-10-04. No behavior change.
 // ============================================================
 
-import { json, fail, nowIso } from './http.js';
+import { json, fail, nowIso, readWebhookText, hmacSha256, safeEqual, uuid, escapeHtml, PACKAGE_FALLBACK, paidAtMs, scoreLead } from './http.js';
 import { normalizeRefCode } from './affiliates.js';
-import { enqueueEmail, enqueueWebhook, sentAlready } from './email.js';
+import { getSessionPriceCents, splitMilestoneAmounts } from './billing.js';
+import { enqueueEmail, enqueueWebhook, sentAlready, getLeadPaidAmountCents } from './email.js';
 
 // ------------------------------------------------------------
 // Calendly bookings (S19) — session GMV + owner handoff

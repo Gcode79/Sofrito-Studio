@@ -162,6 +162,41 @@ const BUSINESS_TYPES = ['food_truck', 'restaurant', 'cpg', 'other'];
 const CHANNELS = ['sprint_page', 'boh_sprint_page', 'sprint_boh', 'api', 'calendly', 'google_my_business', 'social', 'referral', 'founding_application', 'other'];
 
 // ------------------------------------------------------------
+// Shared package fallback + lead scoring (moved from worker.js —
+// billing.js, booking.js and automations.js also use these, and lib
+// modules cannot import from the worker entry point).
+// ------------------------------------------------------------
+const PACKAGE_FALLBACK = {
+  session: { name: 'Sofrito Session', description: '1:1 brand session', price_cents: 40000, billing: 'one_time' },
+  sprint: { name: 'Brand & Web Sprint', description: 'Brand + website in 48 hours', price_cents: 99700, billing: 'one_time' },
+};
+
+const DEFAULT_WEIGHTS = {
+  package_specific: 30,
+  budget_set: 20,
+  message_length_30: 25,
+  business_name: 15,
+  phone: 10,
+  stage_timeline_set: 20,
+  decision_owner: 5,
+  max: 100,
+};
+
+async function scoreLead(env, lead) {
+  const raw = await env.CONFIG.get('scoring/weights');
+  const w = raw ? { ...DEFAULT_WEIGHTS, ...JSON.parse(raw) } : DEFAULT_WEIGHTS;
+  let score = 0;
+  if (lead.package_interest) score += w.package_specific;
+  if (lead.budget) score += w.budget_set;
+  if ((lead.message || '').trim().length >= 30) score += w.message_length_30;
+  if (lead.business_name) score += w.business_name;
+  if (lead.phone) score += w.phone;
+  if (lead.stage && lead.timeline) score += w.stage_timeline_set;
+  if (lead.decision === 'owner-operator') score += w.decision_owner;
+  return Math.min(score, w.max);
+}
+
+// ------------------------------------------------------------
 // Legacy retail redirects (shelved 2026-09-05)
 // The assets `_redirects` engine cannot express these safely: its globs apply
 // to real files too, so `/privacy*` → /privacy.html loops, and `/blog/*` would
@@ -205,6 +240,7 @@ export {
   json,
   fail,
   MAX_JSON_BYTES,
+  MAX_WEBHOOK_BYTES,
   bodyTooLarge,
   tooLargeError,
   readJson,
@@ -225,4 +261,9 @@ export {
   calendlyPrefillUrl,
   verifyTurnstile,
   legacyRedirectFor,
+  BUSINESS_TYPES,
+  CHANNELS,
+  PACKAGE_FALLBACK,
+  DEFAULT_WEIGHTS,
+  scoreLead,
 };

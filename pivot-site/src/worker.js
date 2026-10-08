@@ -34,46 +34,12 @@
 // ============================================================
 
 import { isoCutoffSql } from './lib/pure.js';
-import { CORS, stripCors, json, fail, authorized, readJson, verifyTurnstile, nowIso, legacyRedirectFor } from './lib/http.js';
-import { enqueueEmail, enqueueWebhook, tiktokTrack } from './lib/email.js';
-import { createStripeCheckoutSession, ensureFreshCheckoutUrl, getSessionPriceCents, handleStripeWebhook, handleInvoiceStatus, handleInvoiceReconcile, handleInvoiceTrigger } from './lib/billing.js';
+import { CORS, stripCors, json, fail, authorized, readJson, verifyTurnstile, nowIso, legacyRedirectFor, badBody, sha256Hex, nowEpoch, escapeHtml, uuid, bodyTooLarge, MAX_WEBHOOK_BYTES, BUSINESS_TYPES, CHANNELS, PACKAGE_FALLBACK, scoreLead } from './lib/http.js';
+import { enqueueEmail, enqueueWebhook, tiktokTrack, processEmailMessage, processWebhookMessage } from './lib/email.js';
+import { createStripeCheckoutSession, ensureFreshCheckoutUrl, getSessionPriceCents, getStripeCheckoutSession, handleStripeWebhook, handleInvoiceStatus, handleInvoiceReconcile, handleInvoiceTrigger } from './lib/billing.js';
 import { handleCalendlyWebhook } from './lib/booking.js';
 import { handlePartnerSignup, handlePartnerClick, handlePartnerPayouts, recordAttributionForPaidLead, normalizeRefCode } from './lib/affiliates.js';
 import { handleUnbilledFinalSweep, handleBookingSafetyNet, handleCheckoutSafetyNet, handleSecondCheckoutNudge, runSessionAutomations, runWonLeadFallbacks, runLeadAutomations, weeklyDigest, handleFlowGenerate, getAbCache, putAbCache, getRunningPageTestId, abTestTerminated } from './lib/automations.js';
-
-// ------------------------------------------------------------
-// Lead scoring (KV weights, static-first)
-// ------------------------------------------------------------
-const DEFAULT_WEIGHTS = {
-  package_specific: 30,
-  budget_set: 20,
-  message_length_30: 25,
-  business_name: 15,
-  phone: 10,
-  stage_timeline_set: 20,
-  decision_owner: 5,
-  max: 100,
-};
-
-async function scoreLead(env, lead) {
-  const raw = await env.CONFIG.get('scoring/weights');
-  const w = raw ? { ...DEFAULT_WEIGHTS, ...JSON.parse(raw) } : DEFAULT_WEIGHTS;
-  let score = 0;
-  if (lead.package_interest) score += w.package_specific;
-  if (lead.budget) score += w.budget_set;
-  if ((lead.message || '').trim().length >= 30) score += w.message_length_30;
-  if (lead.business_name) score += w.business_name;
-  if (lead.phone) score += w.phone;
-  if (lead.stage && lead.timeline) score += w.stage_timeline_set;
-  if (lead.decision === 'owner-operator') score += w.decision_owner;
-  return Math.min(score, w.max);
-}
-
-const PACKAGE_FALLBACK = {
-  session: { name: 'Sofrito Session', description: '1:1 brand session', price_cents: 40000, billing: 'one_time' },
-  sprint: { name: 'Brand & Web Sprint', description: 'Brand + website in 48 hours', price_cents: 99700, billing: 'one_time' },
-};
-
 
 // ------------------------------------------------------------
 // Public routes
