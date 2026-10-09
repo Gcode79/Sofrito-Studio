@@ -33,6 +33,9 @@ jobs:
       - name: Syntax check
         run: npm run check
 
+      - name: Lint (no-undef — catches missing imports)
+        run: npm run lint
+
       - name: Queue regression tests
         run: npm run test:queue
 
