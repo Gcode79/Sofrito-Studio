@@ -74,121 +74,144 @@
             .animate-marquee { animation: none; }
             #hero-audience, .scroll-fill .sf-w { transition: none; }
         }
+        /* --- Mobile: 320px layout + 44px tap targets --- */
+        @media (max-width: 480px) {
+            /* Header: compact, no overlap */
+            nav .max-w-7xl { padding-left: 1rem; padding-right: 1rem; gap: 0.5rem; }
+            nav a[href="/"] span { display: none; } /* hide wordmark, keep logo */
+            /* Hero facts: stack vertically */
+            .hero-facts { grid-template-columns: 1fr !important; gap: 1rem !important; }
+            /* Footer: stack columns, wrap long text */
+            footer .grid { grid-template-columns: 1fr !important; }
+            footer a { overflow-wrap: break-word; word-break: break-word; }
+        }
+        /* 44px minimum tap targets */
+        details > summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+        #sofrito-share, #sofrito-share-nav,
+        button[data-theme-toggle] { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+        footer a, nav a { display: inline-flex; align-items: center; min-width: 44px; min-height: 44px; }
+        nav .max-w-7xl > a:first-child { min-width: 44px; min-height: 44px; }
     </style>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@graph": [
-            {
-                "@type": "Organization",
-                "@id": "https://sofritostudio.com/#business",
-                "name": "Sofrito Studio",
-                "url": "https://sofritostudio.com/",
-                "description": "Branding and one-page websites for independent food businesses. 48-hour design sprints: $997 flat.",
-                "email": "hello@sofritostudio.com"
-            },
-            {
-                "@type": "WebSite",
-                "@id": "https://sofritostudio.com/#website",
-                "url": "https://sofritostudio.com/",
-                "name": "Sofrito Studio",
-                "publisher": { "@id": "https://sofritostudio.com/#business" }
-            },
-            {
-                "@type": "Service",
-                "@id": "https://sofritostudio.com/#sofrito-session",
-                "name": "Sofrito Session",
-                "serviceType": "Brand strategy working session",
-                "description": "A 45-minute working strategy session for independent food businesses. Sets the creative direction for your brand and website. The full $400 fee is credited toward the $997 Brand & Web Sprint when you start within 30 days.",
-                "provider": { "@id": "https://sofritostudio.com/#business" },
-                "offers": {
-                    "@type": "Offer",
-                    "name": "Sofrito Session",
-                    "price": "400",
-                    "priceCurrency": "USD",
-                    "description": "45-minute working session. Non-refundable; fully credited toward the Brand & Web Sprint within 30 days. One free reschedule with 48 hours' notice."
-                }
-            },
-            {
-                "@type": "Service",
-                "@id": "https://sofritostudio.com/#brand-web-sprint",
-                "name": "Brand & Web Sprint",
-                "serviceType": "One-page website design and branding for food businesses",
-                "description": "A complete brand and one-page website for independent food businesses \u2014 food trucks, restaurants, and specialty food brands. Built and launched within 48 hours (two business days) from direction lock. You own the brand assets, files, and site outright.",
-                "provider": { "@id": "https://sofritostudio.com/#business" },
-                "offers": {
-                    "@type": "Offer",
-                    "name": "Brand & Web Sprint",
-                    "price": "997",
-                    "priceCurrency": "USD",
-                    "description": "$997 flat. Includes brand identity, one-page mobile-first website, 30 days of post-launch support, and two refinement rounds. Hosting separate; optional $49/month Engine Maintenance plan."
-                }
-            },
-            {
-                "@type": "FAQPage",
-                "@id": "https://sofritostudio.com/#faq",
-                "mainEntity": [
-                    {
-                        "@type": "Question",
-                        "name": "Is the $400 Sofrito Session refundable?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "The $400 Sofrito Session is non-refundable \u2014 it's a working strategy session, and the full fee is credited toward your $997 sprint when you start within 30 days. Need to move your session? One free reschedule with 48 hours' notice: email hello@sofritostudio.com. And if we decide on the session that the sprint isn't a fit for your business, we'll tell you straight \u2014 no further payment, no pressure."
-                        }
-                    },
-                    {
-                        "@type": "Question",
-                        "name": "How fast is the 48-hour turnaround?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "Your Sofrito Session sets the direction. We then build and launch the site within 48 hours \u2014 two business days from direction lock."
-                        }
-                    },
-                    {
-                        "@type": "Question",
-                        "name": "What do I need to bring to a Sofrito Studio sprint?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "Your menu, your story, and any photos or branding you already have. We'll tell you exactly what's needed on the session."
-                        }
-                    },
-                    {
-                        "@type": "Question",
-                        "name": "What happens after I pay for a Sofrito Studio sprint?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "Pick your Sofrito Session time right after payment. We set the direction on the call \u2014 then you approve it in writing (that's direction lock; we confirm it by email within one business day), and we build and launch within 48 hours."
-                        }
-                    },
-                    {
-                        "@type": "Question",
-                        "name": "What does hosting cost with Sofrito Studio?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "Hosting is separate from the $997 sprint. Our Engine Maintenance plan is $49/month and covers hosting, security, and small updates. It's optional \u2014 your site is yours either way."
-                        }
-                    },
-                    {
-                        "@type": "Question",
-                        "name": "Do I own my website built by Sofrito Studio?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "Yes. Once the sprint is paid in full, the brand assets, files, and site are yours outright \u2014 including if you ever leave the maintenance plan."
-                        }
-                    },
-                    {
-                        "@type": "Question",
-                        "name": "What happens after the 30 days of support?",
-                        "acceptedAnswer": {
-                            "@type": "Answer",
-                            "text": "The 30 days after launch cover fixes and small tweaks. After that, the $49/month Engine Maintenance plan keeps you covered, or reach out anytime for project-based help."
-                        }
-                    }
-                ]
+{
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "Organization",
+            "@id": "https://sofritostudio.com/#business",
+            "name": "Sofrito Studio",
+            "url": "https://sofritostudio.com/",
+            "description": "Branding and one-page websites for independent food businesses. $997 flat, launched within two business days of written direction lock.",
+            "email": "hello@sofritostudio.com"
+        },
+        {
+            "@type": "WebSite",
+            "@id": "https://sofritostudio.com/#website",
+            "url": "https://sofritostudio.com/",
+            "name": "Sofrito Studio",
+            "publisher": {
+                "@id": "https://sofritostudio.com/#business"
             }
-        ]
-    }
+        },
+        {
+            "@type": "Service",
+            "@id": "https://sofritostudio.com/#sofrito-session",
+            "name": "Sofrito Session",
+            "serviceType": "Brand strategy working session",
+            "description": "A 45-minute working strategy session for independent food businesses. Sets the creative direction for your brand and website. The full $400 fee is credited toward the $997 Brand & Web Sprint when you start within 30 days.",
+            "provider": {
+                "@id": "https://sofritostudio.com/#business"
+            },
+            "offers": {
+                "@type": "Offer",
+                "name": "Sofrito Session",
+                "price": "400",
+                "priceCurrency": "USD",
+                "description": "45-minute working session. Non-refundable; fully credited toward the Brand & Web Sprint within 30 days. One free reschedule with 48 hours' notice."
+            }
+        },
+        {
+            "@type": "Service",
+            "@id": "https://sofritostudio.com/#brand-web-sprint",
+            "name": "Brand & Web Sprint",
+            "serviceType": "One-page website design and branding for food businesses",
+            "description": "A complete brand and one-page website for independent food businesses \u2014 food trucks, restaurants, and specialty food brands. Built and launched within 48 hours (two business days) from direction lock. You own the brand assets, files, and site outright.",
+            "provider": {
+                "@id": "https://sofritostudio.com/#business"
+            },
+            "offers": {
+                "@type": "Offer",
+                "name": "Brand & Web Sprint",
+                "price": "997",
+                "priceCurrency": "USD",
+                "description": "$997 flat. Includes brand identity, one-page mobile-first website, 30 days of post-launch support, and two refinement rounds. Hosting separate; optional $49/month Engine Maintenance plan."
+            }
+        },
+        {
+            "@type": "FAQPage",
+            "@id": "https://sofritostudio.com/#faq",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "What if I hate it?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "You approve the creative direction in writing before we build anything \u2014 so there are no surprises. Then you get two refinement rounds to dial it in. If the sprint isn't a fit for your business, we'll tell you on the session before any build work starts. We don't take on projects we can't stand behind."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Is the $400 refundable?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "The $400 Sofrito Session is non-refundable \u2014 it's a working strategy session, and the full fee is credited toward your $997 sprint when you start within 30 days. Need to move your session? One free reschedule with 48 hours' notice: email hello@sofritostudio.com. And if we decide on the session that the sprint isn't a fit for your business, we'll tell you straight \u2014 no further payment, no pressure."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How fast is \"48 hours\"?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Your Sofrito Session sets the direction. We then build and launch the site within 48 hours \u2014 two business days from direction lock."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What do I need to bring?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Your menu, your story, and any photos or branding you already have. We'll tell you exactly what's needed on the session."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What does hosting cost?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Hosting is separate from the $997 sprint. Our Engine Maintenance plan is $49/month and covers hosting, security, and small updates. It's optional \u2014 your site is yours either way."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Do I own my website?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Once the sprint is paid in full, the brand assets, files, and site are yours outright \u2014 including if you ever leave the maintenance plan."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What happens after the 30 days of support?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "The 30 days after launch cover fixes and small tweaks. After that, the $49/month Engine Maintenance plan keeps you covered, or reach out anytime for project-based help."
+                    }
+                }
+            ]
+        }
+    ]
+}
     </script>
 </head>
 <body class="bg-zinc-950 text-zinc-50 antialiased">
@@ -201,9 +224,9 @@
                 <span class="text-white font-bold tracking-widest uppercase text-sm">SOFRITO STUDIO</span>
             </a>
             <div class="hidden md:flex space-x-8 text-xs tracking-widest uppercase font-semibold text-zinc-400">
-                <a href="#sprint" class="hover:text-zinc-200 transition-colors">The Sprint</a>
-                <a href="#process" class="hover:text-zinc-200 transition-colors">Process</a>
-                <a href="#book-now" data-select-booking class="hover:text-zinc-200 transition-colors">Book Your Sofrito Session</a>
+                <a href="#offer" class="hover:text-zinc-200 transition-colors">The Sprint</a>
+                <a href="#faq" class="hover:text-zinc-200 transition-colors">FAQ</a>
+                <a href="#apply" class="hover:text-zinc-200 transition-colors">Apply for Founding</a>
             </div>
             <button type="button" data-theme-toggle class="theme-toggle" aria-label="Toggle light and dark theme">
                 <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -212,38 +235,36 @@
             <button type="button" id="sofrito-share-nav" aria-label="Share Sofrito Studio" title="Share this site" class="text-zinc-400 hover:text-zinc-200 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
             </button>
-            <a href="#book-now" data-select-booking class="rounded-full bg-orange-600 text-white text-center text-xs font-bold uppercase tracking-widest px-5 py-3 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors">
-                Book Your Sofrito Session
+            <a href="#apply" class="rounded-full bg-orange-600 text-white text-center text-xs font-bold uppercase tracking-widest px-5 py-3 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors">
+                Apply for Founding
             </a>
         </div>
     </nav>
     </header>
 
     <main>
-    <!-- Hero Section -->
+    <!-- Hero: Founding Round -->
     <section class="pt-28 pb-16 px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div>
-            <div class="inline-flex items-center gap-2.5 border border-white/10 rounded-full px-4 py-2 mb-6">
+            <div class="inline-flex items-center gap-2.5 border border-orange-500/30 rounded-full px-4 py-2 mb-6">
                 <span class="relative flex h-2 w-2">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
                 </span>
-                <span class="text-[11px] font-bold tracking-widest uppercase text-zinc-300">Now booking — 3 sprints a week</span>
+                <span class="text-[11px] font-bold tracking-widest uppercase text-orange-400">Founding Client Round — 10 spots</span>
             </div>
-            <div class="text-zinc-400 text-xs font-bold tracking-widest uppercase mb-6">Brand Foundations for Food Businesses</div>
             <h1 class="text-6xl md:text-7xl font-bold tracking-tighter text-chrome leading-[1.1] mb-6">
-                From Direction to Launch<br>in 48 Hours.
+                Your food earns regulars.<br>Your brand should too.
             </h1>
-            <p class="text-2xl text-zinc-200 font-semibold mb-8">For <span id="hero-audience">food trucks</span>.</p>
             <p class="text-xl text-zinc-400 mb-10 max-w-2xl leading-relaxed">
-                We build clear brand identities and one-page websites for independent food businesses at one fixed price.
+                We're opening 10 founding spots for independent food businesses. The full Brand &amp; Web Sprint — brand identity and one-page website, launched within two business days of written direction lock — for $997 flat.
             </p>
-            <a href="#book-now" data-select-booking class="rounded-full inline-block bg-orange-600 text-white text-center font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
-                Book Your Sofrito Session
+            <a href="#apply" class="rounded-full inline-block bg-orange-600 text-white text-center font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
+                Apply for a Founding Spot
             </a>
-            <p class="text-sm text-zinc-500 mt-4">Your $400 Sofrito Session is credited in full toward your $997 Brand &amp; Web Sprint when you start the sprint within 30 days of your session.</p>
+            <p class="text-sm text-zinc-500 mt-4">No charge to apply. We read every application personally and reply within two business days.</p>
 
-            <div class="grid grid-cols-3 gap-6 mt-16 pt-8 border-t border-white/10">
+            <div class="hero-facts grid grid-cols-3 gap-6 mt-16 pt-8 border-t border-white/10">
                 <div>
                     <div class="text-zinc-500 text-[10px] tracking-widest uppercase mb-1">Turnaround</div>
                     <div class="text-white font-bold text-sm">48H FROM DIRECTION</div>
@@ -269,10 +290,11 @@
     <!-- Animated Marquee Banner -->
     <div class="w-full overflow-hidden border-y border-white/10 bg-zinc-900/50 py-4">
         <div class="whitespace-nowrap animate-marquee" aria-hidden="true">
-            <span class="marquee-pill">Brand Identity</span><span class="marquee-pill">One-Page Websites</span><span class="marquee-pill">Menu &amp; Ordering</span><span class="marquee-pill">48-Hour Sprint</span><span class="marquee-pill">Caribbean Future</span><span class="marquee-pill">One Fixed Price</span><span class="marquee-pill">Brand Identity</span><span class="marquee-pill">One-Page Websites</span><span class="marquee-pill">Menu &amp; Ordering</span><span class="marquee-pill">48-Hour Sprint</span><span class="marquee-pill">Caribbean Future</span><span class="marquee-pill">One Fixed Price</span>
+            <span class="marquee-pill">Brand Identity</span><span class="marquee-pill">One-Page Websites</span><span class="marquee-pill">Menu &amp; Ordering</span><span class="marquee-pill">Brand & Web Sprint</span><span class="marquee-pill">Caribbean Future</span><span class="marquee-pill">One Fixed Price</span><span class="marquee-pill">Brand Identity</span><span class="marquee-pill">One-Page Websites</span><span class="marquee-pill">Menu &amp; Ordering</span><span class="marquee-pill">Brand & Web Sprint</span><span class="marquee-pill">Caribbean Future</span><span class="marquee-pill">One Fixed Price</span>
         </div>
     </div>
 
+    <!-- The 30-Second Audit -->
     <section aria-label="The problem" class="py-20 px-6 max-w-7xl mx-auto">
         <div class="max-w-3xl">
             <div class="text-zinc-400 text-xs font-bold tracking-widest uppercase mb-6">The 30-second audit</div>
@@ -300,6 +322,7 @@
             <p class="mt-8 pt-6 border-t border-white/10 text-zinc-400 leading-relaxed">If two of these are true, your food is carrying your website. <span class="text-white font-semibold">It shouldn&rsquo;t have to.</span></p>
         </div>
     </section>
+
     <!-- Portfolio Scoreboard -->
     <section class="py-20 px-6 max-w-7xl mx-auto">
         <div class="text-center mb-16">
@@ -341,160 +364,91 @@
         </div>
     </section>
 
-    <!-- Chapter 01: The Sprint -->
-    <section id="sprint" class="py-20 px-6 max-w-7xl mx-auto">
-        <div class="text-zinc-400 text-xs font-bold tracking-widest uppercase mb-6">Chapter 01 — The Sprint</div>
-        <h2 class="text-5xl font-bold tracking-tighter text-white mb-6">Your next chapter, served fast.</h2>
-        <p class="text-xl text-zinc-400 max-w-2xl mb-16 leading-relaxed">
-            For restaurants, food trucks, makers, and food brands that have outgrown the DIY look. We turn your flavor, story, and menu into a brand people remember—and a site that turns browsers into guests.
-        </p>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="glass-panel p-10">
-                <div class="text-zinc-600 text-sm font-mono mb-4">01</div>
-                <h3 class="text-2xl text-white font-bold mb-2">FOUNDATION</h3>
-                <h4 class="text-zinc-400 mb-6">Core Brand Identity</h4>
-                <p class="text-sm text-zinc-500 uppercase tracking-widest">Logo Suite <br> Color Palette <br> Typography <br> Voice</p>
-            </div>
-            <div class="glass-panel p-10">
-                <div class="text-zinc-600 text-sm font-mono mb-4">02</div>
-                <h3 class="text-2xl text-white font-bold mb-2">DIGITAL CORE</h3>
-                <h4 class="text-zinc-400 mb-6">One-Page Engine</h4>
-                <p class="text-sm text-zinc-500 uppercase tracking-widest">Menu &amp; Ordering Links <br> Hours &amp; Location <br> Map <br> Mobile-First Speed</p>
-            </div>
-            <div class="glass-panel p-10">
-                <div class="text-zinc-600 text-sm font-mono mb-4">03</div>
-                <h3 class="text-2xl text-white font-bold mb-2">BRAND IN A BOX</h3>
-                <h4 class="text-zinc-400 mb-6">Launch-Ready Assets</h4>
-                <p class="text-sm text-zinc-500 uppercase tracking-widest">Social Essentials <br> Print Essentials <br> Merch Essentials <br> Brand in a Box</p>
-            </div>
-            <div class="glass-panel p-10">
-                <div class="text-zinc-600 text-sm font-mono mb-4">04</div>
-                <h3 class="text-2xl text-white font-bold mb-2">ZERO FRICTION</h3>
-                <h4 class="text-zinc-400 mb-6">Clear Handoff</h4>
-                <p class="text-sm text-zinc-500 uppercase tracking-widest">Two Refinement Rounds <br> Live Site <br> Organized Assets <br> Ready to Use</p>
-            </div>
-        </div>
-
-        <div class="relative h-[400px] w-full mt-12">
-            <img src="/image-4.webp" alt="Volcanic Stone" loading="lazy" decoding="async" class="w-full h-full object-cover rounded-sm">
-            <div class="absolute bottom-4 left-4 glass-panel px-4 py-2">
-                <div class="text-[10px] tracking-widest uppercase text-white font-bold mb-1">FIG. 02 — VOLCANIC STONE</div>
-                <div class="text-xs text-zinc-400">Chrome, stone, glass, and sauce — a material palette borrowed from the island, built for the future.</div>
+    <!-- Founder Story -->
+    <section aria-label="Founder" class="py-16 px-6 max-w-3xl mx-auto">
+        <div class="border border-white/10 rounded-lg px-6 py-10 md:px-10 md:py-12 bg-zinc-900/30">
+            <blockquote class="font-serif text-xl md:text-2xl text-zinc-300 leading-relaxed space-y-5">
+                <p>"In my family, the first thing you hear when you walk through the door isn't "hello" — it's "are you hungry? Because I just cooked."</p>
+                <p>My mom worked two jobs. But no matter what, we came home after school to a cooked meal. That's how love looks in our culture. Not said — served.</p>
+                <p>That turned into a passion I had to learn myself. And somewhere along the way I saw it clearly: the people who cook like that — the food trucks, the corner spots, the ones feeding their neighborhoods — they put all their love into the food and none of it into how the world sees them.</p>
+                <p>That's the gap I close. Your food already says "I love you." Your brand should say it too.</p>
+                <p>I'm the sofrito — the base underneath everything that makes the whole dish work.</p>
+            </blockquote>
+            <div class="mt-6 flex items-center gap-4">
+                <img src="/founder.webp" alt="Joshua Ortiz, founder of Sofrito Studio" class="w-12 h-12 rounded-full object-cover shrink-0" />
+                <p class="text-sm text-zinc-300 font-sans font-semibold">Joshua Ortiz, founder</p>
             </div>
         </div>
     </section>
-
-    <!-- Pricing & Process -->
-    <section id="process" class="py-20 px-6 bg-zinc-900 border-y border-white/5">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
-
-            <!-- Pricing -->
-            <div>
-                <div class="relative h-[300px] w-full mb-12">
-                    <img src="/image-2.webp" alt="Amber Glass" loading="lazy" decoding="async" class="w-full h-full object-cover rounded-sm">
-                    <div class="absolute bottom-4 left-4 glass-panel px-4 py-2 text-[10px] tracking-widest uppercase text-white font-bold">
-                        FIG. 03 — AMBER GLASS
-                    </div>
-                </div>
-                <h2 class="text-4xl font-bold tracking-tighter text-white mb-4">WHAT YOUR $997 INVESTMENT INCLUDES</h2>
-                <div class="text-5xl font-mono text-orange-500 mb-6">$997</div>
-                <p class="text-zinc-400 mb-8 leading-relaxed">
-                    One brand identity and one one-page website. Monthly hosting is separate.
-                </p>
-                <div class="space-y-4 text-sm text-zinc-300 font-medium">
-                    <div class="flex gap-4"><span class="text-orange-500">&#10022;</span> Start with your $400 Sofrito Session, credited in full toward the $997 Brand &amp; Web Sprint</div>
-                    <div class="flex gap-4"><span class="text-orange-500">&#10022;</span> Start your sprint within 30 days of your session to apply the $400 credit</div>
-                    <div class="flex gap-4"><span class="text-orange-500">&#10022;</span> Remaining $597 is due after written direction lock</div>
-                    <div class="flex gap-4"><span class="text-orange-500">&#10022;</span> 48-hour turnaround after direction is set</div>
-                    <div class="flex gap-4"><span class="text-orange-500">&#10022;</span> Two refinement rounds included before launch</div>
-                </div>
-            </div>
-
-            <!-- Process -->
-            <div>
-                <div class="text-zinc-400 text-xs font-bold tracking-widest uppercase mb-6">ONE SPRINT. ONE INVOICE. DONE.</div>
-                <h2 class="text-4xl font-bold tracking-tighter text-white mb-12">THREE STEPS. NO MYSTERY.</h2>
-
-                <div class="space-y-12">
-                    <div class="flex gap-8">
-                        <div class="text-2xl font-mono text-zinc-600">01</div>
-                        <div>
-                            <h3 class="text-xl text-white font-bold mb-2 uppercase">01 / TASTE</h3>
-                            <div class="text-zinc-300 text-sm mb-3 font-bold">Find the flavor truth.</div>
-                            <p class="text-zinc-400 scroll-fill">We use a 45-minute Sofrito Session to understand your menu, story, audience, and competition.</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-8">
-                        <div class="text-2xl font-mono text-zinc-600">02</div>
-                        <div>
-                            <h3 class="text-xl text-white font-bold mb-2 uppercase">02 / PLATE</h3>
-                            <div class="text-zinc-300 text-sm mb-3 font-bold">Build the system.</div>
-                            <p class="text-zinc-400 scroll-fill">Identity and website come together into one considered experience, with two refinement rounds.</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-8">
-                        <div class="text-2xl font-mono text-zinc-600">03</div>
-                        <div>
-                            <h3 class="text-xl text-white font-bold mb-2 uppercase">03 / SERVE</h3>
-                            <div class="text-zinc-300 text-sm mb-3 font-bold">Launch with confidence.</div>
-                            <p class="text-zinc-400 scroll-fill">The site goes live and the client receives launch-ready assets plus 30 days of support.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- The Sofrito Promise — risk reversal, price-adjacent -->
-    <section aria-label="Our promise" class="py-16 px-6 max-w-3xl mx-auto">
-        <div class="glass-panel p-8 md:p-10 text-center">
-            <div class="text-zinc-400 text-xs font-bold tracking-widest uppercase mb-4">The Sofrito Promise</div>
-            <h2 class="text-3xl font-bold tracking-tighter text-white font-serif mb-6">You approve everything before we build anything.</h2>
-            <div class="space-y-3 text-zinc-300 leading-relaxed text-left max-w-xl mx-auto">
-                <p><span class="text-white font-semibold">Your $400 session counts in full.</span> Start the sprint within 30 days and the remaining balance is $597 — nothing more.</p>
-                <p><span class="text-white font-semibold">Nothing builds without your sign-off.</span> We lock the direction together on the session; you approve it in writing before we touch a pixel.</p>
-                <p><span class="text-white font-semibold">Two refinement rounds included.</span> The site isn't done until it feels like yours.</p>
-                <p><span class="text-white font-semibold">Not a fit? We'll say so.</span> If the sprint isn't right for your business, we tell you on the session — no further payment, no pressure.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Inside the 48 Hours — the operating system -->
-    <section aria-label="Inside the 48 hours" class="py-20 px-6 max-w-7xl mx-auto border-t border-white/5">
+    <!-- The Sprint: what you get + how it works + the promise -->
+    <section id="offer" aria-label="The Sprint" class="py-20 px-6 max-w-7xl mx-auto border-t border-white/5">
         <div class="text-center mb-16">
-            <div class="text-zinc-400 text-xs font-bold tracking-widest uppercase mb-6">The Operating System</div>
-            <h2 class="text-5xl font-bold tracking-tighter text-white mb-4">Inside the 48 Hours</h2>
-            <p class="text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">The clock starts when direction is set — confirmed in writing — not when you pay. Here is exactly what happens on each side of that line.</p>
+            <div class="text-zinc-400 text-xs font-bold tracking-widest uppercase mb-6">The Sprint</div>
+            <h2 class="text-5xl font-bold tracking-tighter text-white mb-4">One sprint. Everything you need to look like the food tastes.</h2>
+            <p class="text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">Brand identity and one-page website. $997 flat. Built and launched within 48 hours of direction lock.</p>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- What you get -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20">
             <div class="glass-panel p-8">
-                <div class="text-2xl font-mono text-orange-500 mb-4">A</div>
-                <h3 class="text-xl text-white font-bold mb-3 uppercase">Before the clock starts</h3>
-                <ul class="space-y-3 text-sm text-zinc-400 leading-relaxed">
-                    <li><span class="text-zinc-200 font-semibold">Kickoff questionnaire</span> — one form: your menu, your story, your photos.</li>
-                    <li><span class="text-zinc-200 font-semibold">Direction call, 30 minutes</span> — we lock the visual lane and the one action your page must drive.</li>
-                    <li><span class="text-zinc-200 font-semibold">Written confirmation + $597 balance</span> — direction is not set until you confirm it in writing and the balance clears.</li>
-                </ul>
+                <div class="text-zinc-600 text-sm font-mono mb-4">01</div>
+                <h3 class="text-xl text-white font-bold mb-2 uppercase">Brand Identity</h3>
+                <p class="text-zinc-400 text-sm leading-relaxed">Logo suite, color palette, typography, and voice — a complete identity built around your food and your story.</p>
             </div>
             <div class="glass-panel p-8">
-                <div class="text-2xl font-mono text-orange-500 mb-4">B</div>
-                <h3 class="text-xl text-white font-bold mb-3 uppercase">The 48-hour build</h3>
-                <ul class="space-y-3 text-sm text-zinc-400 leading-relaxed">
-                    <li><span class="text-zinc-200 font-semibold">Hours 0–16 — identity.</span> Logo set, color palette, typography, and the rationale behind them.</li>
-                    <li><span class="text-zinc-200 font-semibold">Hours 16–36 — the page.</span> Built mobile-first with your real content. One page, one action.</li>
-                    <li><span class="text-zinc-200 font-semibold">Hours 36–44 — V1 walkthrough.</span> A video tour of every choice and why we made it.</li>
-                    <li><span class="text-zinc-200 font-semibold">Hours 44–48 — refinement + launch.</span> Your consolidated feedback, then we deploy to your domain.</li>
-                </ul>
+                <div class="text-zinc-600 text-sm font-mono mb-4">02</div>
+                <h3 class="text-xl text-white font-bold mb-2 uppercase">One-Page Website</h3>
+                <p class="text-zinc-400 text-sm leading-relaxed">Menu, ordering links, hours, location, and map — mobile-first, loads fast, one page with one job: turn visitors into customers.</p>
             </div>
             <div class="glass-panel p-8">
-                <div class="text-2xl font-mono text-orange-500 mb-4">C</div>
-                <h3 class="text-xl text-white font-bold mb-3 uppercase">Fixed scope</h3>
-                <ul class="space-y-3 text-sm text-zinc-400 leading-relaxed">
-                    <li><span class="text-zinc-200 font-semibold">In:</span> one brand identity and one one-page website. That is the sprint.</li>
-                    <li><span class="text-zinc-200 font-semibold">Out:</span> monthly hosting is separate. Anything beyond the one page and identity is a different engagement — never scope creep inside your 48 hours.</li>
-                    <li><span class="text-zinc-200 font-semibold">Feedback rule:</span> one consolidated response per round. Three people, one list — that is how 48 hours stays 48 hours.</li>
-                </ul>
+                <div class="text-zinc-600 text-sm font-mono mb-4">03</div>
+                <h3 class="text-xl text-white font-bold mb-2 uppercase">Launch Assets</h3>
+                <p class="text-zinc-400 text-sm leading-relaxed">Social profiles, print-ready files, and merch basics — everything you need to show up consistently from day one.</p>
+            </div>
+            <div class="glass-panel p-8">
+                <div class="text-zinc-600 text-sm font-mono mb-4">04</div>
+                <h3 class="text-xl text-white font-bold mb-2 uppercase">Clear Handoff</h3>
+                <p class="text-zinc-400 text-sm leading-relaxed">Two refinement rounds, organized files, live site on your domain, and 30 days of post-launch support. You own everything outright.</p>
+            </div>
+        </div>
+
+        <!-- How it works -->
+        <div class="max-w-3xl mx-auto mb-20">
+            <h3 class="text-3xl font-bold tracking-tighter text-white text-center mb-12">How it works</h3>
+            <div class="space-y-10">
+                <div class="flex gap-8">
+                    <div class="text-2xl font-mono text-orange-500 shrink-0">01</div>
+                    <div>
+                        <h4 class="text-xl text-white font-bold mb-2 uppercase">Direction</h4>
+                        <p class="text-zinc-400 leading-relaxed">A 45-minute Sofrito Session to lock your visual lane and the one action your page must drive. You approve the direction in writing — nothing builds without your sign-off.</p>
+                    </div>
+                </div>
+                <div class="flex gap-8">
+                    <div class="text-2xl font-mono text-orange-500 shrink-0">02</div>
+                    <div>
+                        <h4 class="text-xl text-white font-bold mb-2 uppercase">Build</h4>
+                        <p class="text-zinc-400 leading-relaxed">48 hours from direction lock. Identity first, then the page, then a video walkthrough of every choice — then your consolidated feedback and launch.</p>
+                    </div>
+                </div>
+                <div class="flex gap-8">
+                    <div class="text-2xl font-mono text-orange-500 shrink-0">03</div>
+                    <div>
+                        <h4 class="text-xl text-white font-bold mb-2 uppercase">Launch</h4>
+                        <p class="text-zinc-400 leading-relaxed">Live on your domain with all assets organized and handed over. 30 days of support for fixes and tweaks. The brand is yours — no lock-in, no platform trap.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- The promise -->
+        <div class="glass-panel max-w-3xl mx-auto p-8 md:p-10 text-center">
+            <div class="text-zinc-400 text-xs font-bold tracking-widest uppercase mb-4">The Sofrito Promise</div>
+            <h3 class="text-2xl font-bold tracking-tighter text-white font-serif mb-6">You approve everything before we build anything.</h3>
+            <div class="space-y-3 text-zinc-300 leading-relaxed text-left max-w-xl mx-auto">
+                <p><span class="text-white font-semibold">Fixed price, no surprises.</span> $997 covers the full sprint — identity, site, assets, and 30 days of support.</p>
+                <p><span class="text-white font-semibold">Nothing builds without your sign-off.</span> We lock the direction together; you approve it in writing before we touch a pixel.</p>
+                <p><span class="text-white font-semibold">Two refinement rounds included.</span> The site isn't done until it feels like yours.</p>
+                <p><span class="text-white font-semibold">Not a fit? We'll say so.</span> If the sprint isn't right for your business, we tell you straight — no pressure, no hard sell.</p>
             </div>
         </div>
     </section>
@@ -520,7 +474,7 @@
                 <tbody class="text-[15px] leading-relaxed">
                     <tr>
                         <th scope="row" class="p-5 text-white font-semibold border-t border-white/5 whitespace-nowrap">Price</th>
-                        <td class="p-5 text-zinc-300 border-t border-white/5 bg-orange-600/5"><span class="text-white font-semibold">$997, flat.</span> $400 session credited in full.</td>
+                        <td class="p-5 text-zinc-300 border-t border-white/5 bg-orange-600/5"><span class="text-white font-semibold">$997, flat.</span> No hourly billing.</td>
                         <td class="p-5 text-zinc-400 border-t border-white/5">$0–$50/month, plus your time.</td>
                         <td class="p-5 text-zinc-400 border-t border-white/5">$5,000–$15,000+, billed by the hour.</td>
                         <td class="p-5 text-zinc-400 border-t border-white/5">Bundled with their POS contract.</td>
@@ -558,32 +512,14 @@
         </div>
     </section>
 
-    <section aria-label="Founder" class="py-16 px-6 max-w-3xl mx-auto">
-        <div class="border border-white/10 rounded-lg px-6 py-10 md:px-10 md:py-12 bg-zinc-900/30">
-            <blockquote class="font-serif text-xl md:text-2xl text-zinc-300 leading-relaxed space-y-5">
-                <p>"In my family, the first thing you hear when you walk through the door isn't "hello" — it's "are you hungry? Because I just cooked."</p>
-                <p>My mom worked two jobs. But no matter what, we came home after school to a cooked meal. That's how love looks in our culture. Not said — served.</p>
-                <p>That turned into a passion I had to learn myself. And somewhere along the way I saw it clearly: the people who cook like that — the food trucks, the corner spots, the ones feeding their neighborhoods — they put all their love into the food and none of it into how the world sees them.</p>
-                <p>That's the gap I close. Your food already says "I love you." Your brand should say it too.</p>
-                <p>I'm the sofrito — the base underneath everything that makes the whole dish work.</p>
-            </blockquote>
-            <div class="mt-6 flex items-center gap-4">
-                <img src="/founder.webp" alt="Joshua Ortiz, founder of Sofrito Studio" class="w-12 h-12 rounded-full object-cover shrink-0" />
-                <p class="text-sm text-zinc-300 font-sans font-semibold">Joshua Ortiz, founder</p>
-            </div>
-        </div>
-        <div class="founder-proof mt-12">
-            <h2 class="text-4xl font-bold tracking-tighter text-white font-serif mb-6">Proof we ship.</h2>
-            <p class="text-lg text-zinc-400 leading-relaxed mb-4">Before Sofrito Studio, I designed and built Mise — a working client portal with secure sign-in, live data, and a dark-mode interface. Real software, in production, not mockups.</p>
-            <p class="text-lg text-zinc-400 leading-relaxed mb-8">We bring the same build-and-ship discipline to your Brand &amp; Web Sprint.</p>
-            <img src="mise-proof-1.png" alt="Mise landing page: 'The client portal for creative studios,' dark-mode design with app preview" class="w-full rounded-lg border border-white/10 shadow-lg mb-6" loading="lazy" decoding="async">
-            <img src="mise-proof-2.png" alt="Close-up of the Mise app interface" class="w-full rounded-lg border border-white/10 shadow-lg" loading="lazy" decoding="async">
-        </div>
-    </section>
-
+    <!-- FAQ -->
     <section aria-label="FAQ" id="faq" class="py-16 px-6 max-w-3xl mx-auto">
         <h2 class="text-4xl font-bold tracking-tighter text-white font-serif mb-8">FAQ</h2>
         <div class="space-y-4">
+            <details class="glass-panel p-6">
+                <summary class="font-bold text-white cursor-pointer hover:text-zinc-200 transition-colors">Q: What if I hate it?</summary>
+                <p class="mt-3 text-zinc-400">A: You approve the creative direction in writing before we build anything — so there are no surprises. Then you get two refinement rounds to dial it in. If the sprint isn't a fit for your business, we'll tell you on the session before any build work starts. We don't take on projects we can't stand behind.</p>
+            </details>
             <details class="glass-panel p-6">
                 <summary class="font-bold text-white cursor-pointer hover:text-zinc-200 transition-colors">Q: Is the $400 refundable?</summary>
                 <p class="mt-3 text-zinc-400">A: The $400 Sofrito Session is non-refundable — it's a working strategy session, and the full fee is credited toward your $997 sprint when you start within 30 days. Need to move your session? One free reschedule with 48 hours' notice: email <a href="mailto:hello@sofritostudio.com" class="underline hover:text-zinc-200">hello@sofritostudio.com</a>. And if we decide on the session that the sprint isn't a fit for your business, we'll tell you straight — no further payment, no pressure.</p>
@@ -595,10 +531,6 @@
             <details class="glass-panel p-6">
                 <summary class="font-bold text-white cursor-pointer hover:text-zinc-200 transition-colors">Q: What do I need to bring?</summary>
                 <p class="mt-3 text-zinc-400">A: Your menu, your story, and any photos or branding you already have. We'll tell you exactly what's needed on the session.</p>
-            </details>
-            <details class="glass-panel p-6">
-                <summary class="font-bold text-white cursor-pointer hover:text-zinc-200 transition-colors">Q: What happens after I pay?</summary>
-                <p class="mt-3 text-zinc-400">A: Pick your Sofrito Session time right after payment. We set the direction on the call — then you approve it in writing (that's direction lock; we confirm it by email within one business day), and we build and launch within 48 hours.</p>
             </details>
             <details class="glass-panel p-6">
                 <summary class="font-bold text-white cursor-pointer hover:text-zinc-200 transition-colors">Q: What does hosting cost?</summary>
@@ -614,83 +546,30 @@
             </details>
         </div>
     </section>
-    <!-- Founding Client Round -->
-    <section id="founding" aria-label="Founding Client Round" class="py-20 px-6 max-w-7xl mx-auto border-t border-white/5">
-        <div class="max-w-3xl mx-auto text-center mb-12">
-            <p class="text-xs font-bold uppercase tracking-widest text-orange-500 mb-4">Founding Client Round</p>
-            <h2 class="text-5xl font-bold tracking-tighter text-white font-serif mb-6">Ten founding spots. The full sprint for $997.</h2>
-            <p class="text-xl text-zinc-400 leading-relaxed mb-4">We&rsquo;re opening 10 founding spots for independent food businesses. Founding clients get the complete Brand &amp; Web Sprint &mdash; brand identity and website, built and launched in 48 hours &mdash; for $997. The $400 session counts toward the sprint, as always, and founders pick their build slots first each week.</p>
-            <p class="text-xl text-zinc-400 leading-relaxed">In return we ask for three things: a written testimonial within two weeks of launch, a 30-minute case-study interview, and permission to show your before-and-after in our portfolio. This is how we earn our proof &mdash; with real clients, not stock quotes.</p>
-        </div>
-        <div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-            <div class="glass-panel p-8">
-                <h3 class="text-lg font-bold text-white mb-4">You get</h3>
-                <ul class="space-y-3 text-zinc-400">
-                    <li class="flex gap-3"><span class="text-orange-500">&#10022;</span> The full $997 sprint ($400 session credited in full &mdash; $597 balance)</li>
-                    <li class="flex gap-3"><span class="text-orange-500">&#10022;</span> First pick of build slots each week</li>
-                    <li class="flex gap-3"><span class="text-orange-500">&#10022;</span> Direct founder line during your sprint</li>
-                    <li class="flex gap-3"><span class="text-orange-500">&#10022;</span> &ldquo;Founding Client&rdquo; credit on your case study</li>
-                </ul>
-            </div>
-            <div class="glass-panel p-8">
-                <h3 class="text-lg font-bold text-white mb-4">You give</h3>
-                <ul class="space-y-3 text-zinc-400">
-                    <li class="flex gap-3"><span class="text-orange-500">&#10022;</span> Written testimonial within 14 days of launch</li>
-                    <li class="flex gap-3"><span class="text-orange-500">&#10022;</span> 30-minute case-study interview</li>
-                    <li class="flex gap-3"><span class="text-orange-500">&#10022;</span> Logo + before/after usage rights for our portfolio</li>
-                </ul>
-            </div>
-        </div>
-        <p class="max-w-3xl mx-auto text-center text-sm text-zinc-500 mb-16">Independent food businesses only &mdash; food trucks, restaurants, specialty food brands. No chains, no franchises. Ready to start within 30 days.</p>
-        <div class="max-w-3xl mx-auto text-center">
-            <p class="text-zinc-400 mb-8">We read every application personally and reply within two business days. Ten spots &mdash; when they&rsquo;re filled, the round closes.</p>
-            <a href="#book-now" data-select-founding class="rounded-full inline-block bg-orange-600 text-white text-center font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
-                Apply for a founding spot
-            </a>
-        </div>
-    </section>
+
     <!-- Objection flip -->
     <section aria-label="The alternative" class="py-16 px-6 max-w-3xl mx-auto text-center border-t border-white/5">
         <blockquote class="font-serif italic text-2xl md:text-3xl text-zinc-300 leading-relaxed mb-6">&ldquo;I love apologizing for my website before showing the menu.&rdquo;</blockquote>
         <p class="text-sm font-bold tracking-widest uppercase text-zinc-500 mb-10">&mdash; Said no one ever.</p>
-        <a href="#book-now" data-select-booking class="rounded-full inline-block bg-orange-600 text-white text-center font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
-            Fix it in 48 hours
+        <a href="#apply" class="rounded-full inline-block bg-orange-600 text-white text-center font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
+            Apply for a Founding Spot
         </a>
     </section>
-    <!-- Lead Capture — Glassmorphic Container -->
-    <section id="book-now" class="py-20 px-6 max-w-3xl mx-auto">
+
+    <!-- #book-now alias: SEO pages and cancelled.html link here; forwards to the founding application -->
+    <span id="book-now" aria-hidden="true" class="block -mt-20 pt-20"></span>
+    <!-- Founding Application: single CTA -->
+    <section id="apply" class="py-20 px-6 max-w-3xl mx-auto">
         <div class="text-center mb-12">
-            <h2 class="text-5xl font-bold tracking-tighter text-chrome mb-4">Book your Sofrito Session now — $400, credited in full toward your $997 sprint.</h2>
-            <p class="text-xl text-zinc-400 leading-relaxed mb-6">Every client starts with a Sofrito Session. Book yours today &mdash; or apply for one of the 10 founding spots: same session, plus slot priority and a case-study feature, reviewed personally.</p>
-            <div id="path-help-booking">
-                <p class="text-xl text-zinc-400">Choose your 45-minute Session time after payment.</p>
-                <p class="text-sm text-zinc-500 mt-3">We take on up to 3 sprints a week &mdash; booking reserves your build slot.</p>
-            </div>
-            <div id="path-help-founding" class="hidden">
-                <p class="text-xl text-zinc-400">No charge today. We read every application personally and reply within two business days.</p>
-                <p class="text-sm text-zinc-500 mt-3">Ten spots &mdash; when they&rsquo;re filled, the round closes.</p>
-            </div>
+            <p class="text-xs font-bold uppercase tracking-widest text-orange-500 mb-4">Founding Client Round</p>
+            <h2 class="text-5xl font-bold tracking-tighter text-chrome mb-4">Claim one of 10 founding spots.</h2>
+            <p class="text-xl text-zinc-400 leading-relaxed mb-6">The full Brand &amp; Web Sprint for $997. Founders pick their build slots first each week and get a direct line during the sprint.</p>
+            <p class="text-xl text-zinc-400 leading-relaxed">In return: a written testimonial within two weeks of launch, a 30-minute case-study interview, and permission to show your before-and-after. That's how we earn our proof — with real clients.</p>
         </div>
 
         <div class="glass-panel p-8 md:p-12">
             <div id="form-container">
                 <form id="lead-form" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" role="radiogroup" aria-label="Choose your path">
-                        <label class="cursor-pointer">
-                            <input type="radio" name="booking-path" value="booking" class="peer sr-only" checked>
-                            <div class="border border-white/10 bg-black/40 p-5 h-full transition-colors peer-checked:border-orange-500 peer-checked:bg-orange-500/10">
-                                <p class="font-bold text-white text-sm uppercase tracking-widest mb-1">Book my session</p>
-                                <p class="text-sm text-zinc-400">$400 &rarr; secure checkout via Stripe</p>
-                            </div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="booking-path" value="founding" class="peer sr-only">
-                            <div class="border border-white/10 bg-black/40 p-5 h-full transition-colors peer-checked:border-orange-500 peer-checked:bg-orange-500/10">
-                                <p class="font-bold text-white text-sm uppercase tracking-widest mb-1">Apply for founding</p>
-                                <p class="text-sm text-zinc-400">10 spots &middot; no charge today</p>
-                            </div>
-                        </label>
-                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="name" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Name <span class="text-zinc-500">*</span></label>
@@ -709,7 +588,6 @@
                         <div>
                             <label for="phone" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Cell Phone <span class="text-zinc-500">*</span></label>
                             <input type="tel" id="phone" required class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors">
-                            <p class="text-xs text-zinc-500 mt-1.5">So we can reach you before your session to talk through your project.</p>
                         </div>
                     </div>
                     <div>
@@ -723,47 +601,36 @@
                         </select>
                         <p id="business-type-pitch" class="text-sm text-zinc-400 mt-3 hidden"></p>
                     </div>
-                    <div>
-                        <label for="message" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Message (Optional)</label>
-                        <textarea id="message" rows="3" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors"></textarea>
-                    </div>
-                    <div id="founding-fields" class="hidden space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="instagram" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Instagram</label>
-                                <input type="text" id="instagram" placeholder="@yourbusiness" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors">
-                            </div>
-                            <div>
-                                <label for="website" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Website</label>
-                                <input type="text" id="website" placeholder="https://" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors">
-                            </div>
-                        </div>
-                        <p class="text-xs text-zinc-500 -mt-2">Share at least one so we can see your business.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label for="fit_reason" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Why you&rsquo;re a fit <span class="text-zinc-500">*</span></label>
-                            <textarea id="fit_reason" rows="4" placeholder="Tell us about your business and why the timing is right." class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors"></textarea>
+                            <label for="instagram" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Instagram</label>
+                            <input type="text" id="instagram" placeholder="@yourbusiness" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors">
                         </div>
+                        <div>
+                            <label for="website" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Website</label>
+                            <input type="text" id="website" placeholder="https://" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors">
+                        </div>
+                    </div>
+                    <p class="text-xs text-zinc-500 -mt-2">Share at least one so we can see your business.</p>
+                    <div>
+                        <label for="fit_reason" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Why you&rsquo;re a fit <span class="text-zinc-500">*</span></label>
+                        <textarea id="fit_reason" rows="4" placeholder="Tell us about your business and why the timing is right." class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors" required></textarea>
+                    </div>
+                    <div>
+                        <label for="message" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Anything else? (Optional)</label>
+                        <textarea id="message" rows="3" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors"></textarea>
                     </div>
                     <div id="lead-turnstile"></div>
                     <div id="form-error" class="hidden text-red-500 text-sm mt-3 text-center" aria-live="polite"></div>
-                    <div id="secure-checkout-row" class="flex items-center justify-center gap-2 text-sm text-zinc-300 text-center mt-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        <span>Secure checkout via Stripe</span>
-                    </div>
-                    <div id="booking-fine-print" class="text-xs text-zinc-500 text-center mt-2">Your $400 Sofrito Session is credited in full toward the $997 Brand &amp; Web Sprint when you start the sprint within 30 days of your session &middot; Questions? <a href="mailto:hello@sofritostudio.com" class="underline hover:text-zinc-200">hello@sofritostudio.com</a></div>
                     <button type="submit" id="submit-btn" class="rounded-full w-full bg-orange-600 text-white font-bold text-sm py-5 uppercase tracking-widest hover:bg-orange-700 transition-colors disabled:opacity-50 mt-6 shadow-[0_0_20px_rgba(234,88,12,0.2)]">
-                        Book Your Sofrito Session
+                        Apply for a Founding Spot
                     </button>
-                    <p id="checkout-note" class="text-xs text-zinc-500 text-center leading-relaxed mt-3">Secure checkout via Stripe. Choose your Sofrito Session time right after payment.</p>
+                    <p class="text-xs text-zinc-500 text-center leading-relaxed mt-3">No charge to apply. We read every application personally and reply within two business days. Ten spots — when they&rsquo;re filled, the round closes.</p>
                 </form>
                 <div id="founding-success" class="hidden text-center py-8">
                     <p class="text-2xl font-bold text-white font-serif mb-3">Application received.</p>
                     <p class="text-zinc-400">We read every one personally &mdash; you&rsquo;ll hear from us within two business days.</p>
                 </div>
-                <p id="refund-note" class="text-xs text-zinc-500 text-center leading-relaxed mt-4">
-                    Your $400 Sofrito Session is credited in full toward your $997 Sprint when you start the sprint within 30 days of your session.<br>
-                    The $400 session fee is non-refundable. One free reschedule with 48 hours' notice — email <a href="mailto:hello@sofritostudio.com" class="underline hover:text-zinc-200">hello@sofritostudio.com</a>. <a href="/terms" class="underline hover:text-zinc-200">Full terms</a>
-                </p>
             </div>
         </div>
         <div class="text-center mt-12 text-zinc-600 text-sm font-mono">
@@ -772,7 +639,6 @@
     </section>
 
     </main>
-
     <!-- Footer -->
     <footer class="bg-zinc-950 border-t border-white/10 pt-16 pb-8 px-6 max-w-7xl mx-auto">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 mb-12">
@@ -787,10 +653,9 @@
             <div>
                 <h4 class="text-zinc-500 text-xs font-bold tracking-widest uppercase mb-4 font-sans">Explore</h4>
                 <ul class="space-y-3 text-sm font-sans">
-                    <li><a href="#sprint" class="text-zinc-400 hover:text-zinc-200 transition-colors">The Sprint</a></li>
-                    <li><a href="#process" class="text-zinc-400 hover:text-zinc-200 transition-colors">Process</a></li>
+                    <li><a href="#offer" class="text-zinc-400 hover:text-zinc-200 transition-colors">The Sprint</a></li>
                     <li><a href="#faq" class="text-zinc-400 hover:text-zinc-200 transition-colors">FAQ</a></li>
-                    <li><a href="#book-now" data-select-booking class="text-zinc-400 hover:text-zinc-200 transition-colors">Book Your Session</a></li>
+                    <li><a href="#apply" class="text-zinc-400 hover:text-zinc-200 transition-colors">Apply for Founding</a></li>
                     <li><a href="/partners" class="text-zinc-400 hover:text-zinc-200 transition-colors">Partners — get $100 per referral</a></li>
                 </ul>
             </div>
@@ -815,8 +680,6 @@
                     <button type="button" id="sofrito-share" aria-label="Share Sofrito Studio" class="text-zinc-400 hover:text-zinc-200 transition-colors" title="Share this site">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                     </button>
-                    <!-- Pinterest temporarily disconnected until the account is fixed.
-                         Restore: <a href="https://pinterest.com/sofritostudio" aria-label="Pinterest">…</a> -->
                 </div>
             </div>
         </div>
@@ -825,65 +688,42 @@
         </div>
     </footer>
 
-    <!-- Funnel Logic Scripts -->
+    <!-- Founding Application Logic -->
     <script>
-        // Unified booking form: one form, two paths. "booking" posts to
-        // /api/lead (Stripe checkout); "founding" posts to
-        // /api/founding-application (personal review, no charge today).
-        // A single Turnstile widget serves both paths.
+        // Founding-only form. Posts to /api/founding-application
+        // (personal review, no charge today). Single Turnstile widget.
         let turnstileToken = null;
         let awaitingTurnstile = false;
 
+        /* Sofrito Partners: capture ?ref=CODE -> 30-day cookie + click beacon. */
+        (function () {
+            function getParam(name) {
+                try { return new URLSearchParams(window.location.search).get(name); } catch (e) { return null; }
+            }
+            var ref = getParam('ref');
+            if (ref) {
+                ref = ref.toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 24);
+                if (ref) {
+                    var exp = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+                    document.cookie = 'sofrito_ref=' + ref + '; expires=' + exp + '; path=/; SameSite=Lax';
+                    try {
+                        fetch('/api/partners/click', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ code: ref, landing_page: window.location.pathname })
+                        });
+                    } catch (e) { /* beacon is best-effort */ }
+                }
+            }
+        })();
+        window.sofritoRefCode = function () {
+            var parts = ('; ' + document.cookie).split('; sofrito_ref=');
+            return parts.length === 2 ? parts.pop().split(';').shift() : '';
+        };
+
         const form = document.getElementById('lead-form');
         const submitBtn = document.getElementById('submit-btn');
-        const foundingFields = document.getElementById('founding-fields');
-        const pathHelpBooking = document.getElementById('path-help-booking');
-        const pathHelpFounding = document.getElementById('path-help-founding');
-        const secureRow = document.getElementById('secure-checkout-row');
-        const bookingFinePrint = document.getElementById('booking-fine-print');
-        const checkoutNote = document.getElementById('checkout-note');
-        const refundNote = document.getElementById('refund-note');
         const foundingSuccess = document.getElementById('founding-success');
-
-        function currentPath() {
-            const checked = document.querySelector('input[name="booking-path"]:checked');
-            return checked ? checked.value : 'booking';
-        }
-
-        function applyPath() {
-            const isFounding = currentPath() === 'founding';
-            foundingFields.classList.toggle('hidden', !isFounding);
-            pathHelpBooking.classList.toggle('hidden', isFounding);
-            pathHelpFounding.classList.toggle('hidden', !isFounding);
-            secureRow.classList.toggle('hidden', isFounding);
-            bookingFinePrint.classList.toggle('hidden', isFounding);
-            checkoutNote.classList.toggle('hidden', isFounding);
-            refundNote.classList.toggle('hidden', isFounding);
-            submitBtn.innerText = isFounding ? 'Submit founding application' : 'Book Your Sofrito Session';
-        }
-
-        document.querySelectorAll('input[name="booking-path"]').forEach((radio) => {
-            radio.addEventListener('change', applyPath);
-        });
-        applyPath();
-
-        // The founding pitch section's CTA scrolls here and pre-selects founding.
-        document.querySelectorAll('[data-select-founding]').forEach((a) => {
-            a.addEventListener('click', () => {
-                const radio = document.querySelector('input[name="booking-path"][value="founding"]');
-                if (radio) { radio.checked = true; applyPath(); }
-            });
-        });
-
-        // Session-intent CTAs ("Fix it in 48 hours", nav/hero/footer booking
-        // links) scroll here and pre-select the booking path. Without this, a
-        // visitor who previously picked founding would land on the wrong path.
-        document.querySelectorAll('[data-select-booking]').forEach((a) => {
-            a.addEventListener('click', () => {
-                const radio = document.querySelector('input[name="booking-path"][value="booking"]');
-                if (radio) { radio.checked = true; applyPath(); }
-            });
-        });
 
         function showError(message) {
             const el = document.getElementById('form-error');
@@ -893,13 +733,6 @@
         function hideError() {
             const el = document.getElementById('form-error');
             if (el) { el.classList.add('hidden'); el.textContent = ''; }
-        }
-
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-            return 'unknown';
         }
 
         window.turnstileCallback = function(token) {
@@ -913,18 +746,10 @@
             if (window.leadWidgetId !== undefined) return;
             window.leadWidgetId = turnstile.render('#lead-turnstile', {
                 sitekey: '0x4AAAAAAFAfcfVLJKtjbuO8',
-                callback: window.turnstileCallback
+                callback: window.turnstileCallback,
+                size: 'compact'
             });
         })();
-
-        // One submit key per page render. Re-rendering yields a new key, so a
-        // real repeat purchase is never blocked; a double-click on the same
-        // render reuses this key and the server returns the same checkout.
-        const submitKey = crypto.randomUUID();
-
-        // NOTE: Stripe returns buyers to /success.html (paid / resume) and
-        // /cancelled.html (abandoned). There is intentionally no ?success= or
-        // ?canceled= handling on this page.
 
         const TYPE_PITCHES = {
             food_truck: 'Keep your menu, location, hours, and ordering links in one place.',
@@ -944,43 +769,24 @@
             }
         });
 
-        // Prefill from payment-nudge links (?name=&email=) so returning
-        // bookers don't re-type what we already know.
-        try {
-            const params = new URLSearchParams(window.location.search);
-            const preName = (params.get('name') || '').slice(0, 120);
-            const preEmail = (params.get('email') || '').slice(0, 160);
-            const nameEl = document.getElementById('name');
-            const emailEl = document.getElementById('email');
-            if (preName && nameEl && !nameEl.value) nameEl.value = preName;
-            if (preEmail && emailEl && !emailEl.value && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(preEmail)) emailEl.value = preEmail;
-        } catch (e) { /* prefill is best-effort */ }
-
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             hideError();
 
-            const isFounding = currentPath() === 'founding';
             const originalText = submitBtn.innerText;
 
-            // Founding-only client validation mirrors the server: at least one
-            // of Instagram/website, and a fit reason of 10+ characters.
-            let foundingExtras = null;
-            if (isFounding) {
-                const instagram = document.getElementById('instagram').value.trim();
-                const website = document.getElementById('website').value.trim();
-                const fit_reason = document.getElementById('fit_reason').value.trim();
-                if (!instagram && !website) { showError('Add your Instagram or website \u2014 we need to see your business.'); return; }
-                if (fit_reason.length < 10) { showError('Tell us a little more about why the timing is right (10+ characters).'); return; }
-                foundingExtras = { instagram, website, fit_reason };
-            }
+            const instagram = document.getElementById('instagram').value.trim();
+            const website = document.getElementById('website').value.trim();
+            const fit_reason = document.getElementById('fit_reason').value.trim();
+            if (!instagram && !website) { showError('Add your Instagram or website \u2014 we need to see your business.'); return; }
+            if (fit_reason.length < 10) { showError('Tell us a little more about why the timing is right (10+ characters).'); return; }
 
             const token = turnstileToken || document.querySelector('#lead-form textarea[name="cf-turnstile-response"]')?.value;
 
             if (!token) {
                 if (awaitingTurnstile) return;
                 awaitingTurnstile = true;
-                submitBtn.innerText = 'VERIFYING…'; submitBtn.disabled = true;
+                submitBtn.innerText = 'VERIFYING\u2026'; submitBtn.disabled = true;
                 try {
                     if (!window.turnstile || window.leadWidgetId === undefined) throw new Error('turnstile not ready');
                     turnstile.reset(window.leadWidgetId); turnstile.execute(window.leadWidgetId);
@@ -990,189 +796,52 @@
             }
             awaitingTurnstile = false;
 
-            submitBtn.innerText = isFounding ? 'SENDING…' : 'REDIRECTING TO SECURE CHECKOUT…';
+            submitBtn.innerText = 'SENDING\u2026';
             submitBtn.disabled = true;
 
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const business_name = document.getElementById('business_name').value.trim();
-            const business_type = document.getElementById('business_type').value;
-
-            let endpoint, payload;
-            if (isFounding) {
-                endpoint = '/api/founding-application';
-                payload = {
-                    name, email, phone, business_name, business_type,
-                    instagram: foundingExtras.instagram,
-                    website: foundingExtras.website,
-                    fit_reason: foundingExtras.fit_reason,
-                    turnstile_token: token,
-                    submit_key: submitKey,
-                    ref_code: (window.sofritoRefCode ? window.sofritoRefCode() : ''),
-                };
-            } else {
-                const cookieVal = getCookie('sofrito_ab_page');
-                endpoint = '/api/lead';
-                payload = {
-                    name, email, phone, business_name, business_type,
-                    message: document.getElementById('message').value.trim(),
-                    channel: (cookieVal && cookieVal !== 'unknown') ? decodeURIComponent(cookieVal) : 'sprint_page',
-                    turnstile_token: token,
-                    submit_key: submitKey,
-                    ref_code: (window.sofritoRefCode ? window.sofritoRefCode() : ''),
-                };
-            }
+            const payload = {
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                business_name: document.getElementById('business_name').value.trim(),
+                business_type: document.getElementById('business_type').value,
+                instagram,
+                website,
+                fit_reason,
+                message: document.getElementById('message').value.trim(),
+                turnstile_token: token,
+                ref_code: (window.sofritoRefCode ? window.sofritoRefCode() : ''),
+            };
 
             try {
-                const res = await fetch(endpoint, {
+                const res = await fetch('/api/founding-application', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload),
                 });
                 const data = await res.json().catch(() => ({}));
-                if (res.ok && data.ok) {
-                    if (isFounding) {
-                        form.querySelectorAll('input, select, textarea, button, .cf-turnstile').forEach((el) => { el.style.display = 'none'; });
-                        foundingSuccess.classList.remove('hidden');
-                    } else if (data.checkout_url) {
-                        window.location.href = data.checkout_url;
-                    } else {
-                        showError(data.error || 'Something went wrong. Please try again.');
-                        submitBtn.innerText = originalText;
-                        submitBtn.disabled = false;
-                        if (window.turnstile && window.leadWidgetId !== undefined) turnstile.reset(window.leadWidgetId);
-                        turnstileToken = null;
-                    }
-                } else {
-                    showError(data.error || 'Something went wrong. Please try again.');
-                    submitBtn.innerText = originalText;
-                    submitBtn.disabled = false;
-                    if (window.turnstile && window.leadWidgetId !== undefined) turnstile.reset(window.leadWidgetId);
-                    turnstileToken = null;
-                }
-            } catch (error) {
-                showError(error.message || 'Something went wrong. Please try again.');
+                if (!res.ok) throw new Error(data.error || 'Submission failed. Please try again.');
+                document.getElementById('form-container').querySelector('form').classList.add('hidden');
+                foundingSuccess.classList.remove('hidden');
+                foundingSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } catch (err) {
+                showError(err.message);
                 submitBtn.innerText = originalText;
                 submitBtn.disabled = false;
                 if (window.turnstile && window.leadWidgetId !== undefined) turnstile.reset(window.leadWidgetId);
                 turnstileToken = null;
             }
         });
-    </script>
-    <script>
-        // Competitor-study mods: hero audience rotator + scroll-fill process text.
-        // Both degrade gracefully: no-JS keeps the static first phrase and
-        // readable zinc-400 paragraphs; reduced-motion disables the animation.
-        (function () {
-            var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-            // Rotating hero clause: food trucks -> restaurants -> specialty food brands.
-            var audience = document.getElementById('hero-audience');
-            if (audience && !reduceMotion) {
-                var phrases = ['food trucks', 'restaurants', 'specialty food brands'];
-                var idx = 0;
-                setInterval(function () {
-                    audience.classList.add('is-swapping');
-                    setTimeout(function () {
-                        idx = (idx + 1) % phrases.length;
-                        audience.textContent = phrases[idx];
-                        audience.classList.remove('is-swapping');
-                    }, 350);
-                }, 3000);
-            }
+        // Share buttons
+        async function sharePage() {
+            const shareData = { title: document.title, text: 'Sofrito Studio — Brand & Web Sprints for independent food businesses.', url: window.location.href };
+            if (navigator.share) { try { await navigator.share(shareData); } catch (e) { /* dismissed */ } }
+            else { try { await navigator.clipboard.writeText(window.location.href); } catch (e) { /* clipboard unavailable */ } }
+        }
+        document.getElementById('sofrito-share')?.addEventListener('click', sharePage);
+        document.getElementById('sofrito-share-nav')?.addEventListener('click', sharePage);
 
-            // Scroll-fill: split each .scroll-fill paragraph into word spans so
-            // the fill can stagger word by word as the block enters the viewport.
-            function escapeHtml(s) {
-                return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            }
-            var blocks = Array.prototype.slice.call(document.querySelectorAll('.scroll-fill'));
-            blocks.forEach(function (p) {
-                var text = p.textContent.trim();
-                p.setAttribute('aria-label', text);
-                p.innerHTML = text.split(/\s+/).map(function (w, i) {
-                    return '<span class="sf-w" aria-hidden="true" style="transition-delay:' + (i * 45) + 'ms">' + escapeHtml(w) + '</span>';
-                }).join(' ');
-            });
-            if (!blocks.length) return;
-            if (reduceMotion || !('IntersectionObserver' in window)) {
-                blocks.forEach(function (p) { p.classList.add('is-filled'); });
-                return;
-            }
-            var io = new IntersectionObserver(function (entries) {
-                entries.forEach(function (entry) {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-filled');
-                        io.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.4 });
-            blocks.forEach(function (p) { io.observe(p); });
-        })();
-
-        /* Sofrito Partners: capture ?ref=CODE -> 30-day cookie + click beacon. */
-        (function () {
-            function getParam(name) {
-                try { return new URLSearchParams(window.location.search).get(name); } catch (e) { return null; }
-            }
-            function getCookie(name) {
-                var parts = ('; ' + document.cookie).split('; ' + name + '=');
-                return parts.length === 2 ? parts.pop().split(';').shift() : '';
-            }
-            var ref = getParam('ref');
-            if (ref) {
-                ref = ref.toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 24);
-                if (ref) {
-                    var exp = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
-                    document.cookie = 'sofrito_ref=' + ref + '; expires=' + exp + '; path=/; SameSite=Lax';
-                    try {
-                        fetch('/api/partners/click', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ code: ref, landing_page: window.location.pathname })
-                        });
-                    } catch (e) { /* beacon is best-effort */ }
-                }
-            }
-            // Expose for the lead form: read the cookie at submit time.
-            window.sofritoRefCode = function () { return getCookie('sofrito_ref'); };
-        })();
-
-        /* Share buttons (nav + footer): native share sheet on mobile, clipboard fallback on desktop. */
-        (function () {
-            var data = {
-                title: 'Sofrito Studio — Brand & Web Sprint for food businesses',
-                text: 'Brand identity + one-page website for your food business. $997 flat, live in 48 hours.',
-                url: 'https://sofritostudio.com/'
-            };
-            function bindShare(btn) {
-                btn.addEventListener('click', function () {
-                    function fallback() {
-                        var done = function (msg) {
-                            btn.setAttribute('title', msg);
-                            setTimeout(function () { btn.setAttribute('title', 'Share this site'); }, 2500);
-                        };
-                        if (navigator.clipboard && navigator.clipboard.writeText) {
-                            navigator.clipboard.writeText(data.url).then(function () { done('Link copied'); }, function () { done('Copy this link: sofritostudio.com'); });
-                        } else {
-                            done('Copy this link: sofritostudio.com');
-                        }
-                    }
-                    if (navigator.share) {
-                        navigator.share(data).catch(function (err) {
-                            if (err && err.name !== 'AbortError') fallback();
-                        });
-                    } else {
-                        fallback();
-                    }
-                });
-            }
-            ['sofrito-share', 'sofrito-share-nav'].forEach(function (id) {
-                var btn = document.getElementById(id);
-                if (btn) bindShare(btn);
-            });
-        })();
     </script>
 </body>
 </html>
