@@ -11,9 +11,15 @@ export default [
       globals: {
         // Node / standard
         console: 'readonly',
+        process: 'readonly',
         setTimeout: 'readonly',
         clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
         queueMicrotask: 'readonly',
+        Buffer: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
         // Web / Workers runtime
         fetch: 'readonly',
         Request: 'readonly',

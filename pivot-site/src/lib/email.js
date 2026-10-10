@@ -76,8 +76,8 @@ const REPO_EMAIL_TEMPLATES = Object.freeze({
 async function trackEmailQueued(env, job) {
   const tracked = {
     ...job,
-    emails_sent_id: uuid(),
-    email_log_id: uuid(),
+    emails_sent_id: job.emails_sent_id || uuid(),
+    email_log_id: job.email_log_id || uuid(),
   };
   const metadata = JSON.stringify({
     ...(job.metadata || {}),
@@ -101,6 +101,7 @@ async function trackEmailQueued(env, job) {
     ]);
   } catch (e) {
     console.error('email tracking insert failed', logType, e.message);
+    if (job.delivery_key) throw e;
   }
 
   return tracked;
@@ -111,10 +112,14 @@ async function updateEmailTracking(env, job, result, providerId = null) {
   const error = result.ok ? null : String(result.error || `resend_${result.status || 0}`).slice(0, 500);
   try {
     const updates = [];
+    // Finding 2 fix: 'sent' is terminal. A queue ack failure observed after
+    // the consumer already delivered must not overwrite sent->failed, or a
+    // later replay defeats the redelivery suppression and can email twice.
+    const sentGuard = status === 'failed' ? ` AND status != 'sent'` : '';
     if (job.emails_sent_id) {
       updates.push(
         env.DB.prepare(
-          `UPDATE emails_sent SET status = ?, provider_id = ? WHERE id = ?`
+          `UPDATE emails_sent SET status = ?, provider_id = ? WHERE id = ?${sentGuard}`
         )
           .bind(status, providerId, job.emails_sent_id)
       );
@@ -122,7 +127,7 @@ async function updateEmailTracking(env, job, result, providerId = null) {
     if (job.email_log_id) {
       updates.push(
         env.DB.prepare(
-          `UPDATE email_log SET status = ?, provider_id = ?, error = ? WHERE id = ?`
+          `UPDATE email_log SET status = ?, provider_id = ?, error = ? WHERE id = ?${sentGuard}`
         )
           .bind(status, providerId, error, job.email_log_id)
       );
@@ -130,6 +135,7 @@ async function updateEmailTracking(env, job, result, providerId = null) {
     if (updates.length) await env.DB.batch(updates);
   } catch (e) {
     console.error('email tracking update failed', job.log_type || job.template || 'direct_email', e.message);
+    if (job.delivery_key) throw e;
   }
 }
 
@@ -213,6 +219,13 @@ async function sendResend(env, { to, subject, html, idempotencyKey }) {
 }
 
 async function processEmailMessage(env, job) {
+  // Redelivery suppression: if this delivery identity already sent,
+  // skip. The outbox's stable IDs make this check reliable.
+  if (job.delivery_key) {
+    const sent = await env.DB.prepare(`SELECT 1 FROM emails_sent WHERE id = ? AND status = 'sent'`)
+      .bind(job.emails_sent_id).first();
+    if (sent) return;
+  }
   let result = null;
   try {
     const kvOverride = await env.CONFIG.get(`templates/emails/${job.template}`);
@@ -319,29 +332,21 @@ async function sentPaymentEmailAlready(env, template, leadId, paymentKey) {
   return !!row;
 }
 
-// P2-3: persist the actual paid amount on the lead at mark-paid time, so the
-// final-invoice session credit uses what the client paid instead of the
-// current SESSION_PRICE_CENTS KV value. Tolerant: paid_amount_cents may not
-// exist in D1 yet (no migration applied) — a missing column must never break
-// the webhook, so fall back to the column-less write and rethrow anything else.
-async function updateLeadPaidState(env, leadId, paidAt, amountCents) {
-  try {
-    await env.DB.prepare(
-      `UPDATE leads SET status = 'paid', paid_at = ?, paid_amount_cents = ? WHERE id = ?`
-    )
-      .bind(paidAt, amountCents, leadId)
-      .run();
-  } catch (e) {
-    if (/no such column/i.test(String((e && e.message) || ''))) {
-      await env.DB.prepare(
-        `UPDATE leads SET status = 'paid', paid_at = ? WHERE id = ?`
-      )
-        .bind(paidAt, leadId)
-        .run();
-    } else {
-      throw e;
-    }
-  }
+// Store the paid amount and payment identity in the same update. A missing
+// migration must fail the webhook so Stripe retries after it is applied.
+async function updateLeadPaidState(env, leadId, paidAt, amountCents, paymentIntent, paymentKey) {
+  const id = typeof paymentIntent === 'string' ? paymentIntent : paymentIntent?.id;
+  const key = paymentKey || id;
+  if (!key || !Number.isFinite(paidAt)) throw new Error('Payment identity and timestamp are required');
+  await env.DB.batch([
+    env.DB.prepare(
+      `UPDATE leads SET status = 'paid', paid_at = ?, paid_amount_cents = ?, stripe_payment_intent_id = ?
+       WHERE id = ? AND (paid_at IS NULL OR paid_at <= ?)
+         AND NOT EXISTS (SELECT 1 FROM stripe_payments WHERE id = ?)`
+    ).bind(paidAt, amountCents, id || null, leadId, paidAt, key),
+    env.DB.prepare(`INSERT INTO stripe_payments (id, lead_id, paid_at) VALUES (?, ?, ?) ON CONFLICT(id) DO NOTHING`)
+      .bind(key, leadId, paidAt),
+  ]);
 }
 
 // P2-3 reader: the amount the lead actually paid, or null when unknown

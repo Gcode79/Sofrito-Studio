@@ -41,3 +41,6 @@ jobs:
 
       - name: Payment regression tests
         run: npm run test:payments
+
+      - name: Runtime, migration, and scheduler regression tests
+        run: npm run test:runtime

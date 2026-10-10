@@ -57,7 +57,7 @@ async function handleCalendlyWebhook(request, env, ctx) {
     return fail(e && e.status === 413 ? 'body too large' : 'unreadable body', e && e.status === 413 ? 413 : 400);
   }
   const { t, v1 } = parseCalendlySignature(request.headers.get('calendly-webhook-signature'));
-  if (!secret || !t || !v1) return fail('missing signature', 400);
+  if (!secret || !/^\d+$/.test(t) || !v1) return fail('missing signature', 400);
   if (Math.abs(Date.now() / 1000 - Number(t)) > 300) return fail('stale signature', 401);
   const expected = await hmacSha256(secret, `${t}.${raw}`);
   if (!safeEqual(expected, v1)) return fail('invalid signature', 401);

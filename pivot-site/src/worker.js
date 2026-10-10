@@ -34,7 +34,8 @@
 // ============================================================
 
 import { isoCutoffSql } from './lib/pure.js';
-import { CORS, stripCors, json, fail, authorized, readJson, verifyTurnstile, nowIso, legacyRedirectFor, badBody, sha256Hex, nowEpoch, escapeHtml, uuid, bodyTooLarge, MAX_WEBHOOK_BYTES, BUSINESS_TYPES, CHANNELS, PACKAGE_FALLBACK, scoreLead } from './lib/http.js';
+import { dispatchEmailOutbox } from './lib/outbox.js';
+import { CORS, stripCors, json, fail, authorized, readJson, verifyTurnstile, nowIso, legacyRedirectFor, badBody, sha256Hex, nowEpoch, escapeHtml, uuid, bodyTooLarge, MAX_WEBHOOK_BYTES, BUSINESS_TYPES, CHANNELS, PACKAGE_FALLBACK, scoreLead, readWebhookText } from './lib/http.js';
 import { enqueueEmail, enqueueWebhook, tiktokTrack, processEmailMessage, processWebhookMessage } from './lib/email.js';
 import { createStripeCheckoutSession, ensureFreshCheckoutUrl, getSessionPriceCents, getStripeCheckoutSession, handleStripeWebhook, handleInvoiceStatus, handleInvoiceReconcile, handleInvoiceTrigger } from './lib/billing.js';
 import { handleCalendlyWebhook } from './lib/booking.js';
@@ -725,10 +726,10 @@ export default {
     // before responding — leaving it unread crashes `wrangler dev` locally
     // ("Can't read from request stream after response has been sent").
     if (new URL(request.url).pathname === '/csp-report') {
-      // Drain small bodies only — a huge report body is not worth buffering;
-      // the 204 goes out either way.
+      // Drain with the byte-limited reader — a huge report body is not worth
+      // buffering; the 204 goes out either way.
       try {
-        if (!bodyTooLarge(request, MAX_WEBHOOK_BYTES)) await request.text();
+        await readWebhookText(request);
       } catch {}
       return new Response(null, { status: 204 });
     }
@@ -999,6 +1000,14 @@ const PRETTY_URLS = {
     const now = new Date();
     const utcDay = now.getUTCDay();
     const utcHour = now.getUTCHours();
+
+    // ── Durable email outbox sweep: redeliver anything the immediate
+    // dispatch missed (hourly cron covers the sweep cadence).
+    try {
+      await dispatchEmailOutbox(env);
+    } catch (e) {
+      console.error('email outbox sweep failed', e.message);
+    }
 
     // ── Lead and booking automations ──
     try {

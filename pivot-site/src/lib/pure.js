@@ -39,7 +39,10 @@ export function extractIndividualRefund(charge) {
 // stays 'pending'). A row already 'sent'/'paid' must not re-attempt.
 export function shouldAttemptStripeInvoice({ isNewInvoice, status, hasApiKey }) {
   if (!hasApiKey) return false;
-  return isNewInvoice === true || status === 'pending';
+  // reconciliation_required rows must re-enter the resume path: the helper
+  // re-checks Stripe state and preserves the flag without resending.
+  // Skipping them as already_exists would hide ambiguous deliveries.
+  return isNewInvoice === true || status === 'pending' || status === 'reconciliation_required';
 }
 
 // Fix 4 (2026-10-04): receipt/booking emails are keyed on the Stripe payment

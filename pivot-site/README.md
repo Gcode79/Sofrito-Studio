@@ -83,3 +83,38 @@ content/queue/     AI-generated posts awaiting deploy
 - Case studies auto-draft when a project is marked complete (S11).
 
 See `automations/make/README.md` for the scenario catalog.
+See `automations/make/README.md` for the scenario catalog.
+## Reliability changes: local validation and rollout
+
+Use Node 22.13+ (CI uses Node 22), then `npm ci`. Run `npm run check`,
+`npm run test:queue`, `npm run test:payments`, and `npm run test:runtime`.
+The runtime suite applies all D1 migrations to in-memory SQLite and exercises
+signed webhook handlers, invoice retries, email recovery, and scheduler claims
+with synthetic providers. `npm run check` includes undefined-variable linting.
+
+Before deploying this revision, apply migration `0018_payment_delivery.sql` to
+the intended database through the approved deployment process. It adds payment
+identities, a processed-payment ledger, and a durable receipt/booking outbox.
+Code intentionally fails payment processing if its required schema is missing,
+allowing Stripe to retry after the migration is applied. Remote migration and
+deployment require founder approval.
+
+New payments record the Stripe PaymentIntent associated with the latest paid
+purchase. Historical rows are not matched by email on refunds. Reconcile legacy
+refunds against Stripe and backfill payment identities only after verifying the
+specific purchase. Unmatched refunds emit a reconciliation error instead of
+changing unrelated lead records.
+
+Payment emails are persisted before acknowledging Stripe. Immediate dispatch
+and the hourly outbox sweep enqueue pending work using stable delivery IDs.
+Queue retries reuse the provider idempotency key; successful delivery records
+suppress later redeliveries. Monitor pending outbox rows and the email dead-letter
+queue. Outbox recovery covers publication to the queue; exhausted provider
+retries still require dead-letter reconciliation. Provider idempotency retention
+is finite, so reconcile ambiguous sends before replaying very old messages.
+
+Invoice retries persist the remote invoice ID, inspect its state and marked
+line items, and use a separate idempotency key for each Stripe write. Existing
+unmarked draft invoices and uncertain legacy attempts require reconciliation
+before retrying them. The social scheduler has separate provisioning and approval
+requirements documented in `post-scheduler/OPERATIONS.md`.
