@@ -946,6 +946,11 @@ const PRETTY_URLS = {
   '/success': '/success.html',
   '/cancelled': '/cancelled.html',
   '/partners': '/partners.html',
+  '/food-truck-branding': '/food-truck-branding.html',
+  '/specialty-food-websites': '/specialty-food-websites.html',
+  '/pos-locked-websites': '/pos-locked-websites.html',
+  '/cottage-food-brand-identity': '/cottage-food-brand-identity.html',
+  '/alternatives': '/alternatives.html',
 };
     if ((request.method === 'GET' || request.method === 'HEAD') && PRETTY_URLS[pathname]) {
       const assetReq = new Request(assetUrl.origin + PRETTY_URLS[pathname], request);
