@@ -68,3 +68,4 @@ sofrito-example/
 .github/workflows/post-purchase-followup.yml
 .github/workflows/reengagement.yml
 .github/workflows/welcome.yml
+graphify-out/
