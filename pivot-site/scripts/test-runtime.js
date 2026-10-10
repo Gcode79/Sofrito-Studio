@@ -213,7 +213,7 @@ test('CR2: sent delivery status is terminal, failure update cannot overwrite it'
 test('CR3: resuming an already-paid invoice returns paid status', async t => {
   t.mock.method(globalThis, 'fetch', async (url) => {
     const path = new URL(url).pathname;
-    if (path === '/v1/invoices/in_paid') return Response.json({ id: 'in_paid', customer: 'cus_test', status: 'paid', number: 'INV-1' });
+    if (path === '/v1/invoices/in_paid') return Response.json({ id: 'in_paid', customer: 'cus_test', status: 'paid', number: 'INV-1', status_transitions: { paid_at: 1700000000 } });
     throw new Error('Unexpected mock request: ' + path);
   });
   const result = await createAndSendStripeInvoice({ STRIPE_API_KEY: 'test' },
@@ -237,4 +237,19 @@ test('CR4: resuming an open invoice does not re-send', async t => {
       idempotencyKey: 'open-test', invoiceId: 'in_open' });
   assert.equal(result.status, 'open');
   assert.ok(!calls.some(p => p.endsWith('/send_invoice')), 'send_invoice must not be called on resumed open invoice');
+});
+
+test('CR5: ambiguous open resume returns reconciliation-required, not sent', async t => {
+  const calls = [];
+  t.mock.method(globalThis, 'fetch', async (url) => {
+    const path = new URL(url).pathname; calls.push(path);
+    if (path === '/v1/invoices/in_ambig') return Response.json({ id: 'in_ambig', customer: 'cus_test', status: 'open', number: 'INV-3' });
+    throw new Error('Unexpected mock request: ' + path);
+  });
+  const result = await createAndSendStripeInvoice({ STRIPE_API_KEY: 'test' },
+    { customerEmail: 't@t', customerName: 'T', description: 'Test', meta: {},
+      line: { amountCents: 100, description: 'Test' },
+      idempotencyKey: 'ambig-test', invoiceId: 'in_ambig' });
+  assert.equal(result.reconciliationRequired, true);
+  assert.ok(!calls.some(p => p.endsWith('/send_invoice')));
 });

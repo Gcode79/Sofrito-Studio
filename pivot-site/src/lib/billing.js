@@ -250,20 +250,27 @@ async function createAndSendStripeInvoice(env, { customerEmail, customerName, de
     invoice = await stripeRequest(env, 'POST', `/invoices/${invoice.id}/finalize`, {}, headers('finalize'));
     finalizedHere = true;
   }
-  // Finding 4 fix: never re-send an already-open resumed invoice. If
-  // /send_invoice succeeded but its response was lost, the invoice is 'open'
-  // and retrying would email the customer again after Stripe's idempotency
-  // retention expires. A missed send (crash between finalize and send) is
-  // recoverable via the Stripe dashboard; a duplicate email is not.
-  // Only send when we created or finalized the invoice in this run.
+  // Round-2 fix: an ambiguous send must not be recorded as successful.
+  // If finalize succeeded but its response was lost, the invoice is 'open'
+  // and we can't know if /send_invoice ran. Return reconciliation-required
+  // so the trigger persists that state WITHOUT sent_at or ok=true.
   const resumedOpen = !!invoiceId && !finalizedHere && invoice.status === 'open';
   if (resumedOpen) {
     console.error('invoice send ambiguous, requires manual verification', invoice.id);
-  } else if (invoice.status !== 'paid') {
+    return { id: invoice.id, number: invoice.number, url: invoice.hosted_invoice_url,
+      status: invoice.status, paidAt: null, reconciliationRequired: true,
+      reason: 'send state ambiguous: invoice is open but this run did not send it' };
+  }
+  if (invoice.status !== 'paid') {
     invoice = await stripeRequest(env, 'POST', `/invoices/${invoice.id}/send_invoice`, {}, headers('send'));
   }
   return { id: invoice.id, number: invoice.number, url: invoice.hosted_invoice_url,
-    status: invoice.status, paidAt: invoice.status === 'paid' ? nowIso() : null };
+    status: invoice.status,
+    // Round-2 fix: use Stripe's actual payment timestamp, not nowIso().
+    // status_transitions.paid_at is a Unix timestamp; convert to ISO.
+    paidAt: invoice.status === 'paid' && invoice.status_transitions?.paid_at
+      ? new Date(invoice.status_transitions.paid_at * 1000).toISOString()
+      : null };
 }
 
 async function handleInvoiceStatus(env) {
@@ -381,8 +388,8 @@ async function handleInvoiceTrigger(request, env, ctx) {
   // one invoice per milestone per project, never double-billed.
   // COALESCE preserves the ORIGINAL written-trigger timestamp.
   await env.DB.prepare(
-    `INSERT INTO invoices (id, created_at, project_id, milestone, amount_cents, currency, status, notes, approval_confirmed_at, files_delivered_at)
-     VALUES (?, ?, ?, ?, ?, 'usd', 'pending', ?, ?, ?)
+    `INSERT INTO invoices (id, created_at, project_id, milestone, amount_cents, currency, status, notes, approval_confirmed_at, files_delivered_at, protocol_version)
+     VALUES (?, ?, ?, ?, ?, 'usd', 'pending', ?, ?, ?, 'v2')
      ON CONFLICT(project_id, milestone) DO UPDATE SET
        notes = excluded.notes,
        approval_confirmed_at = COALESCE(invoices.approval_confirmed_at, excluded.approval_confirmed_at),
@@ -392,7 +399,7 @@ async function handleInvoiceTrigger(request, env, ctx) {
     .run();
 
   const canonical = await env.DB.prepare(
-    `SELECT id, status, stripe_invoice_id, amount_cents FROM invoices WHERE project_id = ? AND milestone = ?`
+    `SELECT id, status, stripe_invoice_id, amount_cents, protocol_version FROM invoices WHERE project_id = ? AND milestone = ?`
   )
     .bind(project.id, milestone)
     .first();
@@ -411,11 +418,13 @@ async function handleInvoiceTrigger(request, env, ctx) {
   const stripe = { attempted: false };
   if (needsStripeAttempt) {
     try {
-      // Blocker fix: legacy pending rows without a Stripe ID may already
-      // exist on Stripe under the OLD idempotency key format. Reconcile
-      // via metadata before creating — never auto-create blind.
+      // Round-2 fix: only pre-cutover rows (protocol_version IS NULL) take the
+      // legacy reconciliation path. Rows created by this protocol ('v2') that
+      // failed transiently before Stripe creation can safely retry — no old
+      // invoice exists under a different key format.
       let resumeId = canonical.stripe_invoice_id;
-      if (!resumeId && !isNewInvoice) {
+      const isLegacyRow = !canonical.stripe_invoice_id && canonical.protocol_version !== 'v2';
+      if (isLegacyRow) {
         resumeId = await reconcileLegacyInvoice(env, canonical.id);
         if (resumeId) {
           await env.DB.prepare(`UPDATE invoices SET stripe_invoice_id = ? WHERE id = ?`)
@@ -439,18 +448,34 @@ async function handleInvoiceTrigger(request, env, ctx) {
       // Record the actual Stripe status: a resumed invoice may already be
       // paid. Never overwrite a locally-paid row with 'sent' — the
       // invoice.paid webhook owns the paid transition.
-      const localStatus = created.status === 'paid' ? 'paid' : 'sent';
-      await env.DB.prepare(
-        `UPDATE invoices SET status = ?, sent_at = ?, stripe_invoice_id = ?
-         WHERE id = ? AND status != 'paid'`
-      )
-        .bind(localStatus, nowIso(), created.id, canonical.id)
-        .run();
-      stripe.attempted = true;
-      stripe.ok = true;
-      stripe.invoice_id = created.id;
-      stripe.number = created.number || null;
-      stripe.url = created.url || null;
+      // Round-2 fixes: (a) ambiguous sends persist 'reconciliation_required'
+      // WITHOUT sent_at and report ok=false; (b) paid invoices persist
+      // Stripe's actual paid_at so v_invoice_status doesn't count them
+      // as outstanding.
+      if (created.reconciliationRequired) {
+        await env.DB.prepare(
+          `UPDATE invoices SET status = 'reconciliation_required', stripe_invoice_id = ?
+           WHERE id = ? AND status != 'paid'`
+        ).bind(created.id, canonical.id).run();
+        stripe.attempted = true;
+        stripe.ok = false;
+        stripe.reconciliationRequired = true;
+        stripe.reason = created.reason;
+        stripe.invoice_id = created.id;
+      } else {
+        const localStatus = created.status === 'paid' ? 'paid' : 'sent';
+        const paidAt = created.status === 'paid' ? created.paidAt : null;
+        await env.DB.prepare(
+          `UPDATE invoices SET status = ?, sent_at = ?,
+             paid_at = COALESCE(paid_at, ?), stripe_invoice_id = ?
+           WHERE id = ? AND status != 'paid'`
+        ).bind(localStatus, localStatus === 'sent' ? nowIso() : null, paidAt, created.id, canonical.id).run();
+        stripe.attempted = true;
+        stripe.ok = true;
+        stripe.invoice_id = created.id;
+        stripe.number = created.number || null;
+        stripe.url = created.url || null;
+      }
     } catch (e) {
       stripe.attempted = true;
       stripe.ok = false;
