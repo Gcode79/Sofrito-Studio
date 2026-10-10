@@ -50,19 +50,36 @@ const tooLargeError = () => {
   return err;
 };
 
-const readJson = async (request, maxBytes = MAX_JSON_BYTES) => {
+// Read bytes incrementally so chunked requests cannot bypass the memory limit.
+const readLimitedText = async (request, maxBytes) => {
   if (bodyTooLarge(request, maxBytes)) throw tooLargeError();
-  const raw = await request.text();
-  if (raw.length > maxBytes) throw tooLargeError();
-  return JSON.parse(raw);
+  if (!request.body) return '';
+  const reader = request.body.getReader();
+  const decoder = new TextDecoder();
+  const parts = [];
+  let bytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > maxBytes) {
+        await reader.cancel().catch(() => {});
+        throw tooLargeError();
+      }
+      parts.push(decoder.decode(value, { stream: true }));
+    }
+    parts.push(decoder.decode());
+    return parts.join('');
+  } finally {
+    reader.releaseLock();
+  }
 };
 
-const readWebhookText = async (request) => {
-  if (bodyTooLarge(request, MAX_WEBHOOK_BYTES)) throw tooLargeError();
-  const raw = await request.text();
-  if (raw.length > MAX_WEBHOOK_BYTES) throw tooLargeError();
-  return raw;
-};
+const readJson = async (request, maxBytes = MAX_JSON_BYTES) =>
+  JSON.parse(await readLimitedText(request, maxBytes));
+
+const readWebhookText = (request) => readLimitedText(request, MAX_WEBHOOK_BYTES);
 
 // Maps body-parse errors to responses: 413 for oversized, 400 otherwise.
 const badBody = (e) => (e && e.status === 413 ? fail('Request body too large.', 413) : fail('Please send valid JSON.', 400));
