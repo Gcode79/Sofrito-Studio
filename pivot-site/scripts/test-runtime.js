@@ -184,3 +184,57 @@ test('paid checkout handler persists both deliveries and safely replays the even
   assert.equal(env.DB.raw.prepare('SELECT count(*) AS n FROM revenue').get().n, 1);
   assert.equal(env.DB.raw.prepare("SELECT paid_at FROM leads WHERE id='payer'").get().paid_at, 100);
 });
+test('CR1 blocker: legacy pending invoice reconciles via metadata instead of duplicating', async t => {
+  let createCalls = 0;
+  t.mock.method(globalThis, 'fetch', async (url, init) => {
+    const path = new URL(url).pathname;
+    let data;
+    if (path === '/v1/invoices' && init.method === 'GET') {
+      data = { data: [{ id: 'in_legacy', metadata: { invoice_id: 'legacy-123' }, customer: 'cus_test', status: 'open' }], has_more: false };
+    } else if (path === '/v1/invoices') { createCalls++; data = { id: 'in_dupe', status: 'draft' }; }
+    else throw new Error('Unexpected mock request: ' + path);
+    return Response.json(data);
+  });
+  const found = await (await import('../src/lib/billing.js')).reconcileLegacyInvoice({ STRIPE_API_KEY: 'test' }, 'legacy-123');
+  assert.equal(found, 'in_legacy');
+  assert.equal(createCalls, 0);
+});
+
+test('CR2: sent delivery status is terminal, failure update cannot overwrite it', async () => {
+  const env = environment();
+  const { updateEmailTracking } = await import('../src/lib/email.js');
+  env.DB.raw.exec(`INSERT INTO emails_sent(id,created_at,to_email,template,subject,status) VALUES('e1','2020','t@t','x','s','sent')`);
+  env.DB.raw.exec(`INSERT INTO email_log(id,created_at,lead_id,type,status) VALUES('l1','2020','x','x','sent')`);
+  await updateEmailTracking(env, { emails_sent_id: 'e1', email_log_id: 'l1', delivery_key: 'k' }, { ok: false, error: 'queue ack failed' });
+  assert.equal(env.DB.raw.prepare(`SELECT status FROM emails_sent WHERE id='e1'`).get().status, 'sent');
+  assert.equal(env.DB.raw.prepare(`SELECT status FROM email_log WHERE id='l1'`).get().status, 'sent');
+});
+
+test('CR3: resuming an already-paid invoice returns paid status', async t => {
+  t.mock.method(globalThis, 'fetch', async (url) => {
+    const path = new URL(url).pathname;
+    if (path === '/v1/invoices/in_paid') return Response.json({ id: 'in_paid', customer: 'cus_test', status: 'paid', number: 'INV-1' });
+    throw new Error('Unexpected mock request: ' + path);
+  });
+  const result = await createAndSendStripeInvoice({ STRIPE_API_KEY: 'test' },
+    { customerEmail: 't@t', customerName: 'T',
+      description: 'Test', meta: {}, line: { amountCents: 100, description: 'Test' },
+      idempotencyKey: 'paid-test', invoiceId: 'in_paid' });
+  assert.equal(result.status, 'paid');
+  assert.ok(result.paidAt);
+});
+
+test('CR4: resuming an open invoice does not re-send', async t => {
+  const calls = [];
+  t.mock.method(globalThis, 'fetch', async (url, init) => {
+    const path = new URL(url).pathname; calls.push(path);
+    if (path === '/v1/invoices/in_open') return Response.json({ id: 'in_open', customer: 'cus_test', status: 'open', number: 'INV-2' });
+    throw new Error('Unexpected mock request: ' + path);
+  });
+  const result = await createAndSendStripeInvoice({ STRIPE_API_KEY: 'test' },
+    { customerEmail: 't@t', customerName: 'T',
+      description: 'Test', meta: {}, line: { amountCents: 100, description: 'Test' },
+      idempotencyKey: 'open-test', invoiceId: 'in_open' });
+  assert.equal(result.status, 'open');
+  assert.ok(!calls.some(p => p.endsWith('/send_invoice')), 'send_invoice must not be called on resumed open invoice');
+});

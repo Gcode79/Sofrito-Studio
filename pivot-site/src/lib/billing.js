@@ -176,6 +176,25 @@ async function stripeRequest(env, method, path, form, extraHeaders) {
   return data;
 }
 
+// Blocker fix (CodeRabbit PR #1): the idempotency key format changed from
+// `sofrito-invoice:<id>` to `sofrito-invoice:<id>:invoice`. A legacy row that
+// is pending without a Stripe ID may already have a payable invoice on
+// Stripe created under the OLD key. Creating with the new key would bypass
+// Stripe's idempotency and issue a duplicate. Reconcile first: search Stripe
+// for an invoice carrying our metadata before allowing creation.
+async function reconcileLegacyInvoice(env, canonicalId) {
+  let after = '';
+  do {
+    const page = await stripeRequest(env, 'GET', `/invoices?limit=100${after ? `&starting_after=${encodeURIComponent(after)}` : ''}`);
+    const match = (page.data || []).find(inv =>
+      inv.metadata && inv.metadata.invoice_id === canonicalId
+    );
+    if (match) return match.id;
+    after = page.has_more ? page.data?.at(-1)?.id : '';
+  } while (after);
+  return null;
+}
+
 async function createAndSendStripeInvoice(env, { customerEmail, customerName, description, meta, line, idempotencyKey, invoiceId, onCreated }) {
   if (!idempotencyKey) throw new Error('Invoice creation requires an idempotency key');
   const headers = (step) => ({ 'Idempotency-Key': `${idempotencyKey}:${step}` });
@@ -207,6 +226,7 @@ async function createAndSendStripeInvoice(env, { customerEmail, customerName, de
     invoice = await stripeRequest(env, 'GET', `/invoices/${encodeURIComponent(invoice.id)}`);
   }
   if (!['draft', 'open', 'paid'].includes(invoice.status)) throw new Error('Invoice requires manual reconciliation');
+  let finalizedHere = false;
   if (invoice.status === 'draft') {
     // Inspect all lines before retrying even if the provider's idempotency
     // window has elapsed. The line marker survives a lost HTTP response.
@@ -228,11 +248,22 @@ async function createAndSendStripeInvoice(env, { customerEmail, customerName, de
       }, headers('line'));
     }
     invoice = await stripeRequest(env, 'POST', `/invoices/${invoice.id}/finalize`, {}, headers('finalize'));
+    finalizedHere = true;
   }
-  if (invoice.status !== 'paid') {
+  // Finding 4 fix: never re-send an already-open resumed invoice. If
+  // /send_invoice succeeded but its response was lost, the invoice is 'open'
+  // and retrying would email the customer again after Stripe's idempotency
+  // retention expires. A missed send (crash between finalize and send) is
+  // recoverable via the Stripe dashboard; a duplicate email is not.
+  // Only send when we created or finalized the invoice in this run.
+  const resumedOpen = !!invoiceId && !finalizedHere && invoice.status === 'open';
+  if (resumedOpen) {
+    console.error('invoice send ambiguous, requires manual verification', invoice.id);
+  } else if (invoice.status !== 'paid') {
     invoice = await stripeRequest(env, 'POST', `/invoices/${invoice.id}/send_invoice`, {}, headers('send'));
   }
-  return { id: invoice.id, number: invoice.number, url: invoice.hosted_invoice_url };
+  return { id: invoice.id, number: invoice.number, url: invoice.hosted_invoice_url,
+    status: invoice.status, paidAt: invoice.status === 'paid' ? nowIso() : null };
 }
 
 async function handleInvoiceStatus(env) {
@@ -380,6 +411,19 @@ async function handleInvoiceTrigger(request, env, ctx) {
   const stripe = { attempted: false };
   if (needsStripeAttempt) {
     try {
+      // Blocker fix: legacy pending rows without a Stripe ID may already
+      // exist on Stripe under the OLD idempotency key format. Reconcile
+      // via metadata before creating — never auto-create blind.
+      let resumeId = canonical.stripe_invoice_id;
+      if (!resumeId && !isNewInvoice) {
+        resumeId = await reconcileLegacyInvoice(env, canonical.id);
+        if (resumeId) {
+          await env.DB.prepare(`UPDATE invoices SET stripe_invoice_id = ? WHERE id = ?`)
+            .bind(resumeId, canonical.id).run();
+        } else {
+          throw new Error('Legacy pending invoice requires manual reconciliation: no Stripe invoice found with matching metadata');
+        }
+      }
       const created = await createAndSendStripeInvoice(env, {
         customerEmail: project.client_email,
         customerName: project.name,
@@ -387,13 +431,20 @@ async function handleInvoiceTrigger(request, env, ctx) {
         meta: { invoice_id: canonical.id, project_id: project.id, milestone },
         line: { description: MILESTONE_LABELS[milestone], amountCents: canonical.amount_cents },
         idempotencyKey: `sofrito-invoice:${canonical.id}`,
-        invoiceId: canonical.stripe_invoice_id,
+        invoiceId: resumeId,
         onCreated: async (id) => {
           await env.DB.prepare(`UPDATE invoices SET stripe_invoice_id = ? WHERE id = ?`).bind(id, canonical.id).run();
         },
       });
-      await env.DB.prepare(`UPDATE invoices SET status = 'sent', sent_at = ?, stripe_invoice_id = ? WHERE id = ?`)
-        .bind(nowIso(), created.id, canonical.id)
+      // Record the actual Stripe status: a resumed invoice may already be
+      // paid. Never overwrite a locally-paid row with 'sent' — the
+      // invoice.paid webhook owns the paid transition.
+      const localStatus = created.status === 'paid' ? 'paid' : 'sent';
+      await env.DB.prepare(
+        `UPDATE invoices SET status = ?, sent_at = ?, stripe_invoice_id = ?
+         WHERE id = ? AND status != 'paid'`
+      )
+        .bind(localStatus, nowIso(), created.id, canonical.id)
         .run();
       stripe.attempted = true;
       stripe.ok = true;
@@ -1042,6 +1093,7 @@ export {
   alertOnSessionPriceOverride,
   stripeRequest,
   createAndSendStripeInvoice,
+  reconcileLegacyInvoice,
   createStripeCheckoutSession,
   getStripeCheckoutSession,
   ensureFreshCheckoutUrl,

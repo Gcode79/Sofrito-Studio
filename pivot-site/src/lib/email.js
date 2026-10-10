@@ -112,10 +112,14 @@ async function updateEmailTracking(env, job, result, providerId = null) {
   const error = result.ok ? null : String(result.error || `resend_${result.status || 0}`).slice(0, 500);
   try {
     const updates = [];
+    // Finding 2 fix: 'sent' is terminal. A queue ack failure observed after
+    // the consumer already delivered must not overwrite sent->failed, or a
+    // later replay defeats the redelivery suppression and can email twice.
+    const sentGuard = status === 'failed' ? ` AND status != 'sent'` : '';
     if (job.emails_sent_id) {
       updates.push(
         env.DB.prepare(
-          `UPDATE emails_sent SET status = ?, provider_id = ? WHERE id = ?`
+          `UPDATE emails_sent SET status = ?, provider_id = ? WHERE id = ?${sentGuard}`
         )
           .bind(status, providerId, job.emails_sent_id)
       );
@@ -123,7 +127,7 @@ async function updateEmailTracking(env, job, result, providerId = null) {
     if (job.email_log_id) {
       updates.push(
         env.DB.prepare(
-          `UPDATE email_log SET status = ?, provider_id = ?, error = ? WHERE id = ?`
+          `UPDATE email_log SET status = ?, provider_id = ?, error = ? WHERE id = ?${sentGuard}`
         )
           .bind(status, providerId, error, job.email_log_id)
       );
