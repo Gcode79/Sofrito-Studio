@@ -305,3 +305,18 @@ test('CR7: paid resume persists Stripe paid_at to invoice row', async t => {
   assert.ok(row.paid_at, 'paid_at must be persisted');
   assert.ok(row.paid_at.includes('2023'), 'paid_at must be Stripe timestamp (1700000000 = Nov 2023), not now');
 });
+
+test('CR8: retry with conflicting honor_expired_credit is rejected, amount locked', async t => {
+  const env = environment();
+  env.DB.raw.exec(`INSERT INTO leads(id,created_at,name,email,status,paid_at,paid_amount_cents) VALUES('l1','2020','Lead','t@t.test','paid',1,40000)`);
+  env.DB.raw.exec(`INSERT INTO projects(id,name,package_name,price_cents,status,lead_id) VALUES('p1','Proj','sprint',99700,'active','l1')`);
+  env.DB.raw.exec(`INSERT INTO invoices(id,created_at,project_id,milestone,amount_cents,status,protocol_version) VALUES('inv-lock','2020','p1','final',99700,'pending','v2')`);
+  t.mock.method(globalThis, 'fetch', async () => { throw new Error('Stripe must not be called on conflicting retry'); });
+  const req = new Request('https://example.test/api/invoice-trigger', { method: 'POST',
+    body: JSON.stringify({ project_id: 'p1', milestone: 'final', honor_expired_credit: 'true' }) });
+  const res = await handleInvoiceTrigger(req, { ...env, STRIPE_API_KEY: 'test' }, env.ctx);
+  assert.equal(res.status, 409);
+  const body = await res.json();
+  assert.ok(body.error.includes('amount locked'), 'must explain the amount is locked');
+  assert.ok(body.error.includes('997.00'), 'must cite the canonical amount');
+});
