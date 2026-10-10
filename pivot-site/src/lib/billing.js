@@ -413,7 +413,21 @@ async function handleInvoiceTrigger(request, env, ctx) {
     .first();
   if (!canonical) return fail('invoice row not found after upsert', 500);
 
+  // CodeRabbit round 4: the invoiced amount is locked at first creation.
+  // A retry passing honor_expired_credit=true recalculates a lower amount,
+  // but Stripe is billed canonical.amount_cents. Reporting the recalculated
+  // amount would claim a credit that was never applied. Reject conflicting
+  // overrides explicitly instead of silently misreporting.
   const isNewInvoice = canonical.id === invoiceId;
+  if (!isNewInvoice && honorExpired && amountCents !== canonical.amount_cents) {
+    return fail(
+      `amount locked: invoice was created for $${(canonical.amount_cents / 100).toFixed(2)}, ` +
+      `but honor_expired_credit recalculates $${(amountCents / 100).toFixed(2)}. ` +
+      `Void the existing invoice and create a new one to change the amount.`, 409);
+  }
+  // Notifications report the canonical (actually billed) amount, never a
+  // recalculated figure.
+  const notifyCents = canonical.amount_cents;
   // A prior attempt may have written the row but failed before Stripe
   // succeeded (status stays 'pending'). Retrying must resume that invoice
   // instead of reporting already_exists — the idempotency key keeps Stripe
@@ -512,8 +526,8 @@ async function handleInvoiceTrigger(request, env, ctx) {
         package_name: project.package_name || null,
         milestone,
         milestone_label: MILESTONE_LABELS[milestone],
-        amount_cents: amountCents,
-        amount_dollars: (amountCents / 100).toFixed(2),
+        amount_cents: notifyCents,
+        amount_dollars: (notifyCents / 100).toFixed(2),
         status: finalRow.status,
         sent_at: finalRow.sent_at || null,
         approval_confirmed_at: finalRow.approval_confirmed_at,
@@ -528,12 +542,12 @@ async function handleInvoiceTrigger(request, env, ctx) {
         kind: 'email',
         to: env.NOTIFICATION_EMAIL || '',
         template: 'invoice-trigger-notify.html',
-        subject: `[Milestone] ${MILESTONE_LABELS[milestone]} — ${project.name} ($${(amountCents / 100).toFixed(2)})${creditExpired && !honorExpired ? ' — credit expired' : ''}`,
+        subject: `[Milestone] ${MILESTONE_LABELS[milestone]} — ${project.name} ($${(notifyCents / 100).toFixed(2)})${creditExpired && !honorExpired ? ' — credit expired' : ''}`,
         data: {
           invoice: finalRow,
           project,
           milestone_label: MILESTONE_LABELS[milestone],
-          amount_dollars: (amountCents / 100).toFixed(2),
+          amount_dollars: (notifyCents / 100).toFixed(2),
           credit_note: milestone === 'final'
             ? (creditExpired
               ? (honorExpired
