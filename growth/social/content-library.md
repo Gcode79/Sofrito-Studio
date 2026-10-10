@@ -6,7 +6,7 @@
 - Pillar: 1 (Brand clarity)  |  Format: Carousel 4:5  (+ LinkedIn static list)
 - Target: Owner-operators upscale years 1–5, problem-aware
 - Pain: "Food is good, but I look like everyone else"
-- Offer endpoint: Sofrito Session  |  CTA: Book a session (`/session.html`; contact-path until Calendly)
+- Offer endpoint: Sofrito Session  |  CTA: Book Your Sofrito Session (`/#book-now`)
 - Metric: link clicks → contact submissions → D1 lead
 - Hook: "Good food isn't the differentiator you think it is."
 
@@ -22,7 +22,7 @@
 - Pillar: 2 (Website & conversion)  |  Format: Carousel 4:5 + LinkedIn
 - Target: Pre-launch and 1–5yr owners; considering a site
 - Pain: Website looks fine but doesn't convert
-- Offer: Sofrito / Plato  |  CTA: Book the teardown session
+- Offer: Sofrito Session  |  CTA: Book Your Sofrito Session
 - Metric: link clicks → qualified DMs
 - Hook: "Your website has three seconds on a phone. It's showing the wrong screen."
 
@@ -70,7 +70,7 @@
 - Pillar: 5 (Studio POV)  |  Format: Carousel + LinkedIn
 - Target: Consideration-stage buyers
 - Pain: "Everyone sounds the same when I'm comparing studios"
-- Offer: Sofrito Session  |  CTA: Book a session
+- Offer: Sofrito Session  |  CTA: Book Your Sofrito Session
 - Metric: link clicks → session inquiries
 - Hook: "The right studio interview changes when you bake in food business reality."
 
@@ -86,7 +86,7 @@
 - Pillar: 2 (Website & conversion)  |  Format: Carousel 4:5
 - Target: Restaurants/trucks with third-party ordering
 - Pain: Orders happen on apps; margins and data lost
-- Offer: The Plato (site + ordering clarity)  |  CTA: Save / book a session
+- Offer: Sofrito Session  |  CTA: Save / Book Your Sofrito Session
 - Metric: saves + site/service page clicks
 - Hook: "If your own site can't take the order, every third-party fee is rent on your name."
 

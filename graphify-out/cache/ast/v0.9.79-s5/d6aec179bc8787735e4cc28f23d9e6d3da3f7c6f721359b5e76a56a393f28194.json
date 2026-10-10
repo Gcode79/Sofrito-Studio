@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_pivot_site_scripts_probe_remote_schema_sql", "label": "probe_remote_schema.sql", "file_type": "code", "source_file": "pivot-site/scripts/probe_remote_schema.sql", "source_location": null}], "edges": []}

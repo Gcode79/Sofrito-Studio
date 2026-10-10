@@ -1,6 +1,8 @@
 SP-02 Carousel — Website Clarity — Instagram Carousel (4:5, 1080x1350)
-CTA: Book a Sofrito Session → sofritostudio.com/session
-Hashtags: #FoodBusiness #RestaurantWebsite #BrandFoundation #SofritoStudio #WebsiteDesign #IndependentRestaurant #NextStep
+CTA: Book Your Sofrito Session — https://sofritostudio.com/#book-now
+Closer: Book your Sofrito Session now — $400, credited in full toward your $997 sprint.
+Duration: 45 minutes
+Hashtags: #FoodBusiness #RestaurantWebsite #BrandAndWebSprint #SofritoStudio #WebsiteDesign #IndependentRestaurant #NextStep
 Alt text source file: alt-text.md (restaurant/studio/menu/editorial scenes — owner reviewing generic restaurant website beside printed menu, ceramic cup, receipt printer, warm kitchen light, realistic textures, no recognizable client identity)
 Copy source: copy.md (exact source; revisions only in source file; version tracked in Git)
 UTM tracking: ?utm_source=instagram&utm_medium=carousel&utm_campaign=sp02

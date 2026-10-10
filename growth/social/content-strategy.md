@@ -13,7 +13,7 @@ Sofrito Studio is a branding studio for food businesses. Social content exists t
 
 | Offer | Price * | Role in social |
 |---|---|---|
-| Sofrito Session | $400 / 90 min | **Primary CTA** — lowest-commitment entry; every educational post can end here |
+| Sofrito Session | $400 / 45 min | **Primary CTA** — credited in full toward the $997 Brand & Web Sprint when booked within 30 days |
 | The Sofrito (brand identity) | $2,500 | Mid-level proof + "what you get" posts |
 | The Plato (brand + website) | $5,000 | Teardown + before/after proof posts |
 | La Mesa (full launch) | $7,500 — **by referral only** | Awareness only (no price announcements until OD5) |
@@ -63,11 +63,11 @@ Cadence: **2–3 high-quality core posts/week** from the calendar; repurpose eac
 
 ## Approved CTAs (each post picks exactly one)
 
-1. Book a Sofrito Session (**primary** — leads to `/session.html` → contact-path until Calendly live)
+1. Book Your Sofrito Session (**primary** — `https://sofritostudio.com/#book-now`)
 2. Save this for your next menu/site/brand review (zero-click, builds saves)
 3. Share it with a food-business owner (referral)
 4. Comment with the decision you're stuck on (community; requires response-rails — see response-library)
-5. Visit the relevant service page (`/services.html`, Guides page)
+5. Visit the current Session page (`https://sofritostudio.com/#book-now`)
 6. Take the free Digital Guide (feeds `/api/newsletter`)
 7. (Future, gated) Reply-with-keyword — ONLY once founder approves the follow-up workflow
 

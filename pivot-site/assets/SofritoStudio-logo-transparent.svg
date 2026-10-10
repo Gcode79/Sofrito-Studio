@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+  <!--
+    SOFRITO STUDIO — LOGO PLACEHOLDER (VECTOR TRACE PENDING)
+    This is a CL early-draft placeholder, NOT an approved logo.
+    It shows where the vector logo will live after a real trace of
+    logo-master.jpeg (food illustration). DO NOT ship this as the logo.
+    Replace with the traced vector master when available.
+    Palette follows DESIGN-TOKENS.md: orange #EA580C, green #16A34A.
+  -->
+  <rect width="800" height="400" fill="#F9FAFB"/>
+  <!-- placeholder safe-area box (dashed) -->
+  <rect x="40" y="40" width="720" height="320" fill="none" stroke="#D1D5DB" stroke-width="4" stroke-dasharray="14 10"/>
+  <!-- placeholder slot where the soffritto wordmark lockup will sit -->
+  <rect x="150" y="120" width="500" height="120" fill="#FFF7ED" stroke="#EA580C" stroke-width="4" stroke-dasharray="14 10"/>
+  <text x="400" y="158" font-family="Georgia, 'Times New Roman', serif" font-size="40" font-weight="bold" fill="#EA580C" text-anchor="middle">SOFRITO</text>
+  <text x="400" y="205" font-family="'Segoe UI', system-ui, sans-serif" font-size="20" fill="#16A34A" text-anchor="middle">STUDIO · PLACEHOLDER</text>
+  <!-- obvious "not approved" band -->
+  <rect x="230" y="300" width="340" height="34" rx="17" fill="#EA580C"/>
+  <text x="400" y="323" font-family="'Segoe UI', system-ui, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF" text-anchor="middle">PLACEHOLDER — VECTOR TRACE PENDING</text>

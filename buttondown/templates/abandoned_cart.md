@@ -1,15 +1,11 @@
 subject: Your cart is waiting
 
-Looks like you were checking out and didn't finish your order. No worries — it's saved and ready whenever you are.
+Looks like you started something and didn't finish. No worries — nothing is lost.
 
-Here's a quick reminder of what you were looking at:
+Right now the open door is a Sofrito Session: 45 minutes, $400, and one clear fix for your brand and menu. If you go on to the $997 Brand & Web Sprint within 30 days, the $400 comes straight off it.
 
-**La Mesa Boricua** — 30 bilingual Puerto Rican recipes, tested and mainland-ready. Ingredient swaps, holiday menus, and a full Nochebuena timeline. The cookbook that brings the island home.
+If you had a question or hit a snag, just reply — we're here to help.
 
-If you had a question or hit a snag at checkout, just reply — I'm here to help.
-
-Your cart is one click away:
-
-https://sofritostudio.com/products/la-mesa-boricua-sales.html
+Book a time: https://sofritostudio.com/#book-now
 
 — The Ortiz kitchen, Sofrito Studio

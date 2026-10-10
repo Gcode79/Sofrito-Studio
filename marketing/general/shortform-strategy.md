@@ -1,95 +1,79 @@
-# Short-Form Video Strategy — Puerto Rican Diaspora Cooks
+# Short-Form Ad Strategy — Food Businesses
 
-Two high-converting faceless concepts for Reels / TikTok / Shorts (9:16, hands
-+ ingredients only, burned-in bilingual captions). Each is scripted in English
-and Spanish with hook → shots → on-screen text → CTA. Batch-film 3 takes per
-concept per session.
+Status: **DRAFT — AWAITING FOUNDER APPROVAL**
 
-CTA links:
-- $9 Starter Kit: `https://sofritostudio.com/products/starter-kit.html` (also
-  opens the cart drawer in-context via `data-cart-add`)
-- Recipe database: `https://sofritostudio.com/recipe-db.html`
-- Swap guides: `https://sofritostudio.com/blog/mainland-ingredients.html`
-  and `https://sofritostudio.com/blog/hawaii-adaptations.html`
+This strategy covers copy only. It does not authorize publishing, scheduling, deployment, or media production.
 
----
+## Offer Foundation
 
-## Concept 1 · Ingredient Swaps  (CTA → $9 Starter Kit)
+- **Offer:** Sofrito Session
+- **Duration:** 45 minutes
+- **Price:** $400
+- **Credit:** Credited in full toward the $997 Brand & Web Sprint
+- **Active destination:** `https://sofritostudio.com/#book-now`
+- **Voice:** Professional we/our voice, except inside a section explicitly labeled as a founder story.
 
-**Goal:** show that authentic boricua food works with what's at ANY local
-supermarket (mainland or Hawaii) — then convert to the Starter Kit.
+The offer lasts 45 minutes. A short-form video can be shorter. Keep one problem, one review, and one action per edit.
 
-### ENGLISH (≈45–55s)
-| Time | Visual | On-screen text (overlay) | Audio hook (optional VO) |
-|---|---|---|---|
-| 0–2s | Hands hold a bunch of culantro/recao | HOOK: "Can't find culantro at your store?" | "Can't find culantro? Your local store already has the swap." |
-| 2–8s | Cut to a bunch of cilantro; hands double it + add a pinch of salt | RECAO → DOUBLE THE CILANTRO + A PINCH OF SALT | — |
-| 8–16s | Ají dulce → sweet banana pepper side-by-side | AJÍ DULCE → SWEET BANANA PEPPER (+ touch of heat) | — |
-| 16–24s | Gandules → black-eyed peas | GANDULES → BLACK-EYED PEAS | — |
-| 24–32s | Sazón ingredients (paprika, garlic, cumin) | SAZÓN → PAPRIKA + GARLIC + CUMIN + OREGANO | "Same flavor, different aisle." |
-| 32–45s | Sofrito cube melting into sizzling oil | EVERY SWAP + 5 RECIPES = $9 STARTER KIT | "Every swap, plus 5 recipes, in the Starter Kit." |
-| 45–55s | END CARD: Starter Kit cover + link | `sofritostudio.com` → $9 Starter Kit | — |
+## Required Close
 
-### ESPAÑOL (≈45–55s)
-| Time | Visual | Texto en pantalla | Audio |
-|---|---|---|---|
-| 0–2s | Mano con recao/culantro | HOOK: "¿No encuentras culantro en tu tienda?" | "¿No encuentras culantro? Tu tienda local ya tiene el swap." |
-| 2–8s | Cilantro duplicado + pizca de sal | RECAO → DUPLICA EL CILANTRO + PIZCA DE SAL | — |
-| 8–16s | Ají dulce → chile banana dulce | AJÍ DULCE → CHILE BANANA DULCE (+ un toque de picante) | — |
-| 16–24s | Gandules → guisantes de ojo negro | GANDULES → GUISANTES DE OJO NEGRO | — |
-| 24–32s | Sazón (pimentón, ajo, comino) | SAZÓN → PIMENTÓN + AJO + COMINO + ORÉGANO | "Mismo sabor, otro pasillo." |
-| 32–45s | Cubo de sofrito en aceite | CADA SWAP + 5 RECETAS = KIT DE INICIO $9 | "Cada swap, más 5 recetas, en el Kit de Inicio." |
-| 45–55s | TARJETA FINAL: Kit de Inicio + link | `sofritostudio.com` → Kit de Inicio $9 | — |
+**On-screen command:** Book Your Sofrito Session
 
-**Variants:** Hawaii cut — swap the ají dulce/sazón shots for taro/kabocha/local
-fish (link to the Hawaii guide). West/East Coast overlay copy can be geo-swapped
-from the edge banner copy if filmed once and captioned per region.
+**Spoken closer:** Book your Sofrito Session now — $400, credited in full toward your $997 sprint.
 
 ---
 
-## Concept 2 · Cultural Nostalgia  (CTA → recipe database)
+## Concept 1 — Decide What to Fix First
 
-**Goal:** evoke the abuela's kitchen and the diaspora connection; drive traffic
-to the searchable recipe hub where every dish lives.
+**Goal:** Help food-business owners understand what a Sofrito Session reviews.
 
-### ENGLISH (≈40–50s)
-| Time | Visual | On-screen text (overlay) | Audio hook |
-|---|---|---|---|
-| 0–2s | Hands pound green plantains in a pilón (wooden mortar) | HOOK: "This is how mofongo gets made in our kitchen." | "This is how mofongo gets made in our kitchen." |
-| 2–10s | Green plantains frying, cut to the mash | GREEN PLANTAINS ONLY | "Green, never yellow — that's the rule." |
-| 10–18s | Garlic + chicharrón added, mashing while hot | MASH WHILE HOT · GARLIC + CHICHARRÓN | — |
-| 18–28s | Dome plated, steam rising | WORK FAST — IT STIFFENS | — |
-| 28–40s | Overlay to the recipe hub grid | 30+ BILINGUAL RECIPES → SEARCHABLE HUB | "The whole library is free to browse — 30+ bilingual recipes." |
-| 40–50s | END CARD: recipe index + link | `sofritostudio.com/recipe-db` | — |
+| Time | On-Screen Copy | Voiceover |
+|---|---|---|
+| 0–3s | What should your food business fix first? | Start with the decisions that guide the rest of the brand. |
+| 3–10s | Brand · Offer · Menu · Website | We review the materials your business uses now. |
+| 10–22s | We look for what needs clarification first. | We separate what needs to change now from what can wait. |
+| 22–35s | A focused action plan for the next move. | We organize the review into clear next steps. |
+| 35–42s | 45-minute Sofrito Session | The Sofrito Session gives you time to settle the direction before a larger build. |
+| 42–45s | Book Your Sofrito Session | Book your Sofrito Session now — $400, credited in full toward your $997 sprint. |
 
-### ESPAÑOL (≈40–50s)
-| Time | Visual | Texto en pantalla | Audio |
-|---|---|---|---|
-| 0–2s | Manos machacando plátanos verdes en el pilón | HOOK: "Así se hace el mofongo en nuestra cocina." | "Así se hace el mofongo en nuestra cocina." |
-| 2–10s | Plátanos verdes fritos, corte al machacado | SOLO PLÁTANOS VERDES | "Verde, nunca amarillo — esa es la regla." |
-| 10–18s | Ajo + chicharrón, machacando caliente | MACHACA CALIENTE · AJO + CHICHARRÓN | — |
-| 18–28s | Cúpula servida, vapor | TRABAJA RÁPIDO — SE ENDURECE | — |
-| 28–40s | Transición a la cuadrícula del índice | 30+ RECETAS BILINGÜES → BUSCA TODO | "Toda la biblioteca es gratis — más de 30 recetas bilingües." |
-| 40–50s | TARJETA FINAL: índice + link | `sofritostudio.com/recipe-db` | — |
+**Destination:** `https://sofritostudio.com/#book-now`
 
-**Variants:** batch-prep (sofrito cubes into the tray), toston press, pernil
-24-hour marinade — all reuse the same hook/CTA template. Cross-post to IG + FB
-via `marketing/platforms/meta/post_to_meta.py`; TikTok hooks live in `marketing/platforms/tiktok/hooks.md`.
+**Adaptation angles:** brand clarity, offer clarity, menu structure, website review.
 
 ---
 
-## Production notes
-- 9:16, hands + ingredients only, shot at 4K then cropped to 1080×1920.
-- Hook in the first 2s; one technique per video; one CTA at the end.
-- Burned-in captions EN + ES (both concepts are already dual-language).
-- The $9 Starter Kit CTA can be a `data-cart-add` link on a companion landing
-  page so taps open the cart drawer in-context (see `/recipe-db.html` unlock
-  pattern).
+## Concept 2 — Review Before Rebuilding
 
-## Companion email nurture (already wired in the Worker)
-The 3-part sequence for free-guide subscribers:
-1. **Day 0** — `welcome_15`: deliver Sofrito 101 + 15% code + $9 Starter Kit hook.
-2. **Day 3** — `nurture_swaps`: substitution secrets + La Mesa Boricua ($47).
-3. **Day 7** — `nurture_heritage`: heritage + social proof + urgency.
-Runs automatically from the hourly cron (`/api/cron/run`); stops if the lead
-converts.
+**Goal:** Replace a broad redesign request with a focused next decision.
+
+| Time | On-Screen Copy | Voiceover |
+|---|---|---|
+| 0–3s | Before a rebrand, review the decisions. | Start by deciding what the brand and website need to do. |
+| 3–11s | A new logo will not answer an unclear offer. | Design cannot carry a message that has not been settled. |
+| 11–22s | We review the offer, menu, and website together. | We look at the business as a connected system. |
+| 22–34s | Set the first priority before the build. | The Sofrito Session turns a broad list into one clear direction. |
+| 34–41s | $400 · credited toward the $997 Brand & Web Sprint | The full Sofrito Session payment applies to the Brand & Web Sprint. |
+| 41–45s | Book Your Sofrito Session | Book your Sofrito Session now — $400, credited in full toward your $997 sprint. |
+
+**Destination:** `https://sofritostudio.com/#book-now`
+
+**Adaptation angles:** before a rebrand, before a website build, before choosing assets, before setting scope.
+
+---
+
+## Copy Standards
+
+- Use plain verbs: review, explain, compare, clarify, decide, plan.
+- State the Sofrito Session duration as 45 minutes.
+- Name the offer as Sofrito Session and the project as Brand & Web Sprint.
+- Avoid hype, fake urgency, unsupported guarantees, invented metrics, and testimonials.
+- Do not revive retired offers, products, prices, or links.
+- Keep the exact command and closer unchanged.
+- Keep publishing manual and separate from copy preparation.
+
+## Platform Use
+
+- Use the same core message on Meta, TikTok, Reels, and Pinterest.
+- Change the opening problem, not the offer facts.
+- Keep captions readable and direct.
+- Send clicks only to `https://sofritostudio.com/#book-now`.

@@ -5,185 +5,162 @@ Complete email copy for every automated flow. These map to the flows in
 on the paid plan; whole-list on free).
 
 > ⚠️ On Buttondown's FREE plan, emails broadcast to the whole list (no tags).
-> Upgrade to Basic (~$9/mo) to segment leads vs. buyers for the tripwire and
-> onboarding flows to work as intended.
+> Upgrade to Basic to segment leads vs. buyers for the session and onboarding
+> flows to work as intended.
+
+**Current offer:** 45-minute Sofrito Session — **$400**. Brand & Web Sprint —
+**$997** for brand and website in 48 hours. A $400 session booked within 30 days
+is credited in full toward the Sprint.
+
+**Live destinations used below** (all verified 200):
+- Booking: `https://sofritostudio.com/#book-now`
+- Sprint: `https://sofritostudio.com/sprint.html`
 
 ---
 
 ## 1. Welcome / Lead Magnet (lead_magnet)
 
-**Trigger:** New subscriber (from freebie signup).
-**Goal:** Deliver the freebie, build connection, tease the $9 Starter Kit.
+**Trigger:** New subscriber.
+**Goal:** Build connection, offer the session.
 
-### Email — freebie delivery
-**Subject:** Your free recipe starter kit is here
+**Subject:** Your 45-minute brand session is open
 
-Hey! Your free Puerto Rican recipe starter kit is ready:
+Hi —
 
-https://sofritostudio.com/freebies/Sofrito-101.pdf
+You asked what your menu is really costing you. That's a 45-minute conversation, not a document.
 
-It covers the **sofrito base** — the flavor foundation of every Puerto Rican dish — with mainland ingredient swaps and a 20-minute batch plan.
+A Sofrito Session is $400. In 45 minutes we go through your positioning, your menu, and the one fix that moves the most. If you then book the $997 Brand & Web Sprint within 30 days, the $400 comes straight off it.
 
-If it doesn't arrive, check spam and add us to your contacts.
+Book a time: https://sofritostudio.com/#book-now
 
-**When you're ready to go further:** the Starter Kit has the 5 essential dishes for just $9.
+— The Ortiz kitchen, Sofrito Studio
 
-Buen provecho,
+> Live copy: `templates/lead_magnet.md`, `templates/welcome.md`, `templates/welcome_es.md`
+
+---
+
+## 2. Session → Sprint Conversion (tripwire)
+
+**Trigger:** 24–48h after a subscriber joins.
+**Goal:** Convert subscriber → $400 Session buyer, then Sprint.
+
+### Email 1 (hour ~24) — the session
+**Subject:** 45 minutes to get your brand straight
+
+If your menu, your site, and your message don't line up, that's a 45-minute conversation, not a document.
+
+A Sofrito Session is $400. In 45 minutes we go through your positioning, your menu, and the one fix that moves the most.
+
+Book a time: https://sofritostudio.com/#book-now
+
+— The Ortiz kitchen, Sofrito Studio
+
+### Email 2 (hour ~48) — the Sprint
+**Subject:** Your $400 session comes off the Sprint
+
+If we've already done the session, the next step is the Brand & Web Sprint: $997 for brand and website in 48 hours.
+
+Your $400 session is credited in full if you book within 30 days.
+
+See the Sprint: https://sofritostudio.com/sprint.html
+
 — The Ortiz kitchen, Sofrito Studio
 
 ---
 
-## 2. Tripwire Conversion (tripwire)
+## 3. Post-Session Onboarding (onboarding)
 
-**Trigger:** 24–48h after a free subscriber joins.
-**Goal:** Convert free → $9 Starter Kit buyer.
-**Segmentation:** Tag `lead:sofrito-101` (paid plan).
-
-### Email 1 (hour ~24) — value + tease
-**Subject:** The 5 essential dishes, for $9
-
-Hey,
-
-The sofrito base is the foundation — but there are 5 dishes every boricua kitchen needs to nail. I put them all in one place:
-
-**The Sofrito Starter Kit — $9**
-
-- Sofrito (the base you already know)
-- Arroz con Pollo
-- Pernil
-- Tostones
-- Flan
-
-All bilingual, tested in the Ortiz kitchen, with mainland ingredient swaps.
-
-Get it here: https://sofritostudio.com/products/starter-kit.html
-
-When you're ready to go beyond these 5, the credit applies toward any bigger bundle.
-
-— J.Ortiz, Sofrito Studio
-
-### Email 2 (hour ~48) — urgency nudge
-**Subject:** Last chance — the $9 starter
-
-Hey,
-
-Quick heads-up — the Starter Kit's $9 entry price is the lowest way to try boricua cooking, and it's the same recipes people cook for years.
-
-5 recipes, bilingual, instant download, 30-day guarantee:
-
-https://sofritostudio.com/products/starter-kit.html
-
-If you've been thinking about it, this is the easiest first step.
-
-— J.Ortiz
-
----
-
-## 3. Post-Purchase Onboarding (onboarding)
-
-**Trigger:** After a purchase.
-**Goal:** Deliver, educate, soft-upsell to Full Table ($97).
+**Trigger:** After a booked session.
+**Goal:** Recap, then the Sprint with the credit named.
 **Segmentation:** Tag `customer:<tier>` (paid plan).
 
-### Email 1 (immediate) — delivery
-**Subject:** Thanks! Your book is ready
+### Email 1 (immediate) — recap
+**Subject:** Thanks — here's where we go from the session
 
-Your download is in your Gumroad library.
+Everything we agreed is written down in one place, so you don't have to remember it.
 
-**Start with the sofrito** — it's the base of everything. Once you master it, mofongo, pernil, arroz con pollo, and coquito all get a step easier.
+When you're ready for the next step, the Brand & Web Sprint is $997 for brand and website in 48 hours. Your $400 session is credited in full if you book within 30 days.
 
-Full cookbook: https://sofritostudio.com/products/la-mesa-boricua-sales.html
-
-If anything feels off, reply and I'll fix it fast.
-
-— The Ortiz kitchen
+See the Sprint: https://sofritostudio.com/sprint.html
 
 ### Email 2 (day 7) — check-in + tip
-**Subject:** How's your first week?
+**Subject:** How's the first week?
 
-Have you cooked anything yet? I'd love to hear how it turned out.
+Have you written your homepage line yet from what we covered? If you want it looked at, reply to this email.
 
-**Tip:** don't lift the lid once the rice boils. The steam does the work — lift it and you lose the moisture that makes rice fluffy instead of mushy.
+**Tip:** one clear sentence per section beats five bullet points.
 
-Reply and tell me what you made.
+Reply and tell us how it landed.
 
-— J.Ortiz
+### Email 3 (day 14) — the Sprint
+**Subject:** Ready for the next step?
 
-### Email 3 (day 14) — soft upsell to Full Table
-**Subject:** Ready for the next level?
+The Brand & Web Sprint is $997 for brand and website in 48 hours. Your $400 session is credited in full if you book within 30 days.
 
-If you've nailed the basics, **The Full Table** takes it further:
+https://sofritostudio.com/sprint.html
 
-- Cookbook + printables
-- 50 no-recipe 30-minute dinners
-- The 6-step planning-to-table workflow
+— The Ortiz kitchen, Sofrito Studio
 
-Get authentic boricua dinner on the table in 30 minutes, no recipe required:
-
-https://sofritostudio.com/products/full-table.html
-
-— J.Ortiz, Sofrito Studio
+> Live copy: `templates/onboarding.md`
 
 ---
 
 ## 4. Abandoned Cart (abandoned_cart)
 
-**Trigger:** Cart abandoned.
-**Goal:** Recover the sale.
-**Segmentation:** Tag `cart:abandoned` (paid plan) or Gumroad's own abandoned-cart emails.
+**Trigger:** Started booking, didn't finish.
+**Goal:** Recover the session booking.
+**Segmentation:** Tag `cart:abandoned` (paid plan).
 
 ### Email 1 — reminder
 **Subject:** Your cart is waiting
 
-Looks like you were checking out and didn't finish. No worries — it's saved.
+Looks like you started something and didn't finish. No worries — nothing is lost.
 
-**La Mesa Boricua** — 30 bilingual recipes, mainland swaps, holiday menus, and a full Nochebuena timeline.
+Right now the open door is a Sofrito Session: 45 minutes, $400, and one clear fix for your brand and menu. If you go on to the $997 Brand & Web Sprint within 30 days, the $400 comes straight off it.
 
-https://sofritostudio.com/products/la-mesa-boricua-sales.html
+Book a time: https://sofritostudio.com/#book-now
 
-Reply if you hit a snag at checkout — I'm here to help.
+### Email 2 — plain nudge (no discount)
+**Subject:** Your session is still open
 
-— The Ortiz kitchen
+Your $400 session is still open. 45 minutes to get your brand straight.
 
-### Email 2 — discount
-**Subject:** 10% off — 24 hours only
+https://sofritostudio.com/#book-now
 
-Use code **COMEBACK10** for 10% off La Mesa Boricua. It expires in 24 hours.
+— The Ortiz kitchen, Sofrito Studio
 
-https://sofritostudio.com/products/la-mesa-boricua-sales.html
-
-30 recipes, bilingual, instant download.
-
-— J.Ortiz
+> Live copy: `templates/abandoned_cart.md`
+> Note: the old percentage-discount email was deleted. There is no product left
+> to discount, so the second email is a plain re-offer, not an expiring code.
 
 ---
 
 ## 5. Seasonal (seasonal)
 
 **Trigger:** High-volume holidays.
-**Goal:** Drive holiday sales.
+**Goal:** Drive session bookings before the rush.
 **Segmentation:** Tag `seasonal:<holiday>` (paid plan).
 
 ### Thanksgiving (Nov)
-**Subject:** Prep your Boricua Thanksgiving — the complete guide
+**Subject:** Thanksgiving — book your session before the date
 
-Pasteles workflow, pernil timing for the big day, and Puerto Rican sides that steal the show. Printable shopping list + step-by-step timeline.
+A $400 Sofrito Session is 45 minutes to get your brand and menu straight ahead of the holiday menu and the pernil timing.
 
-https://sofritostudio.com/products/la-mesa-boricua-sales.html
+Book: https://sofritostudio.com/#book-now
 
 ### Nochebuena / Navidad (Dec)
-**Subject:** Prep your Nochebuena menu — the complete guide
+**Subject:** Nochebuena — book your session before the date
 
-Pasteles, pernil, coquito — the full timeline so you're never scrambling on the big night.
+A $400 Sofrito Session is 45 minutes to get your brand and menu straight ahead of the holiday menu, the pernil, and the timeline.
 
-https://sofritostudio.com/products/la-mesa-boricua-sales.html
+Book: https://sofritostudio.com/#book-now
 
 ### San Sebastián (Jan)
-**Subject:** Prep for the San Sebastián Street Fest
+**Subject:** San Sebastián — book your session before the date
 
-Portable snacks, drinks, and parranda tips for the biggest street festival.
+A $400 Sofrito Session is 45 minutes to get your brand and menu straight ahead of the street-fest menu and the parade schedule.
 
-https://sofritostudio.com/products/la-mesa-boricua-sales.html
+Book: https://sofritostudio.com/#book-now
 
 ---
 

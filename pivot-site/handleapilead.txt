@@ -1,0 +1,68 @@
+async function handleApiLead(request, env, ctx) {
+  let body;
+  try {
+    body = await readJson(request);
+  } catch {
+    return fail('Please send valid JSON.', 400);
+  }
+  const email = String(body.email || '').trim().toLowerCase();
+  const name = String(body.name || '').trim();
+  // Minimal validation — idempotency key is the canonical email.
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !name) {
+    return fail('Please include a valid email and your name.', 422);
+  }
+
+  // Deterministic id from the email → re-posts never create duplicates.
+  const id = `lead_${(await sha256Hex(email)).slice(0, 24)}`;
+
+  const lead = {
+    id,
+    created_at: nowIso(),
+    name,
+    email,
+    phone: String(body.phone || '').trim(),
+    business_name: String(body.business_name || '').trim(),
+    business_type: String(body.business_type || '').trim(),
+    package_interest: String(body.package_interest || '').trim(),
+    budget: String(body.budget || '').trim(),
+    message: String(body.message || '').trim(),
+    channel: String(body.channel || 'api').trim(),
+  };
+
+  // Idempotent insert — INSERT OR IGNORE on the PK (email-derived id).
+  await env.DB.prepare(
+    `INSERT OR IGNORE INTO leads (id, created_at, name, email, phone, business_name, business_type, package_interest, budget, message, channel, status, source)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', 'lead_api')`
+  )
+    .bind(email, lead.created_at, lead.name, lead.email, lead.phone, lead.business_name, lead.business_type, lead.package_interest, lead.budget, lead.message, lead.channel)
+    .run();
+
+  // Async webhook dispatch to Zapier (async through the queue — never sync).
+  ctx.waitUntil(
+    enqueueWebhook(env, 'lead.new', {
+      id: lead.id,
+      created_at: lead.created_at,
+      name: lead.name,
+      email: lead.email,
+      phone: lead.phone,
+      business_name: lead.business_name,
+      business_type: lead.business_type,
+      package_interest: lead.package_interest,
+      budget: lead.budget,
+      message: lead.message,
+      channel: lead.channel,
+    })
+  )
+  // Auto-reply email
+  ctx.waitUntil(
+    enqueueEmail(env, {
+      kind: 'email',
+      to: lead.email,
+      template: 'lead_acknowledgement',
+      subject: 'Thanks for reaching out – Sofrito Studio',
+      data: { lead_id: lead.id, name: lead.name }
+    })
+  );
+  return json({ ok: true, id: lead.id, created_at: lead.created_at }, 201);
+}
+

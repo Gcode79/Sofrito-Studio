@@ -1,46 +1,48 @@
-# Draft Post SP-01 — "5 signs your food brand reads as commodity"
+# Draft Post SP-01 — "5 signs your food brand is hard to distinguish"
 **Status:** DRAFT — Awaiting Founder Approval · **System:** Growth/Social (approval-workflow: post-by-post)
-**Concept ref:** Content Library #1 · **Pillar:** 1 (Brand clarity) · **Offer endpoint:** Sofrito Session ($400/90min)
+**Concept ref:** Content Library #1 · **Pillar:** 1 (Brand clarity) · **Offer endpoint:** Sofrito Session ($400 / 45 minutes)
 
 ---
 
 ## 1) Content Brief
-- **Audience:** Independently owned restaurants, cafés, trucks (owner-operators), years 1–5, problem-aware.
-- **Pain:** "Food is good, but I don't look any different from the place two blocks away."
-- **So-what:** A brand that reads as commodity gives buyers no reason to pick you, remember you, or defend you.
-- **Objective:** Qualified demand. Primary metric: link clicks → session inquiries.
-- **CTA (one):** Book a session (→ `/session.html` until Calendly live).
+- **Audience:** Independently owned restaurants, cafés, and food trucks with an offer that is hard to distinguish.
+- **Pain:** Owners may struggle to explain why customers should choose their business.
+- **So-what:** A generic brand can make it harder to explain why customers should choose the business.
+- **Objective:** Qualified demand. Primary metric: link clicks → Sofrito Session inquiries.
+- **CTA (one):** Book Your Sofrito Session — https://sofritostudio.com/#book-now
 
 ## 2) Core idea
-Good food isn't the differentiator owners think it is — the brand around it is. Five concrete, checkable signs show a food brand still reads like a commodity, so owners can see themselves honestly and take the review-size next step.
+Good food matters, but the brand around it can help customers understand what makes the business different. Five concrete, checkable signs show where a food brand may be hard to distinguish, so owners can choose a practical first step.
 
 ## 3) Platform-ready copy
 
 **Carousel headline (cover):**
-> Good food isn't the differentiator you think it is.
+> Good food matters. Your brand should explain what makes it different.
 
 **Frames (one idea per frame, 5):**
 
 - **Frame 2 — Sign 1. Your name could be swapped.**
-  "If your name works equally for 30 other spots on the same street, it's working for none of them. A commodity name is interchangeable. A brand name gets read, remembered, and repeated."
+  "If your name could fit any nearby business, it may be difficult for customers to tell you apart. A specific name can help people recognize and remember the business."
 
-- **Frame 3 — Sign 2. Your menu is a list, not a pitch.**
-  "Commodity menus recite ingredients. Brand menus sell an experience. Same plate, different persuasion — the second one prices higher and parts with fewer discounts."
+- **Frame 3 — Sign 2. Your menu may be missing context.**
+  "A menu that lists ingredients without context may leave customers without enough context. Show the dish, its place, and the reason to order it."
 
 - **Frame 4 — Sign 3. Your website can't answer 'why you.'**
-  "Three seconds on a phone is all you get. If the first screen doesn't say who you are, what you do, and why you're the one — the buyer assumes the others are the same."
+  "On a phone, the first screen should say who you are, what you make, and where you are. Make those answers easy to find."
 
-- **Frame 5 — Sign 4. Your story is 'authentic and family.'**
-  "Authenticity is the minimum, not the differentiator. The brands people pick have a specific point of view — a flavor philosophy, a place, a standard — not a generic promise."
+- **Frame 5 — Sign 4. Your story is 'good food and family.'**
+  "'Good food and family' is a broad description. A specific point of view—such as a flavor, place, or standard—offers customers something concrete to understand."
 
-- **Frame 6 — Sign 5. You market price and photos, not identity.**
-  "Discounts and pretty plates are what commoditized brands compete on. Identity is the only thing a competitor can't copy."
+- **Frame 6 — Sign 5. Your marketing may be leaning on price and photos.**
+  "Discounts and food photos can make one business look like another. Show the identity, standards, and choices that are specific to your business."
 
 - **Close:**
-  "None of these is a death sentence. All are solvable — and you don't need a full rebrand to start. A 90-minute Sofrito Session audits where your brand reads commodity and what to fix first."
+  "You may not need a full rebrand to start. The Sofrito Session lasts 45 minutes. We review how your brand is presented and identify a practical first step."
 
 **CTA line:**
-> Book a Sofrito Session → sofritostudio.com/session
+> Book Your Sofrito Session — https://sofritostudio.com/#book-now
+
+**Closer:** Book your Sofrito Session now — $400, credited in full toward your $997 sprint.
 
 **Hashtags (IG feed):** #foodbranding #restaurantmarketing #foodbusiness #restaurantowner #menudesign
 
@@ -53,15 +55,15 @@ Good food isn't the differentiator owners think it is — the brand around it is
 - **Source note:** All claims framed as common patterns, not attributed statistics — no unverified data (research/social-sources.md).
 
 ## 5) Adaptations
-- **Facebook (static repurpose, after founder approval):** headline + 3-sentence version of Signs 1–3, ending "Five checks, one decision — comment the one that hit closest." CTA → session.
-- **Instagram Stories (amplification, only after feed CTA approved):** "Struggling with your menu or name? Save this" + sticker-to-session.
+- **Facebook (static repurpose, after founder approval):** headline + 3-sentence version of Signs 1–3, ending "Which check feels most useful for your business?" CTA → https://sofritostudio.com/#book-now
+- **Instagram Stories (amplification, only after feed CTA approved):** "Your menu or name may be doing too much. Use this as a review checklist." + sticker to https://sofritostudio.com/#book-now
 
 ## 6) Implementation checklist (gate)
 - [x] One audience / one pain / one offer / one CTA / one metric
 - [x] All claims pattern-based, no fabricated stats or clients
 - [x] Image spec fixed (4:5/1080×1350) — frames approved in asset-register before export
 - [x] Alt text planned
-- [x] CTA link: `/session.html` (contact-path stopgap until Calendly deploy — if founder chooses the 'DM "session"' option in calendar Q3, CTA copy swaps to "DM me 'session'")
+- [x] CTA link: https://sofritostudio.com/#book-now (use the approved "Book Your Sofrito Session" command and compliant closer)
 - [ ] Founder approval of this post (approval-workflow §8 elements)
 - [ ] UTM for the CTA link decided + logged in performance.md (approved-seeding attribution)
 

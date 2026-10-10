@@ -1,46 +1,48 @@
-# Draft Post SP-03 — "Your menu is a sales page"
+# Draft Post SP-03 — "Make your menu easier to understand"
 **Status:** DRAFT — Awaiting Founder Approval · **System:** Growth/Social (approval-workflow: post-by-post)
 **Concept ref:** Content Library #2 · **Pillar:** 2 (Website & conversion) · **Offer endpoint:** Sofrito Session (menu review)
 
 ---
 
 ## 1) Content Brief
-- **Audience:** Restaurant/café/truck owners; owners posting content but flat results.
-- **Pain:** "I redesigned everything except the one thing every guest actually reads."
-- **So-what:** The menu decides what guests order, how they feel about value, and whether they return. Treated as inventory, it sells commodities; treated as a page, it sells the experience.
-- **Objective:** Qualified interaction + demand (saves → session inquiries). Primary metric: saves + session inquiries.
-- **CTA (one):** Save this for your next menu review — then book a Session to have it done for you.
+- **Audience:** Restaurant, café, and food-truck owners reviewing how their menus guide customer decisions.
+- **Pain:** The menu can be redesigned repeatedly without making the next choice clear.
+- **So-what:** A menu can shape what customers notice, what they understand, and what they do next. Its structure should support the offer without adding noise.
+- **Objective:** Qualified interaction + demand (saves → Sofrito Session inquiries). Primary metric: saves + Sofrito Session inquiries.
+- **CTA (one):** Book Your Sofrito Session — https://sofritostudio.com/#book-now
 
 ## 2) Core idea
-A menu is a sales page — persuasion, sequence, and price anchoring — not a list of ingredients. Show the menu-as-page moves (read order, hero, anchoring), frame it as a session-sized audit.
+A menu is a customer-facing decision tool. Review its reading order, featured item, and descriptions to make the offer easier to understand.
 
 ## 3) Platform-ready copy
 
 **Carousel headline (cover):**
-> You redesigned everything except the one thing every guest reads: the menu.
+> Make the next choice easier to understand.
 
 **Frames (one idea per frame, 5):**
 
 - **Frame 2 — Menus are read like pages.**
-  "Guests scan top-to-bottom, left-to-right, like a headline. F-pattern from print design applies on paper and on screen. Whatever you want people to notice has to live where the eye lands first."
+  "People may scan a menu before reading every line. Put the most useful information where the eye is likely to land first, and make the next choice clear."
 
-- **Frame 3 — Every menu needs a hero.**
-  "One anchor dish — your best margin, your best story, your most defining plate — placed where the eye lands first. No hero, and guests default to the cheapest or the first."
+- **Frame 3 — Every menu needs a featured choice.**
+  "Feature one dish you want customers to notice. Use a relevant description, image, or placement to explain why it belongs on the menu."
 
-- **Frame 4 — Anchoring is free profit.**
-  "Place a confident mid-price item above your target order. It makes the one you actually want to sell feel reasonable. This isn't manipulation of taste — it's the same page-design those big chains pay agencies for."
+- **Frame 4 — Show price context.**
+  "A nearby item can give customers context for a higher-priced dish. Explain the portion, ingredients, or preparation so the price makes sense."
 
-- **Frame 5 — Descriptions sell, adjectives don't.**
-  "'Bathed in butter' stops a scan. 'Buttery' gets skipped. Write the food the way the kitchen's proudest regular describes it after two visits."
+- **Frame 5 — Descriptions should be specific.**
+  "Long descriptions can slow a quick menu read. Use specific language that tells guests what the dish is and what makes it distinct."
 
-- **Frame 6 — The menu is a mirror of the brand.**
-  "If your menu reads like every other same-cuisine menu, your guests feel it even if they can't say it. The menu is the cheapest rebrand you'll ever buy."
+- **Frame 6 — The menu can show the brand.**
+  "If the menu says little about what makes the business distinct, the brand may be harder to recognize. Start by making the menu more specific; a full rebrand may not be necessary."
 
 - **Close:**
-  "Need an honest read? A 90-minute Sofrito Session includes a menu pass — we tell you the three changes that move orders, and leave the rest alone."
+  "Need a focused review? The Sofrito Session lasts 45 minutes. We review your menu and identify the first changes to consider."
 
 **CTA line:**
-> Save for your next menu review · Book a session → sofritostudio.com/session
+> Book Your Sofrito Session — https://sofritostudio.com/#book-now
+
+**Closer:** Book your Sofrito Session now — $400, credited in full toward your $997 sprint.
 
 **Hashtags (IG feed):** #menudesign #restaurantmenu #foodbiz #restaurantowner #menuengineering
 
@@ -53,15 +55,15 @@ A menu is a sales page — persuasion, sequence, and price anchoring — not a l
 - **Source note:** Menu-reading behavior described as common design practice — no fabricated studies or statistics.
 
 ## 5) Adaptations
-- **Facebook (static repurpose):** 3-line version (hero + anchoring + descriptions), end with the session CTA.
-- **Stories:** "Does YOUR menu have a hero?" — save-badge + session link.
+- **Facebook (static repurpose):** 3-line version (featured dish, price context, and descriptions), ending with the Sofrito Session CTA.
+- **Stories:** "Does your menu have a featured dish?" + link to https://sofritostudio.com/#book-now
 
 ## 6) Implementation checklist (gate)
 - [x] One audience / one pain / one offer / one CTA / one metric
 - [x] Mock menu = studio-generated (no client asset) — flagged for founder menu-shot option
 - [x] Image spec fixed (4:5/1080×1350)
 - [x] Alt text planned
-- [x] CTA stopgap options as in calendar Q3
+- [x] CTA stopgap: https://sofritostudio.com/#book-now with the approved "Book Your Sofrito Session" command and closer
 - [ ] Founder approval (approval-workflow §8)
 - [ ] UTM logged in performance.md at publication
 

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
-    "publish": "wrangler publish"
+    "publish": "wrangler publish",
+    "check": "node src/dry_run.js"
   }
 }

@@ -1,12 +1,11 @@
-subject: Your free recipe starter kit is here
+subject: Your 45-minute brand session is open
 
-Hey! Your free Puerto Rican recipe starter kit is ready to download:
+Hi —
 
-https://sofritostudio.com/freebies/Sofrito-101.pdf
+You asked what your menu is really costing you. That's a 45-minute conversation, not a document.
 
-It covers the sofrito base — the flavor foundation of every Puerto Rican dish — with mainland ingredient swaps and a 20-minute batch plan.
+A Sofrito Session is $400. In 45 minutes we go through your positioning, your menu, and the one fix that moves the most. If you then book the $997 Brand & Web Sprint within 30 days, the $400 comes straight off it.
 
-If it doesn't arrive, check spam. Add us to your contacts so the recipes keep coming.
+Book a time: https://sofritostudio.com/#book-now
 
-Buen provecho,
 — The Ortiz kitchen, Sofrito Studio

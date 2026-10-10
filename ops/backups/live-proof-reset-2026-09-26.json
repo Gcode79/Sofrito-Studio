@@ -1,0 +1,40 @@
+{
+  "_note": "Live-proof housekeeping, 2026-09-26. One $1.00 live-mode checkout used to verify the live Stripe path end to end after cutover. Captured pre-deletion / pre-reset so the proof is recoverable.",
+  "revenue_rows": [
+    {
+      "id": "9039629d-4923-4c55-b86f-f4b505ff5e57",
+      "created_at": "2026-09-26T10:37:47.394Z",
+      "occurred_at": "2026-09-26T10:37:46.000Z",
+      "source": "stripe",
+      "source_id": "evt_1UJszGR8GqnYT42eHAGU499h",
+      "project_id": null,
+      "amount_cents": 100,
+      "currency": "usd",
+      "description": "stripe checkout",
+      "metadata": "{\"event_type\":\"checkout.session.completed\"}",
+      "paid": 1
+    }
+  ],
+  "leads": [
+    {
+      "id": "lead_768c77cd31580e80cc10c13e",
+      "created_at": "2026-09-24T06:34:17.736Z",
+      "name": "Joshua Ortiz",
+      "email": "joshortiz6@gmail.com",
+      "phone": "(321) 464-1148",
+      "business_name": "sofrito",
+      "business_type": "food_truck",
+      "channel": "sprint_page",
+      "source": "lead_api",
+      "status": "paid",
+      "paid_at": 1790419067,
+      "stripe_session_id": "cs_live_a1Qf2psyHXh45G62d5T1DYrg8dLsWE8iIIWngTZ3D4wROd5kR5dp8I9M0F",
+      "checkout_url": "https://checkout.stripe.com/c/pay/cs_live_a1Qf2psyHXh45G62d5T1DYrg8dLsWE8iIIWngTZ3D4wROd5kR5dp8I9M0F#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicyc%2FNSknZHVsTmB8Jz8ndW5aaWxzYFowNFBCZ2ExVz1CdGtcUTE3YG49RE1kU101X389M09can1pVENLMEJVbzBvanJobzBUYnBWV0JCd1R3PER8S3N9XEFEM05WQzI3NE5uQVNGPGdyalJGcGNQSjU1ZklLN003f1QnKSdjd2poVmB3c2B3Jz9xd3BgKSdnZGZuYndqcGthRmppancnPycmNTU1NTU1JyknaWR8anBxUXx1YCc%2FJ3Zsa2JpYFpscWBoJyknYGtkZ2lgVWlkZmBtamlhYHd2Jz9xd3BgeCUl",
+      "checkout_started_at": 1790231657,
+      "nudge_sent_at": null,
+      "submit_key": null,
+      "budget": ""
+    }
+  ],
+  "stripe_side_note": "The $1.00 charge and the cs_live_ Checkout Session still exist in Stripe. This cleanup only removes them from the D1 ledger and lead state. No refund was issued and no Stripe object was modified."
+}

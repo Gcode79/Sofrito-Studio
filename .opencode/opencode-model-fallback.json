@@ -1,0 +1,36 @@
+{
+  // Autofill for the `opencode-model-fallback` plugin (project scope).
+  // When the active model is rate-limited / out of quota / returns a 5xx, the
+  // plugin aborts the request and replays it with the next model in
+  // `fallbackModels`, in order. Failed models enter cooldown, then the plugin
+  // auto-recovers back to it after `cooldownMs`; the original is tried again
+  // after `retryOriginalAfterMs`.
+  //
+  // IMPORTANT: every entry below is an OpenRouter FREE-tier model
+  // ($0/M tokens, verified live in the OpenRouter catalog this session —
+  // 2026-07-15 pull).
+  "enabled": true,
+
+  // Ordered fallback chain — tried in sequence when the primary fails.
+  // User-approved free-tier chain (2026-07-15):
+  //   1. Ling 3.0 Flash VL — highest free coding index, vision+text, 262K ctx
+  //   2. Laguna S 2.1 — agentic coding specialist
+  //   3. Nex-N2.5 Mini — agentic, fast
+  "fallbackModels": [
+    "openrouter/inclusionai/ling-3.0-flash-vl:free",
+    "openrouter/poolside/laguna-s-2.1:free",
+    "openrouter/nex-agi/nex-n2.5-mini:free"
+  ],
+
+  // Error categories that trigger a fallback (rate_limit, quota, 429, 5xx…).
+  "fallbackOn": ["rate_limit", "quota", "http_429", "http_5xx", "connection", "context_length_exceeded"],
+
+  // How long a failed model stays in cooldown before it can be reused.
+  "cooldownMs": 60000,
+
+  // After this, the original (primary) model is retried automatically.
+  "retryOriginalAfterMs": 900000,
+
+  // Max cascading fallbacks within a single message.
+  "maxFallbackDepth": 3
+}

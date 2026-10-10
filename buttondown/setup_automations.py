@@ -1,29 +1,25 @@
 """
 Sofrito Studio — Buttondown Automation Setup
 
-One-shot script that creates everything needed for the purchase / welcome /
-thank-you email automation, natively inside Buttondown. Run it once your
-Buttondown account is on the Basic plan or higher (tags + automations
-require Basic; this script will tell you if the plan blocks them).
+One-shot script that creates the tags, private emails and automations used by
+Sofrito Studio inside Buttondown. Requires the Basic plan or higher (tags and
+automations need it; the script reports if the plan blocks them).
 
 What it creates (all idempotent — safe to re-run):
-  1. Tags        customer, customer:<tier>, product:<slug>, lang:<lang>,
-                 lead:sofrito-101
-  2. Emails      Welcome, Post-Purchase (EN/ES), Thank You (EN/ES) — built
-                 from buttondown/templates/*.md with {{ subscriber.metadata.* }}
-                 placeholders so each send is personalized
+  1. Tags        customer, customer:<tier>, lead:sofrito-101, lang:en, lang:es
+  2. Emails      Welcome (EN), Thank You (EN/ES) — built from
+                 buttondown/templates/*.md with {{ subscriber.metadata.* }}
+                 merge variables applied
   3. Automations
-                 - Welcome: fires on subscriber.created -> Welcome email (immediate)
-                 - Post-Purchase + Thank You: fires when the `customer` tag is
-                   added -> Post-Purchase email (immediate) + Thank You email
-                   (2 days later), filtered by language (lang:en / lang:es)
+                 - Sofrito — Welcome: fires on subscriber.created -> Welcome
+                   email (immediate), no tag filter
 
-How the flow works end-to-end:
-  Gumroad Sale webhook -> Cloudflare Worker (/gumroad/webhook) adds the buyer with
-  metadata (product, tier, tip, contents, lang) + tags (customer, ...).
-  Buttondown sees the `customer` tag added and the automation above sends
-  the post-purchase email now and the thank-you ~48h later. New subscribers
-  (leads) are welcome-emailed on subscriber.created.
+Retired 2026-09-25: the Post-Purchase + Thank You automation. It was keyed on
+the `customer` tag, which only the retired digital-product purchase flow set,
+and it consumed the post_purchase EN/ES emails. The current offer is a booked
+service rather than a digital delivery, so there is no purchase tag and no
+post-purchase trigger today. The Thank You emails are still created, but
+nothing currently fires them.
 
 Usage:
   python setup_automations.py --dry-run     # preview everything (no API writes)
@@ -148,8 +144,9 @@ def ensure_emails() -> dict:
         out[key] = created.get("id")
 
     make("welcome", "welcome", "en")
-    make("post_en", "post_purchase", "en")
-    make("post_es", "post_purchase", "es")
+    # retired 2026-09-25: digital-product flow; no digital product in current offer
+    # make("post_en", "post_purchase", "en")
+    # make("post_es", "post_purchase", "es")
     make("thanks_en", "thank_you", "en")
     make("thanks_es", "thank_you", "es")
     return out
@@ -191,20 +188,26 @@ def ensure_automations(emails: dict, tag_ids: dict) -> None:
 
     delay = {"time": "delay", "delay": {"value": "2", "unit": "days", "time_of_day": None}}
 
-    for lang, lang_tag in LANG_TAGS.items():
-        create(
-            f"Sofrito — Post-Purchase + Thank You ({lang.upper()})",
-            "subscriber.tags.changed",
-            [tag_filter(tag_ids["customer"]), tag_filter(tag_ids[lang_tag])],
-            [
-                {"type": "send_email",
-                 "metadata": {"email_id": emails[f"post_{lang}"]},
-                 "timing": {"time": "immediate"}},
-                {"type": "send_email",
-                 "metadata": {"email_id": emails[f"thanks_{lang}"]},
-                 "timing": delay},
-            ],
-        )
+    # retired 2026-09-25: digital-product flow; no digital product in current offer
+    # This block was the only consumer of emails["post_en"] / emails["post_es"].
+    # It fired on the Gumroad-driven `customer` tag, which no longer exists, and
+    # it also carried the thank-you send — so both are parked together. No
+    # replacement is defined here; the current offer is a booked service, not a
+    # digital delivery, so a post-purchase fulfilment flow has no trigger yet.
+    # for lang, lang_tag in LANG_TAGS.items():
+    #     create(
+    #         f"Sofrito — Post-Purchase + Thank You ({lang.upper()})",
+    #         "subscriber.tags.changed",
+    #         [tag_filter(tag_ids["customer"]), tag_filter(tag_ids[lang_tag])],
+    #         [
+    #             {"type": "send_email",
+    #              "metadata": {"email_id": emails[f"post_{lang}"]},
+    #              "timing": {"time": "immediate"}},
+    #             {"type": "send_email",
+    #              "metadata": {"email_id": emails[f"thanks_{lang}"]},
+    #              "timing": delay},
+    #         ],
+    #     )
 
 
 def main() -> None:
@@ -217,9 +220,9 @@ def main() -> None:
     ensure_automations(emails, tag_ids)
 
     print("\nDone. Next steps:")
-    print("  1. Point Gumroad (Settings > Advanced > Webhooks) at your deployed webhook: POST /gumroad/webhook")
-    print("  2. Add the repo secret GUMROAD_WEBHOOK_SECRET (Gumroad signed webhooks) + WEBHOOK_URL")
-    print("  3. Buyers tagged `customer` now get post-purchase + thank-you automatically.")
+    print("  1. Confirm the 'Sofrito — Welcome' automation is active in Buttondown.")
+    print("  2. New subscribers get the Welcome email immediately on signup.")
+    print("  3. No post-purchase trigger exists — see the retirement note in this file.")
     if DRY:
         print("  (dry-run: nothing was written to Buttondown)")
 

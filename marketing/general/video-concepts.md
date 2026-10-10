@@ -1,61 +1,92 @@
-# Faceless Short-Form Video Concepts — EN + ES
+# Faceless Ad Copy Concepts — Sofrito Session
 
-Hands-only / close-up cooking videos (no talking head). Each concept is a
-45–60s Reel/TikTok/Shorts script: HOOK → technique → payoff. Film the
-technique, overlay the text, caption in both languages. Cross-post via
-`marketing/platforms/meta/post_to_meta.py` (IG) once tokens are set; TikTok hooks live in
-`marketing/platforms/tiktok/hooks.md`.
+Status: **DRAFT — AWAITING FOUNDER APPROVAL**
 
-## 1 · The Sofrito Cube Hack  (EN/ES — “El truco del cubo de sofrito”)
-- Hook: “One cube = one dish. This is why your abuela's food hits different.”
-  / “Un cubo = un plato. Por eso la comida de tu abuela sabe distinto.”
-- Visual: hands spooning blender sofrito into an ice-cube tray → freeze →
-  pop a cube into sizzling onions → steam rises.
-- On-screen: “Sofrito en 10 min” / “Batch · freeze · forever”.
-- CTA: “Get the free mini-recipe” → /freebies/mini-recipe.html
+These are copy concepts only. Do not publish, deploy, or generate media from this file without a separate approved production task.
 
-## 2 · The Two-Finger Toston Press  (EN/ES — “El tostonero”)
-- Hook: “Tostones that crunch — it's all in the press.”
-- Visual: smash fried plantain disks with a tostonera, refry to golden,
-  break one open with the crack sound.
-- On-screen: “Twice-fried = twice the crunch.”
+## Offer Facts
 
-## 3 · The Pernil 24-Hour Marinade  (EN/ES — “El adobo de 24 horas”)
-- Hook: “The pernil secret nobody tells you: time does the work.”
-- Visual: garlic-garlic-oregano-oil marinade massaged into pork shoulder,
-  wrapped, timeline text 24h → slow-roasted shredding shot.
-- CTA: Thanksgiving/Navidad guide link.
+- **Offer:** Sofrito Session
+- **Duration:** 45 minutes
+- **Price:** $400
+- **Credit:** Credited in full toward the $997 Brand & Web Sprint
+- **Active destination:** `https://sofritostudio.com/#book-now`
+- **Voice:** Professional we/our voice unless a concept is explicitly labeled as a founder story.
 
-## 4 · The Lid Rule (Arroz con Pollo)  (EN/ES — “La regla de la tapa”)
-- Hook: “Never lift the lid. 25 minutes. Do not peek.”
-- Visual: seared chicken → sofrito rice → broth → lid on → timer text →
-  lifted once at the end, steam burst, fluffy rice.
-- CTA: recipe-db link.
+## Required Close for Every Concept
 
-## 5 · Green, Not Yellow (Mofongo)  (EN/ES — “Verde, no amarillo”)
-- Hook: “Mofongo made with the wrong plantain is mush. Green. Always.”
-- Visual: split screen green vs yellow plantain → correct one pounded in
-  the pilón with garlic + chicharrón → dome plated.
-- On-screen: “Work fast — it stiffens.”
+- **Command:** `Book Your Sofrito Session`
+- **Closer:** `Book your Sofrito Session now — $400, credited in full toward your $997 sprint.`
 
-## 6 · The Coconut Drop (Coquito)  (EN/ES — “La caída del coco”)
-- Hook: “Coquito season starts when this can opens.”
-- Visual: pantry ingredients → blender → pour slow-motion into a glass,
-  cinnamon dust, holiday lights bokeh background.
-- On-screen: “Batch it. It keeps for weeks.”
+---
 
-## 7 · Recao or Nothing? Mainland Swap  (EN/ES — “¿Sin recao?”)
-- Hook: “Can't find recao on the mainland? Do this.”
-- Visual: cilantro bundle + pinch of salt + tip text as the swap on a board.
-- CTA: “All swaps in the free guide” → /freebies/Sofrito-101.pdf
+## 1 · Start With Brand Clarity
 
-## 8 · The Habichuelas Spoon Test  (EN/ES — “La prueba de la cuchara”)
-- Hook: “You know habichuelas are ready when the spoon stands.”
-- Visual: wooden spoon standing in simmering beans → tilt pan → deep color.
-- On-screen: “Low and slow. That's it.”
+- **Hook:** What should your food business fix first?
+- **Body:** We review your positioning, offer, menu, and website in a 45-minute Sofrito Session, then organize the next steps.
+- **On-screen close:** `Book Your Sofrito Session`
+- **Spoken close:** `Book your Sofrito Session now — $400, credited in full toward your $997 sprint.`
+- **Destination:** `https://sofritostudio.com/#book-now`
 
-### Production notes
-- Film 4:5 or 9:16, hands + ingredients only; captions burned in EN + ES.
-- Hook in first 2s; one technique per video; end with one CTA.
-- Repurpose the shot list into the `marketing/platforms/tiktok/hooks.md` hooks.
-- Batch-filming 3 concepts per session maximizes the queue run.
+## 2 · Make the Menu Easier to Understand
+
+- **Hook:** Does your menu help a guest choose?
+- **Body:** We review how the menu explains your offer and what to do next, then identify the first change to make.
+- **On-screen close:** `Book Your Sofrito Session`
+- **Spoken close:** `Book your Sofrito Session now — $400, credited in full toward your $997 sprint.`
+- **Destination:** `https://sofritostudio.com/#book-now`
+
+## 3 · Clarify the Offer
+
+- **Hook:** Can a new visitor tell what you offer and who it fits?
+- **Body:** We review the offer, menu, and website together so the message has a clear direction.
+- **On-screen close:** `Book Your Sofrito Session`
+- **Spoken close:** `Book your Sofrito Session now — $400, credited in full toward your $997 sprint.`
+- **Destination:** `https://sofritostudio.com/#book-now`
+
+## 4 · Review the Website
+
+- **Hook:** What should a food-business website answer?
+- **Body:** We review the offer, navigation, and next step, then identify what to clarify first.
+- **On-screen close:** `Book Your Sofrito Session`
+- **Spoken close:** `Book your Sofrito Session now — $400, credited in full toward your $997 sprint.`
+- **Destination:** `https://sofritostudio.com/#book-now`
+
+## 5 · Plan Before a Rebrand
+
+- **Hook:** Before a rebrand, review the decisions behind the design.
+- **Body:** We use the Sofrito Session to separate what needs to change now from what can wait.
+- **On-screen close:** `Book Your Sofrito Session`
+- **Spoken close:** `Book your Sofrito Session now — $400, credited in full toward your $997 sprint.`
+- **Destination:** `https://sofritostudio.com/#book-now`
+
+## 6 · Set a Clear Brand Voice
+
+- **Hook:** Does your business sound like one brand everywhere?
+- **Body:** We review the words used across the menu, website, and outreach, then define a focused voice for the next step.
+- **On-screen close:** `Book Your Sofrito Session`
+- **Spoken close:** `Book your Sofrito Session now — $400, credited in full toward your $997 sprint.`
+- **Destination:** `https://sofritostudio.com/#book-now`
+
+## 7 · Plan the Brand and Website Work
+
+- **Hook:** Decide what the brand and website need to do before you build.
+- **Body:** In a 45-minute Sofrito Session, we review the current materials and organize the scope for the Brand & Web Sprint.
+- **On-screen close:** `Book Your Sofrito Session`
+- **Spoken close:** `Book your Sofrito Session now — $400, credited in full toward your $997 sprint.`
+- **Destination:** `https://sofritostudio.com/#book-now`
+
+## 8 · Show What the Sofrito Session Covers
+
+- **Hook:** What happens in a 45-minute Sofrito Session?
+- **Body:** We review the brand, offer, menu, and website, then document a focused action plan for the next move.
+- **On-screen close:** `Book Your Sofrito Session`
+- **Spoken close:** `Book your Sofrito Session now — $400, credited in full toward your $997 sprint.`
+- **Destination:** `https://sofritostudio.com/#book-now`
+
+## Production Notes
+
+- Use one problem and one Sofrito Session benefit per concept.
+- Keep the exact offer name, duration, command, and closer.
+- Avoid hype, fake scarcity, invented metrics, testimonials, and guaranteed results.
+- Use only the approved active destination.

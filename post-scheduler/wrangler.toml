@@ -1,22 +1,24 @@
 name = "sofrito-post-scheduler"
-compatibility_date = "2026-10-01"
-compatibility_flags = ["nodejs_compat"]
+type = "javascript"
+compatibility_date = "2024-09-13"
 main = "src/scheduler.js"
 
 # KV binding for metrics and calendar
 [[kv_namespaces]]
 binding = "POST_METRICS"
 # The ID will be filled after you create the KV namespace via `wrangler kv:namespace create "POST_METRICS"`
-# id = "<KV_ID>"
+id = "bc3f6b8f917849b9a77555f7b734ebec"
 
-# Fill in the new D1 binding before deploying; missing DB fails closed.
-[[d1_databases]]
-binding = "DB"
-database_name = "sofrito-publications"
-# database_id = "<D1_ID>"
-migrations_dir = "migrations"
+# Cron triggers – hourly scheduler and nightly analytics
+[[triggers]]
+type = "cron"
+cron = "0 * * * *"   # every hour at minute 0 – runs scheduler
 
-[triggers]
-crons = ["0 * * * *", "0 2 * * *"]
+[[triggers]]
+type = "cron"
+cron = "0 2 * * *"   # nightly at 02:00 UTC – runs analytics worker
+script = "src/analytics.js"
 
-# SCHEDULER_KEY and provider tokens are secrets, configured separately.
+# Environment variables (optional – set your Slack webhook URL here if you want alerts)
+[vars]
+SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/XXXXX/XXXXX/XXXXX"

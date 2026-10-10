@@ -3,9 +3,12 @@ Sofrito Studio — Buttondown Broadcast & Email Scheduler
 
 Sends / schedules email campaigns via the Buttondown API, using the
 Markdown templates in ./templates/. Supports:
-  - Lead magnet delivery (free starter kit PDF)
-  - Post-purchase onboarding 3-step sequence
-  - Seasonal promotional broadcasts
+  - Session offer (45-minute Sofrito Session, $400)
+  - Post-session onboarding 3-step sequence
+  - Seasonal broadcasts
+
+All copy points at the current offer: the $400 Sofrito Session, credited in
+full toward the $997 Brand & Web Sprint when booked within 30 days.
 
 Requires BUTTONDOWN_API_KEY (config/.env or environment).
 
@@ -37,6 +40,15 @@ except Exception:
 BUTTONDOWN_API_KEY = os.getenv("BUTTONDOWN_API_KEY", "")
 BUTTONDOWN_API = "https://api.buttondown.com/v1"
 TEMPLATE_DIR = Path(__file__).resolve().parent / "templates"
+
+# Current offer. The retired low-ticket product, the per-product cookbook pages
+# and the digital-download library are all gone; every CTA below points at a
+# page verified live.
+BOOK_URL = "https://sofritostudio.com/#book-now"
+SPRINT_URL = "https://sofritostudio.com/sprint.html"
+SESSION_PRICE = "$400"
+SPRINT_PRICE = "$997"
+SESSION_CREDIT = "credited in full toward your $997 sprint if you book within 30 days"
 
 
 def _headers() -> dict:
@@ -94,8 +106,8 @@ def send_flow(flow: str, to: str | None = None, lang: str = "en", holiday: str =
         emails = [
             {"subject": "Your cart is waiting" if lang == "en" else "Tu carrito te espera",
              "body": load_template("abandoned_cart", lang)["body"]},
-            {"subject": "10% off — 24 hours only" if lang == "en" else "10% de descuento — solo 24 horas",
-             "body": _discount_email(lang)},
+            {"subject": "Your session is still open" if lang == "en" else "Tu sesión sigue disponible",
+             "body": _session_nudge(lang)},
         ]
     elif flow == "seasonal":
         emails = _seasonal_sequence(lang, holiday)
@@ -111,83 +123,107 @@ def send_flow(flow: str, to: str | None = None, lang: str = "en", holiday: str =
 
 
 def _tripwire_sequence(lang: str) -> list[dict]:
-    """Tripwire conversion: free subscriber -> $9 Starter Kit within 48 hours.
+    """Session -> Sprint conversion.
 
-    Email 1 (hour 0): deliver the freebie + tease the starter kit.
-    Email 2 (hour 24): the $9 tripwire offer with a social-proof nudge.
+    Email 1: offer the 45-minute Sofrito Session ($400).
+    Email 2: the Brand & Web Sprint ($997), with the $400 credit named.
     """
-    free = "https://sofritostudio.com/freebies/Sofrito-101.pdf"
-    starter = "https://sofritostudio.com/products/starter-kit.html"
     if lang == "es":
         return [
             {
-                "subject": "Tu guía gratuita está aquí",
-                "body": f"¡Tu guía gratuita de Sofrito 101 está lista!\n\n{free}\n\n"
-                        "Empieza con el sofrito — es la base de todo.\n\n"
-                        "Cuando quieras ir más allá, el Starter Kit tiene los 5 platos esenciales por solo $9. — La cocina Ortiz",
+                "subject": "45 minutos para ordenar tu marca",
+                "body": "Si tu menú, tu web o tu mensaje no encajan entre sí, eso se "
+                        "resuelve en una conversación de 45 minutos.\n\n"
+                        f"Una Sofrito Session son {SESSION_PRICE}. En 45 minutos vemos tu "
+                        "posicionamiento, tu menú, y el cambio que más mueve la aguja.\n\n"
+                        f"Reserve su tiempo: {BOOK_URL}\n\n— La cocina Ortiz",
             },
             {
-                "subject": "Los 5 platos esenciales, por $9",
-                "body": f"En las próximas 24 horas, consigue el Starter Kit — los 5 platos esenciales (sofrito, arroz con pollo, pernil, tostones, flan) por solo $9.\n\n"
-                        f"{starter}\n\n"
-                        "Bilingüe, probado en la cocina Ortiz, con swaps de ingredientes para el mainland. — J.Ortiz",
+                "subject": f"Tu sesión de {SESSION_PRICE} se descuenta del Brand & Web Sprint",
+                "body": "Si ya hicimos la sesión, el siguiente paso es el Brand & Web "
+                        f"Sprint: {SPRINT_PRICE} para marca y web en 48 horas.\n\n"
+                        f"Tu sesión de {SESSION_PRICE} queda {SESSION_CREDIT}.\n\n"
+                        f"Ver el Sprint: {SPRINT_URL}\n\n— La cocina Ortiz",
             },
         ]
     return [
         {
-            "subject": "Your free guide is here",
-            "body": f"Your free Sofrito 101 guide is ready!\n\n{free}\n\n"
-                    "Start with the sofrito — it's the base of everything.\n\n"
-                    "When you're ready to go further, the Starter Kit has the 5 essential dishes for just $9. — The Ortiz kitchen",
+            "subject": "45 minutes to get your brand straight",
+            "body": "If your menu, your site, and your message don't line up, that's a "
+                    "45-minute conversation, not a document.\n\n"
+                    f"A Sofrito Session is {SESSION_PRICE}. In 45 minutes we go through "
+                    "your positioning, your menu, and the one fix that moves the most.\n\n"
+                    f"Book a time: {BOOK_URL}\n\n— The Ortiz kitchen",
         },
         {
-            "subject": "The 5 essential dishes, for $9",
-            "body": f"In the next 24 hours, grab the Starter Kit — the 5 essential dishes (sofrito, arroz con pollo, pernil, tostones, flan) for just $9.\n\n"
-                    f"{starter}\n\n"
-                    "Bilingual, tested in the Ortiz kitchen, with mainland ingredient swaps. — J.Ortiz",
+            "subject": f"Your {SESSION_PRICE} session comes off the Sprint",
+            "body": f"If we've already done the session, the next step is the Brand & Web "
+                    f"Sprint: {SPRINT_PRICE} for brand and website in 48 hours.\n\n"
+                    f"Your {SESSION_PRICE} session is {SESSION_CREDIT}.\n\n"
+                    f"See the Sprint: {SPRINT_URL}\n\n— The Ortiz kitchen",
         },
     ]
 
 
-def _discount_email(lang: str) -> str:
-    """Abandoned-cart discount nudge (COMEBACK10)."""
-    link = "https://sofritostudio.com/products/la-mesa-boricua-sales.html"
+def _session_nudge(lang: str) -> str:
+    """Replaces the retired percentage-discount nudge. There is no product left
+    to discount, so this is a plain 'your session is still open' follow-up."""
     if lang == "es":
-        return f"Usa el código COMEBACK10 para 10% de descuento en La Mesa Boricua. Expira en 24 horas.\n\n{link}\n\n— J.Ortiz, Sofrito Studio"
-    return f"Use code COMEBACK10 for 10% off La Mesa Boricua. It expires in 24 hours.\n\n{link}\n\n— J.Ortiz, Sofrito Studio"
+        return (f"Tu sesión de {SESSION_PRICE} sigue disponible. Son 45 minutos para "
+                f"ordenar tu marca.\n\n{BOOK_URL}\n\n— La cocina Ortiz, Sofrito Studio")
+    return (f"Your {SESSION_PRICE} session is still open. 45 minutes to get your brand "
+            f"straight.\n\n{BOOK_URL}\n\n— The Ortiz kitchen, Sofrito Studio")
 
 
 def _seasonal_sequence(lang: str, holiday: str) -> list[dict]:
-    """Seasonal promotional broadcasts: Thanksgiving, Nochebuena, San Sebastián."""
+    """Seasonal broadcasts: Thanksgiving, Nochebuena, San Sebastián."""
     topics = {
-        "thanksgiving": ("Boricua Thanksgiving", "pernil timing for the big day"),
-        "navidad": ("Nochebuena Menu", "pasteles, pernil, coquito timeline"),
-        "san-sebastian": ("San Sebastián Street Fest", "portable snacks, drinks, and parranda tips"),
+        "thanksgiving": ("Boricua Thanksgiving", "the holiday menu and the pernil timing"),
+        "navidad": ("Nochebuena", "the holiday menu, the pernil, and the timeline"),
+        "san-sebastian": ("San Sebastián", "the street-fest menu and the parade schedule"),
     }
     title, focus = topics.get(holiday, topics["navidad"])
-    cookbook = "https://sofritostudio.com/products/la-mesa-boricua-sales.html"
     if lang == "es":
-        subject = f"Prepara tu {title} — guía completa"
-        body = f"Las fiestas se acercan. Tu guía para un {title} sin estrés:\n\n- {focus}\n- Lista de compras imprimible\n- Línea de tiempo paso a paso\n\nConsíguela aquí: {cookbook}\n\n— La cocina Ortiz"
+        subject = f"{title} — reserve tu sesión antes de la fecha"
+        body = (f"La temporada de {title} se acerca y la hora de reservar se llena.\n\n"
+                f"Una Sofrito Session de {SESSION_PRICE} son 45 minutos para dejar tu "
+                f"marca y tu menú listos antes de {focus}.\n\n"
+                f"Reserve: {BOOK_URL}\n\n— La cocina Ortiz")
     else:
-        subject = f"Prep your {title} — the complete guide"
-        body = f"The holidays are coming. Your stress-free {title} guide:\n\n- {focus}\n- Printable shopping list\n- Step-by-step timeline\n\nGet it here: {cookbook}\n\n— The Ortiz kitchen"
+        subject = f"{title} — book your session before the date"
+        body = (f"{title} is coming, and the calendar fills up.\n\n"
+                f"A {SESSION_PRICE} Sofrito Session is 45 minutes to get your brand and "
+                f"menu straight ahead of {focus}.\n\n"
+                f"Book: {BOOK_URL}\n\n— The Ortiz kitchen")
     return [{"subject": subject, "body": body}]
 
 
 def _onboarding_email(lang: str, step: int) -> str:
-    cookbook = "https://sofritostudio.com/products/la-mesa-boricua-sales.html"
+    """Post-session follow-up: recap, then the Sprint with the credit named."""
     if lang == "es":
         steps = {
-            1: f"Tu descarga está en tu biblioteca de Gumroad.\n\nEmpieza con el sofrito — es la base de todo. {cookbook}",
-            2: "¿Has cocinado algo? Cuéntame.\n\nTip: no destapes el arroz una vez que hierva — el vapor hace el trabajo.",
-            3: f"Si ya dominas lo básico, The Full Table lleva todo más lejos: libro, imprimibles y 50 cenas de 30 minutos.\n\n{cookbook}",
+            1: f"Gracias por la sesión de hoy. Aquí va lo que acordamos, en un solo lugar.\n\n"
+               f"Cuando quieras dar el siguiente paso, el Brand & Web Sprint es {SPRINT_PRICE} "
+               f"para marca y web en 48 horas.",
+            2: "¿Pudiste escribir tu página de inicio con lo que vimos? Si quieres que la "
+               "revisemos, responde a este correo.\n\n"
+               "Tip: una frase clara por sección vale más que cinco puntos.",
+            3: f"Cuando quieras continuar, el Brand & Web Sprint es {SPRINT_PRICE} para marca "
+               f"y web en 48 horas. Tu sesión de {SESSION_PRICE} queda {SESSION_CREDIT}.\n\n"
+               f"{SPRINT_URL}",
         }
         return steps[step] + "\n\n— La cocina Ortiz"
     steps = {
-        1: f"Your download is in your Gumroad library.\n\nStart with the sofrito — it's the base of everything. {cookbook}",
-        2: "Have you cooked anything yet? Tell me.\n\nTip: don't lift the lid once the rice boils — the steam does the work.",
-        3: f"Once you've nailed the basics, The Full Table takes it further: cookbook, printables, and 50 no-recipe 30-min dinners.\n\n{cookbook}",
+        1: "Thanks for the session today. Everything we agreed is written down in one "
+           "place.\n\n"
+           f"When you're ready for the next step, the Brand & Web Sprint is {SPRINT_PRICE} "
+           "for brand and website in 48 hours.",
+        2: "Have you written your homepage line yet from what we covered? If you want it "
+           "looked at, reply to this email.\n\n"
+           "Tip: one clear sentence per section beats five bullet points.",
+        3: f"When you're ready to continue, the Brand & Web Sprint is {SPRINT_PRICE} for "
+           f"brand and website in 48 hours. Your {SESSION_PRICE} session is {SESSION_CREDIT}.\n\n"
+           f"{SPRINT_URL}",
     }
     return steps[step] + "\n\n— The Ortiz kitchen"
 

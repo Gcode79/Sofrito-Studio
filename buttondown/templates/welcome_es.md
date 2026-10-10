@@ -1,21 +1,17 @@
-subject: Tus recetas boricuas gratis van en camino
+subject: Bienvenido — tu sesión de 45 minutos está disponible
 
-¡Hola! Bienvenido a Sofrito Studio — me alegra mucho que estés aquí.
+¡Hola! Bienvenido a Sofrito Studio — nos alegra mucho que estés aquí.
 
-Tu guía gratuita de Sofrito 101 está lista para descargar:
+No necesitas otra guía que leer. Necesitas que alguien mire lo que tienes y te diga la primera cosa que hay que arreglar.
 
-https://sofritostudio.com/freebies/Sofrito-101.pdf
+Eso es una Sofrito Session: 45 minutos, $400, y un próximo paso claro. Si la reservas dentro de los 30 días del Brand & Web Sprint de $997, los $400 se descuentan completos.
 
-Cubre la base del sofrito — el sabor que le da identidad a cada plato puertorriqueño — con swaps de ingredientes fáciles para el mainland y un plan de lote de 20 minutos para un mes de sabor.
+Así usar los próximos días:
 
-Así aprovechas los próximos días:
+1. **Hoy** — reserva la sesión. Escoge la hora que te sirva.
+2. **Esta semana** — junta tu menú, tu web, y lo que hayas escrito hasta ahora.
+3. **En la sesión** — sal con el arreglo, no con una lista de pendientes.
 
-1. **Hoy** — descarga la guía y lee la base del sofrito. Esa es la receta sobre la que todo lo demás se construye.
-2. **Mañana** — haz un lote grande. Un lote de sofrito = un mes de sabor en el congelador.
-3. **Día 3** — cocina tu primer plato: arroz con pollo. Te vas a sentir imparable.
+Reserva aquí: https://sofritostudio.com/#book-now
 
-Si no llega, revisa el spam y agréganos a tus contactos para que las recetas sigan llegando.
-
-Buen provecho,
 — La cocina Ortiz, Sofrito Studio
-sofritostudio.com

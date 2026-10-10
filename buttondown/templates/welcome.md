@@ -1,21 +1,17 @@
-subject: Your free Puerto Rican recipes are on the way
+subject: Welcome — your 45-minute brand session is open
 
-Hola! Welcome to Sofrito Studio — I'm really glad you're here.
+Hola! Welcome to Sofrito Studio — we're glad you're here.
 
-Your free Sofrito 101 starter kit is ready to download:
+You don't need another guide to read. You need someone to look at what you have and tell you the one thing to fix first.
 
-https://sofritostudio.com/freebies/Sofrito-101.pdf
+That's what a Sofrito Session is: 45 minutes, $400, and a clear next step. Book it within 30 days of the $997 Brand & Web Sprint and the $400 comes straight off.
 
-It covers the sofrito base — the flavor foundation of every Puerto Rican dish — with easy mainland ingredient swaps and a 20-minute batch plan for a month of flavor.
+Here's how to use the next few days:
 
-Here's how to make the most of the next few days:
+1. **Today** — book the session. Pick a time that works.
+2. **This week** — gather your menu, your site, and whatever you've written so far.
+3. **In the session** — leave with the fix, not a to-do list.
 
-1. **Today** — grab your download and read the sofrito base. That's the one recipe everything else builds on.
-2. **Tomorrow** — batch it. One batch of sofrito = a month of flavor in the freezer.
-3. **Day 3** — cook your first dish: arroz con pollo. You'll feel unstoppable.
+Book here: https://sofritostudio.com/#book-now
 
-If it doesn't arrive, check spam and add us to your contacts so the recipes keep coming.
-
-Buen provecho,
 — The Ortiz kitchen, Sofrito Studio
-sofritostudio.com

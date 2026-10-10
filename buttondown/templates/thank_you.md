@@ -1,14 +1,13 @@
 subject: Thank you — from our kitchen to yours
 
-Hey — I just wanted to say thank you for supporting Sofrito Studio.
+Hey — we just wanted to say thank you for spending time with Sofrito Studio.
 
-Every purchase keeps this little family kitchen testing, publishing, and sharing Puerto Rican recipes for free on the blog. It genuinely means a lot.
+Every session teaches us something we can make clearer for the next food business we work with. That genuinely means a lot.
 
-If you've cooked anything from {product_name} yet, I'd love to hear about it — a photo, a question, or a "it turned out great!" Reply to this email anytime; I read every one.
+If you've taken a session, we'd like to hear how it landed — a reply to this email is plenty.
 
-When you're ready for the next step, reader favorites are:
-- **The Full Table** — the complete cookbook, printables, and 50 no-recipe 30-minute dinners
-- **Boricua Weeknights** — 50 quick dinners for busy nights
+When you're ready for the next step, the Brand & Web Sprint is $997 for brand and website in 48 hours. A $400 session within the previous 30 days is credited in full toward it.
 
-Buen provecho,
-— J.Ortiz, Sofrito Studio
+See the Sprint: https://sofritostudio.com/sprint.html
+
+— The Ortiz kitchen, Sofrito Studio

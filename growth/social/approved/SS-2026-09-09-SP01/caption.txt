@@ -1,6 +1,8 @@
 SP-01 Carousel — Menu Clarity — Instagram Carousel (4:5, 1080x1350)
-CTA: Book a Sofrito Session → sofritostudio.com/session
-Hashtags: #FoodBusiness #RestaurantBranding #MenuDesign #SofritoStudio #BrandFoundation #IndependentRestaurant #MenuClarity
+CTA: Book Your Sofrito Session — https://sofritostudio.com/#book-now
+Closer: Book your Sofrito Session now — $400, credited in full toward your $997 sprint.
+Duration: 45 minutes
+Hashtags: #FoodBusiness #RestaurantBranding #MenuDesign #SofritoStudio #BrandAndWebSprint #IndependentRestaurant #MenuClarity
 Alt text source file: alt-text.md (per slide descriptions — restaurant/prep/menu/editorial scenes, warm natural light, realistic textures, no recognizable client identity)
 Copy source: copy.md (exact source of truth; never retype manually; copy exact strings directly from source; revisions only in copy.md first; version tracked in Git)
 UTM tracking: ?utm_source=instagram&utm_medium=carousel&utm_campaign=sp01

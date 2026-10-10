@@ -68,7 +68,7 @@ For each post, first define:
   urgency, or "that is exactly my problem"
 - Visual subject: One dominant real-world object, person, action, or scene
 - Message hierarchy: What must be understood first, second, and third?
-- Desired action: Save, share, visit sofritostudio.com, book a Sofrito Session, or inquire
+- Desired action: Save, share, visit sofritostudio.com, Book Your Sofrito Session, or inquire
 - Asset type: Original, licensed, permissioned client material, or conceptual AI image
 - Permission status: Approved, licensed, needs approval, or unavailable
 
@@ -321,7 +321,7 @@ Consideration:
 - Read the full guide at sofritostudio.com
 
 Conversion:
-- Book a Sofrito Session if you need a clear next step
+- Book Your Sofrito Session if you need a clear next step
 - Request a food-business brand or website review
 - Visit sofritostudio.com to see the current service options
 

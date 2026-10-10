@@ -5,7 +5,7 @@
 ## Standing facts library (for replies — all VERIFIED 2026-09-09)
 
 - Offer ladder & prices: `services.html` + KV `packages/*` (current-pivot.md)
-- Session = $400 / 90 min; delivery after founder confirms calendar path
+- Session = $400 / 45 min; credited in full toward the $997 Brand & Web Sprint when booked within 30 days
 - Sofrito $2,500 · Plato $5,000 · La Mesa $7,500 (referral policy pending)
 - Retainers on waitlist; capture mechanism pending (no "spaces open" claims)
 - Proof state: self-case-study + spec concepts only — no paid client work exists (state honestly)
