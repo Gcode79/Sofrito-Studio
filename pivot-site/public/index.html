@@ -74,6 +74,22 @@
             .animate-marquee { animation: none; }
             #hero-audience, .scroll-fill .sf-w { transition: none; }
         }
+        /* --- Mobile: 320px layout + 44px tap targets --- */
+        @media (max-width: 480px) {
+            /* Header: compact, no overlap */
+            nav .max-w-7xl { padding-left: 1rem; padding-right: 1rem; gap: 0.5rem; }
+            nav a[href="/"] span { display: none; } /* hide wordmark, keep logo */
+            /* Hero facts: stack vertically */
+            .hero-facts { grid-template-columns: 1fr !important; gap: 1rem !important; }
+            /* Footer: stack columns, wrap long text */
+            footer .grid { grid-template-columns: 1fr !important; }
+            footer a { overflow-wrap: break-word; word-break: break-word; }
+        }
+        /* 44px minimum tap targets */
+        details > summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+        #sofrito-share, #sofrito-share-nav,
+        button[data-theme-toggle] { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+        footer nav a, footer ul a { display: inline-block; min-height: 44px; line-height: 44px; }
     </style>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <script type="application/ld+json">
@@ -85,7 +101,7 @@
             "@id": "https://sofritostudio.com/#business",
             "name": "Sofrito Studio",
             "url": "https://sofritostudio.com/",
-            "description": "Branding and one-page websites for independent food businesses. 48-hour design sprints: $997 flat.",
+            "description": "Branding and one-page websites for independent food businesses. $997 flat, launched within two business days of written direction lock.",
             "email": "hello@sofritostudio.com"
         },
         {
@@ -196,7 +212,7 @@
     ]
 }
     </script>
-</head></head>
+</head>
 <body class="bg-zinc-950 text-zinc-50 antialiased">
     <!-- Global Navigation -->
     <header>
@@ -240,14 +256,14 @@
                 Your food earns regulars.<br>Your brand should too.
             </h1>
             <p class="text-xl text-zinc-400 mb-10 max-w-2xl leading-relaxed">
-                We're opening 10 founding spots for independent food businesses. The full Brand &amp; Web Sprint — brand identity and one-page website, built and launched in 48 hours — for $997 flat.
+                We're opening 10 founding spots for independent food businesses. The full Brand &amp; Web Sprint — brand identity and one-page website, launched within two business days of written direction lock — for $997 flat.
             </p>
             <a href="#apply" class="rounded-full inline-block bg-orange-600 text-white text-center font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
                 Apply for a Founding Spot
             </a>
             <p class="text-sm text-zinc-500 mt-4">No charge to apply. We read every application personally and reply within two business days.</p>
 
-            <div class="grid grid-cols-3 gap-6 mt-16 pt-8 border-t border-white/10">
+            <div class="hero-facts grid grid-cols-3 gap-6 mt-16 pt-8 border-t border-white/10">
                 <div>
                     <div class="text-zinc-500 text-[10px] tracking-widest uppercase mb-1">Turnaround</div>
                     <div class="text-white font-bold text-sm">48H FROM DIRECTION</div>
@@ -273,7 +289,7 @@
     <!-- Animated Marquee Banner -->
     <div class="w-full overflow-hidden border-y border-white/10 bg-zinc-900/50 py-4">
         <div class="whitespace-nowrap animate-marquee" aria-hidden="true">
-            <span class="marquee-pill">Brand Identity</span><span class="marquee-pill">One-Page Websites</span><span class="marquee-pill">Menu &amp; Ordering</span><span class="marquee-pill">48-Hour Sprint</span><span class="marquee-pill">Caribbean Future</span><span class="marquee-pill">One Fixed Price</span><span class="marquee-pill">Brand Identity</span><span class="marquee-pill">One-Page Websites</span><span class="marquee-pill">Menu &amp; Ordering</span><span class="marquee-pill">48-Hour Sprint</span><span class="marquee-pill">Caribbean Future</span><span class="marquee-pill">One Fixed Price</span>
+            <span class="marquee-pill">Brand Identity</span><span class="marquee-pill">One-Page Websites</span><span class="marquee-pill">Menu &amp; Ordering</span><span class="marquee-pill">Two-Day Sprint</span><span class="marquee-pill">Caribbean Future</span><span class="marquee-pill">One Fixed Price</span><span class="marquee-pill">Brand Identity</span><span class="marquee-pill">One-Page Websites</span><span class="marquee-pill">Menu &amp; Ordering</span><span class="marquee-pill">Two-Day Sprint</span><span class="marquee-pill">Caribbean Future</span><span class="marquee-pill">One Fixed Price</span>
         </div>
     </div>
 
@@ -535,10 +551,12 @@
         <blockquote class="font-serif italic text-2xl md:text-3xl text-zinc-300 leading-relaxed mb-6">&ldquo;I love apologizing for my website before showing the menu.&rdquo;</blockquote>
         <p class="text-sm font-bold tracking-widest uppercase text-zinc-500 mb-10">&mdash; Said no one ever.</p>
         <a href="#apply" class="rounded-full inline-block bg-orange-600 text-white text-center font-bold px-8 py-4 uppercase tracking-widest hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-colors shadow-[0_0_30px_rgba(234,88,12,0.3)]">
-            Fix it in 48 hours
+            Fix it in two business days
         </a>
     </section>
 
+    <!-- #book-now alias: SEO pages and cancelled.html link here; forwards to the founding application -->
+    <span id="book-now" aria-hidden="true" class="block -mt-20 pt-20"></span>
     <!-- Founding Application: single CTA -->
     <section id="apply" class="py-20 px-6 max-w-3xl mx-auto">
         <div class="text-center mb-12">
@@ -676,6 +694,32 @@
         let turnstileToken = null;
         let awaitingTurnstile = false;
 
+        /* Sofrito Partners: capture ?ref=CODE -> 30-day cookie + click beacon. */
+        (function () {
+            function getParam(name) {
+                try { return new URLSearchParams(window.location.search).get(name); } catch (e) { return null; }
+            }
+            var ref = getParam('ref');
+            if (ref) {
+                ref = ref.toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 24);
+                if (ref) {
+                    var exp = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+                    document.cookie = 'sofrito_ref=' + ref + '; expires=' + exp + '; path=/; SameSite=Lax';
+                    try {
+                        fetch('/api/partners/click', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ code: ref, landing_page: window.location.pathname })
+                        });
+                    } catch (e) { /* beacon is best-effort */ }
+                }
+            }
+        })();
+        window.sofritoRefCode = function () {
+            var parts = ('; ' + document.cookie).split('; sofrito_ref=');
+            return parts.length === 2 ? parts.pop().split(';').shift() : '';
+        };
+
         const form = document.getElementById('lead-form');
         const submitBtn = document.getElementById('submit-btn');
         const foundingSuccess = document.getElementById('founding-success');
@@ -688,13 +732,6 @@
         function hideError() {
             const el = document.getElementById('form-error');
             if (el) { el.classList.add('hidden'); el.textContent = ''; }
-        }
-
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-            return 'unknown';
         }
 
         window.turnstileCallback = function(token) {
@@ -771,7 +808,7 @@
                 fit_reason,
                 message: document.getElementById('message').value.trim(),
                 turnstile_token: token,
-                ref: getCookie('sofrito_ref'),
+                ref_code: (window.sofritoRefCode ? window.sofritoRefCode() : ''),
             };
 
             try {
