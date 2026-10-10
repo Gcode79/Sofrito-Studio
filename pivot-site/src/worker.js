@@ -370,8 +370,7 @@ async function handleFoundingApplication(request, env, ctx) {
   const phone = String(body.phone || '').trim();
   const business_name = String(body.business_name || '').trim();
   const business_type = String(body.business_type || '').trim();
-  const instagram = String(body.instagram || '').trim().replace(/^@/, '').slice(0, 40);
-  const website = String(body.website || '').trim().slice(0, 200);
+  const showcase_link = String(body.showcase_link || '').trim().slice(0, 200);
   const fit_reason = String(body.fit_reason || '').trim();
   const turnstileToken = String(body.turnstile_token || body['cf-turnstile-response'] || '').trim();
   const submitKey = String(body.submit_key || '').trim().slice(0, 64) || null;
@@ -387,12 +386,9 @@ async function handleFoundingApplication(request, env, ctx) {
   if (!business_name) {
     return fail('Please include your business name.', 422);
   }
-  // We need to see the business: at least one public presence is required.
-  if (!instagram && !website) {
-    return fail('Please include your Instagram handle or website so we can see your business.', 422);
-  }
-  if (fit_reason.length < 10) {
-    return fail('Please tell us a little about why the timing is right — a sentence or two is enough.', 422);
+  // We need to see the business: a public link is required.
+  if (!showcase_link) {
+    return fail('Please include a link so we can see your business.', 422);
   }
   if (business_type && !BUSINESS_TYPES.includes(business_type)) {
     return fail('Invalid business type.', 422);
@@ -415,7 +411,7 @@ async function handleFoundingApplication(request, env, ctx) {
   // distinct from checkout leads even for the same email address.
   const id = `founding_${(await sha256Hex(email)).slice(0, 24)}`;
   const created_at = nowIso();
-  const notes = `Instagram: ${instagram ? '@' + instagram : '—'} | Website: ${website || '—'}`;
+  const notes = `Showcase: ${showcase_link || '—'}`;
 
   const existing = await env.DB.prepare(`SELECT id FROM leads WHERE id = ? LIMIT 1`).bind(id).first();
   if (existing) {
@@ -434,7 +430,7 @@ async function handleFoundingApplication(request, env, ctx) {
      VALUES (?, ?, ?, ?, ?, ?, ?, 'founding_round', ?, 'founding_application', 'new', 'founding_round', ?, ?, ?, ?)`
   ).bind(id, created_at, name, email, phone || null, business_name, business_type || null, fit_reason, notes, created_at, submitKey, refCode).run();
 
-  const app = { id, created_at, name, email, phone, business_name, business_type, instagram, website, fit_reason };
+  const app = { id, created_at, name, email, phone, business_name, business_type, showcase_link, fit_reason };
 
   // The existing lead.new consumer (Zapier → Sheets) picks this up as a lead;
   // the channel field distinguishes founding applications downstream.
