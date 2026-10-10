@@ -302,6 +302,14 @@ async function handleInvoiceReconcile(env) {
   let checked = 0;
   for (const inv of rows.results || []) {
     checked += 1;
+    // Round-3 fix: reconciliation_required rows must appear in the report —
+    // they represent invoices whose delivery state is unknown, not clean.
+    if (inv.status === 'reconciliation_required') {
+      mismatches.push({ invoice_id: inv.id, stripe_invoice_id: inv.stripe_invoice_id,
+        issue: 'needs_reconciliation', local_status: inv.status,
+        detail: 'send state ambiguous: verify on Stripe dashboard whether the customer was emailed' });
+      continue;
+    }
     let si;
     try {
       si = await stripeRequest(env, 'GET', `/invoices/${inv.stripe_invoice_id}`);

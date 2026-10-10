@@ -6,7 +6,7 @@ import { test } from 'node:test';
 register('./html-loader.mjs', import.meta.url);
 const { default: worker } = await import('../src/worker.js');
 const { readJson, readWebhookText, hmacSha256 } = await import('../src/lib/http.js');
-const { handleStripeWebhook, createAndSendStripeInvoice } = await import('../src/lib/billing.js');
+const { handleStripeWebhook, createAndSendStripeInvoice, handleInvoiceTrigger } = await import('../src/lib/billing.js');
 const { handleCalendlyWebhook } = await import('../src/lib/booking.js');
 const { handleUnbilledFinalSweep } = await import('../src/lib/automations.js');
 const { persistPaymentEmails, dispatchEmailOutbox } = await import('../src/lib/outbox.js');
@@ -34,6 +34,7 @@ function environment() {
   const DB = database(); const queued = []; const tasks = [];
   return { DB, queued, tasks, CONFIG: { get: async () => null, put: async () => {} },
     EMAIL_QUEUE: { send: async job => queued.push(job) }, SITE_URL: 'https://example.test',
+    WEBHOOK_QUEUE: { send: async () => {} },
     RESEND_API_KEY: 'synthetic', RESEND_FROM: 'test@example.test', NOTIFICATION_EMAIL: 'owner@example.test',
     ctx: { waitUntil: promise => tasks.push(promise) },
   };
@@ -252,4 +253,55 @@ test('CR5: ambiguous open resume returns reconciliation-required, not sent', asy
       idempotencyKey: 'ambig-test', invoiceId: 'in_ambig' });
   assert.equal(result.reconciliationRequired, true);
   assert.ok(!calls.some(p => p.endsWith('/send_invoice')));
+});
+
+test('CR6: v2 row with transient failure retries creation, never hits legacy path', async t => {
+  const env = environment();
+  env.DB.raw.exec(`INSERT INTO leads(id,created_at,name,email,status) VALUES('l1','2020','Lead','t@t.test','new')`);
+  env.DB.raw.exec(`INSERT INTO projects(id,name,package_name,price_cents,status,lead_id) VALUES('p1','Proj','sprint',99700,'active','l1')`);
+  env.DB.raw.exec(`INSERT INTO invoices(id,created_at,project_id,milestone,amount_cents,status,protocol_version) VALUES('inv-v2','2020','p1','session',40000,'pending','v2')`);
+  let created = 0; let reconciled = 0;
+  t.mock.method(globalThis, 'fetch', async (url, init) => {
+    const path = new URL(url).pathname; const method = init.method;
+    if (path === '/v1/invoices' && method === 'GET') return Response.json({ data: [], has_more: false });
+    if (path === '/v1/invoices/in_new') return Response.json({ id: 'in_new', customer: 'cus_1', status: 'draft' });
+    if (path === '/v1/invoices' && method === 'POST') { created++; return Response.json({ id: 'in_new', customer: 'cus_1', status: 'draft' }); }
+    if (path === '/v1/customers') return Response.json({ data: [{ id: 'cus_1' }] });
+    if (path.endsWith('/lines')) return Response.json({ data: [], has_more: false });
+    if (path === '/v1/invoiceitems') return Response.json({ id: 'ii_1' });
+    if (path.endsWith('/finalize')) return Response.json({ id: 'in_new', status: 'open', number: 'INV-1' });
+    if (path.endsWith('/send_invoice')) return Response.json({ id: 'in_new', status: 'open', number: 'INV-1', hosted_invoice_url: 'https://x' });
+    throw new Error('Unexpected: ' + method + ' ' + path);
+  });
+  const req = new Request('https://example.test/api/invoice-trigger', { method: 'POST',
+    body: JSON.stringify({ project_id: 'p1', milestone: 'session' }) });
+  const res = await handleInvoiceTrigger(req, { ...env, STRIPE_API_KEY: 'test' }, env.ctx);
+  await Promise.all(env.tasks);
+  assert.ok(res.status === 200 || res.status === 201);
+  const body = await res.json();
+  assert.equal(body.stripe.ok, true, 'v2 retry must succeed, not throw legacy error');
+  assert.equal(created, 1, 'must create exactly once via new protocol');
+  assert.equal(env.DB.raw.prepare(`SELECT protocol_version FROM invoices WHERE id='inv-v2'`).get().protocol_version, 'v2');
+});
+
+test('CR7: paid resume persists Stripe paid_at to invoice row', async t => {
+  const env = environment();
+  env.DB.raw.exec(`INSERT INTO leads(id,created_at,name,email,status) VALUES('l1','2020','Lead','t@t.test','new')`);
+  env.DB.raw.exec(`INSERT INTO projects(id,name,package_name,price_cents,status,lead_id) VALUES('p1','Proj','sprint',99700,'active','l1')`);
+  env.DB.raw.exec(`INSERT INTO invoices(id,created_at,project_id,milestone,amount_cents,status,stripe_invoice_id,protocol_version) VALUES('inv-paid','2020','p1','session',40000,'pending','in_paid','v2')`);
+  t.mock.method(globalThis, 'fetch', async (url) => {
+    const path = new URL(url).pathname;
+    if (path === '/v1/invoices/in_paid') return Response.json({ id: 'in_paid', customer: 'cus_1', status: 'paid', number: 'INV-1',
+      status_transitions: { paid_at: 1700000000 }, hosted_invoice_url: 'https://x' });
+    throw new Error('Unexpected: ' + path);
+  });
+  const req = new Request('https://example.test/api/invoice-trigger', { method: 'POST',
+    body: JSON.stringify({ project_id: 'p1', milestone: 'session' }) });
+  const res = await handleInvoiceTrigger(req, { ...env, STRIPE_API_KEY: 'test' }, env.ctx);
+  await Promise.all(env.tasks);
+  assert.ok(res.status === 200 || res.status === 201);
+  const row = env.DB.raw.prepare(`SELECT status, paid_at FROM invoices WHERE id='inv-paid'`).get();
+  assert.equal(row.status, 'paid');
+  assert.ok(row.paid_at, 'paid_at must be persisted');
+  assert.ok(row.paid_at.includes('2023'), 'paid_at must be Stripe timestamp (1700000000 = Nov 2023), not now');
 });

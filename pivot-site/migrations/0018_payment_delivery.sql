@@ -20,8 +20,3 @@ CREATE TABLE IF NOT EXISTS stripe_payments (
   lead_id TEXT NOT NULL,
   paid_at INTEGER NOT NULL
 );
-
--- Protocol version marker: distinguishes rows created by the new idempotency
--- protocol (v2) from legacy rows. Legacy pending rows without a Stripe ID
--- must reconcile via metadata lookup; v2 rows can safely retry creation.
-ALTER TABLE invoices ADD COLUMN protocol_version TEXT;
