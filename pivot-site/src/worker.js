@@ -349,6 +349,35 @@ async function handleApiLead(request, env, ctx) {
   return json({ ok: true, id: lead.id, created_at: lead.created_at, checkout_url: checkoutUrl }, 201);
 }
 
+// GET /api/founding-status — public founding-round availability
+// ------------------------------------------------------------------
+// Scarcity is only honest if it is counted, not typed. A founding spot
+// counts as TAKEN when a founding applicant has actually converted:
+// the founder marked the application 'won' in the CRM, or a payment
+// landed for that applicant (payments stamp the checkout lead created
+// by /api/lead — matched back to the application by email). Anything
+// short of that (a submitted application, a 'qualified' tag) does NOT
+// consume a spot. On any D1 error this handler throws on purpose: the
+// /api boundary returns 500 and the homepage pill stays hidden rather
+// than displaying an invented number.
+const FOUNDING_TOTAL_SPOTS = 10;
+async function handleFoundingStatus(env) {
+  const row = await env.DB.prepare(
+    `SELECT COUNT(*) AS n FROM leads f
+     WHERE f.channel = 'founding_application'
+       AND (f.status IN ('won', 'paid') OR f.paid_at IS NOT NULL
+            OR EXISTS (SELECT 1 FROM leads p
+                       WHERE p.email = f.email
+                         AND (p.status = 'paid' OR p.paid_at IS NOT NULL)))`
+  ).first();
+  const taken = Math.min(FOUNDING_TOTAL_SPOTS, Math.max(0, row?.n || 0));
+  return json(
+    { ok: true, total: FOUNDING_TOTAL_SPOTS, taken, remaining: FOUNDING_TOTAL_SPOTS - taken },
+    200,
+    { 'Cache-Control': 'public, max-age=300' }
+  );
+}
+
 // POST /api/founding-application — founding client round applications
 // ------------------------------------------------------------------
 // Same trust stack as /api/lead (Turnstile, 10/min IP rate limit, strict
@@ -746,6 +775,7 @@ export default {
       try {
         const p = url.pathname;
         if (p === '/api/health') return json({ ok: true, ts: nowIso() });
+        if (p === '/api/founding-status' && request.method === 'GET') return await handleFoundingStatus(env);
 
         if (p === '/api/packages' && request.method === 'GET') return await handlePackages(env);
         if (p === '/api/config' && request.method === 'GET') return await handleSiteConfig(env);
@@ -956,6 +986,9 @@ const PRETTY_URLS = {
   '/pos-locked-websites': '/pos-locked-websites.html',
   '/cottage-food-brand-identity': '/cottage-food-brand-identity.html',
   '/alternatives': '/alternatives.html',
+  '/demos/smoke-and-steel': '/demos/smoke-and-steel.html',
+  '/demos/mamas-sofrito': '/demos/mamas-sofrito.html',
+  '/demos/cocina-de-fuego': '/demos/cocina-de-fuego.html',
 };
     if ((request.method === 'GET' || request.method === 'HEAD') && PRETTY_URLS[pathname]) {
       const assetReq = new Request(assetUrl.origin + PRETTY_URLS[pathname], request);
