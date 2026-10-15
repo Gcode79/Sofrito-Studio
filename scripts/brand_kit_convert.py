@@ -3,7 +3,7 @@ Sofrito Studio — Brand Kit: SVG -> PNG + ICO (favicon) converter.
 
 Converts every SVG logo/icon in the Brand Kit to PNG (multiple sizes) and
 ICO favicons, so the brand is available in all formats for any future
-purpose (Gumroad avatar, social, favicon, print, etc.).
+purpose (social avatars, favicon, print, etc.).
 
 Keeps the original SVGs untouched.
 
@@ -17,7 +17,7 @@ from pathlib import Path
 from PIL import Image
 from resvg_py import svg_to_bytes
 
-BRAND_KIT = Path(__file__).resolve().parent.parent / "gumroad-uploads" / "All-Product-Images" / "Sofrito-Studio-Brand-Kit"
+BRAND_KIT = Path(__file__).resolve().parent.parent / "brand-uploads" / "All-Product-Images" / "Sofrito-Studio-Brand-Kit"
 LOGO_DIR = BRAND_KIT / "Logos"
 ICON_DIR = BRAND_KIT / "Icons"
 

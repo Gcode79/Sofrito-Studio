@@ -16,7 +16,7 @@ Sofrito Studio is a static-first, Cloudflare edge platform that provides brand f
 | Async       | Queues EMAIL_QUEUE + WEBHOOK_QUEUE     | Cloudflare Queues for asynchronous processing of email sends and webhook handling. |
 | Email       | Resend (Worker  Queue  consumer)         | Email sending via Resend, triggered by queue consumers. |
 | Automation  | Make.com (webhook-triggered scenarios)     | Workflow automation for lead nurturing, CRM updates, and reporting. |
-| Payments    | Stripe (services + projects; Gumroad dormant) | Payment processing for services and projects. |
+| Payments    | Stripe (services + projects) | Payment processing for services and projects. |
 | Newsletter  | Buttondown                                 | Newsletter distribution and subscriber management. |
 | AI          | OpenRouter (content, copy)                 | AI-powered content generation and copywriting via OpenRouter. |
 | CI/CD       | GitHub Actions deploy.yml, main = prod   | Automated deployment on push to main branch. |
