@@ -731,6 +731,15 @@ export default {
     }
 
     const url = new URL(request.url);
+
+    // www -> apex (301): the pivot owns the apex only. www was the legacy
+    // retail (Gumroad) host; any www request that reaches this Worker is
+    // permanently redirected to the same path + query on the apex.
+    if (url.hostname === 'www.sofritostudio.com') {
+      url.hostname = 'sofritostudio.com';
+      return Response.redirect(url.toString(), 301);
+    }
+
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
 
     if (url.pathname.startsWith('/api/')) {
