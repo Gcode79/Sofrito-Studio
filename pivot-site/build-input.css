@@ -1,3 +1,69 @@
+/* ============================================================
+   Sofrito Studio — production CSS input (Pillar 2, 2026-10-14)
+   Compiled with the Tailwind CLI to public/css/app.css.
+   This bundle replaces the Tailwind Play CDN in production.
+   Build: npm run build:css
+   ============================================================ */
+
+/* ---------- Pillar 1: self-hosted fonts (font-display: swap) ---------- */
+@font-face {
+  font-family: 'Fraunces';
+  src: url('/fonts/fraunces-variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  /* Display face on headings, deterministic Fraunces axes.
+     SOFT/WONK pinned to 0 so headlines never lean or soften by accident. */
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+    font-optical-sizing: auto;
+    font-variation-settings: 'SOFT' 0, 'WONK' 0;
+  }
+}
+
+@layer components {
+  /* Pillar 4: the FIG. / specimen editorial motif, systematized.
+     Mono micro-caption, confined to this component. Block usage adds
+     .fig-caption--ruled for the centered 1px index rule. */
+  .fig-caption {
+    @apply font-mono text-[11px] uppercase tracking-[0.14em];
+    font-variant-numeric: tabular-nums;
+    color: #a1a1aa; /* zinc-400 — 6.9:1 on zinc-950 */
+  }
+
+  .fig-caption--ruled::after {
+    content: '';
+    display: block;
+    width: 2.5rem;
+    height: 1px;
+    margin: 0.625rem 0 0;
+    background: rgba(255, 255, 255, 0.25);
+  }
+}
+
+/* Light-theme parity for the motif (theme.css remaps utilities;
+   component colors are pinned here so captions hold contrast on paper). */
+html.light .fig-caption {
+  color: #52525b; /* zinc-600 — 6.5:1 on #faf7f2 */
+}
+
+html.light .fig-caption--ruled::after {
+  background: rgba(24, 24, 27, 0.25);
+}

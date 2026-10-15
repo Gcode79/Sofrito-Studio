@@ -6,24 +6,26 @@
     <title>Food Truck Branding &amp; One-Page Websites | Sofrito Studio</title>
     <meta name="description" content="Sofrito Studio builds brand identities and one-page websites for independent food businesses. Start with a $400 Sofrito Session, credited in full toward the $997 Brand &amp; Web Sprint when you start the sprint within 30 days of your session.">
     <link rel="canonical" href="https://sofritostudio.com/">
-    <meta property="og:title" content="Sofrito Studio – The Sprint">
+    <meta property="og:title" content="Food Truck Branding &amp; One-Page Websites | Sofrito Studio">
     <meta property="og:description" content="Brand identities and one-page websites for independent food businesses. Start with a $400 Sofrito Session, credited in full toward the $997 Brand &amp; Web Sprint when you start the sprint within 30 days of your session.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://sofritostudio.com/">
     <meta property="og:image" content="https://sofritostudio.com/image-5.webp">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Sofrito Studio – The Sprint">
+    <meta name="twitter:title" content="Food Truck Branding &amp; One-Page Websites | Sofrito Studio">
     <meta name="twitter:description" content="Brand identities and one-page websites for independent food businesses. Start with a $400 Sofrito Session, credited in full toward the $997 Brand &amp; Web Sprint when you start the sprint within 30 days of your session.">
     <meta name="twitter:image" content="https://sofritostudio.com/image-5.webp">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <meta name="theme-color" content="#09090b">
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/fraunces-variable.woff2" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-variable.woff2" crossorigin>
     <link rel="stylesheet" href="/css/theme.css">
     <script>
     /* Theme init: apply the saved theme before first paint (no flash). Dark is the default. */
     (function(){try{if(localStorage.getItem('sofrito-theme')==='light'){document.documentElement.classList.add('light');}}catch(e){}})();
     </script>
     <script src="/js/theme.js" defer></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/app.css">
     <style>
         .glass-panel {
             background: rgba(255, 255, 255, 0.03);
@@ -281,8 +283,8 @@
         </div>
         <div class="relative h-[600px] w-full">
             <img src="/image-5.webp" alt="Chrome and Sauce" fetchpriority="high" class="w-full h-full object-cover rounded-sm">
-            <div class="absolute bottom-4 left-4 glass-panel px-4 py-2 text-[10px] tracking-widest uppercase text-white font-bold">
-                FIG. 01 — CHROME / SAUCE
+            <div class="absolute bottom-4 left-4 glass-panel px-4 py-2 fig-caption text-white">
+                CHROME / SAUCE
             </div>
         </div>
     </section>
@@ -326,6 +328,7 @@
     <!-- Portfolio Scoreboard -->
     <section class="py-20 px-6 max-w-7xl mx-auto">
         <div class="text-center mb-16">
+            <div class="fig-caption fig-caption--ruled after:mx-auto mb-4">FIG. 01 — DEMO SCOREBOARD</div>
             <div class="text-zinc-400 text-xs font-bold tracking-widest uppercase mb-6">Scoreboard</div>
             <h2 class="text-5xl font-bold tracking-tighter text-white mb-4">Built. Not Promised.</h2>
             <p class="text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">Three demo sprints showing exactly what a $997 sprint delivers — direction locked, then 48 hours to launch. Real client work takes this section as founding clients launch.</p>
@@ -383,6 +386,7 @@
     <!-- The Sprint: what you get + how it works + the promise -->
     <section id="offer" aria-label="The Sprint" class="py-20 px-6 max-w-7xl mx-auto border-t border-white/5">
         <div class="text-center mb-16">
+            <div class="fig-caption fig-caption--ruled after:mx-auto mb-4">FIG. 02 — SPRINT ARCHITECTURE</div>
             <div class="text-zinc-400 text-xs font-bold tracking-widest uppercase mb-6">The Sprint</div>
             <h2 class="text-5xl font-bold tracking-tighter text-white mb-4">One sprint. Everything you need to look like the food tastes.</h2>
             <p class="text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">Brand identity and one-page website. $997 flat. Built and launched within 48 hours of direction lock.</p>
@@ -463,6 +467,7 @@
     <!-- The honest comparison -->
     <section aria-label="Compare your options" class="py-20 px-6 max-w-7xl mx-auto border-t border-white/5">
         <div class="text-center mb-16">
+            <div class="fig-caption fig-caption--ruled after:mx-auto mb-4">FIG. 03 — BENCHMARK COMPARISON</div>
             <div class="text-zinc-400 text-xs font-bold tracking-widest uppercase mb-6">The honest comparison</div>
             <h2 class="text-5xl font-bold tracking-tighter text-white mb-4">Why a sprint beats the alternatives.</h2>
             <p class="text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">No strawmen. Every option below works for someone — here is what each one actually costs you.</p>
@@ -584,8 +589,8 @@
                             <input type="text" id="business_name" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors" required>
                         </div>
                         <div>
-                            <label for="phone" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Cell Phone <span class="text-zinc-500">*</span></label>
-                            <input type="tel" id="phone" required class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors">
+                            <label for="phone" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Cell Phone <span class="text-zinc-500 normal-case tracking-normal">(optional)</span></label>
+                            <input type="tel" id="phone" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors">
                         </div>
                     </div>
                     <div>

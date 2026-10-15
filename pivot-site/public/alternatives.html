@@ -17,13 +17,15 @@
     <meta name="twitter:image" content="https://sofritostudio.com/image-5.webp">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <meta name="theme-color" content="#09090b">
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/fraunces-variable.woff2" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-variable.woff2" crossorigin>
     <link rel="stylesheet" href="/css/theme.css">
     <script>
     /* Theme init: apply the saved theme before first paint (no flash). Dark is the default. */
     (function(){try{if(localStorage.getItem('sofrito-theme')==='light'){document.documentElement.classList.add('light');}}catch(e){}})();
     </script>
     <script src="/js/theme.js" defer></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/app.css">
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -113,6 +115,7 @@
         </div>
 
         <section aria-label="Comparison" class="mt-12 overflow-x-auto">
+            <div class="fig-caption fig-caption--ruled mb-4">FIG. 01 — BENCHMARK COMPARISON</div>
             <table class="w-full min-w-[560px] border-collapse text-left text-sm">
                 <thead>
                     <tr class="border-b border-white/10 text-xs uppercase tracking-widest text-zinc-500">
