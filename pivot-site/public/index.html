@@ -227,8 +227,8 @@
             </a>
             <div class="hidden md:flex space-x-8 text-xs tracking-widest uppercase font-semibold text-zinc-400">
                 <a href="#offer" class="hover:text-zinc-200 transition-colors">The Sprint</a>
+                <a href="#demos" class="hover:text-zinc-200 transition-colors">Demos</a>
                 <a href="#faq" class="hover:text-zinc-200 transition-colors">FAQ</a>
-                <a href="#apply" class="hover:text-zinc-200 transition-colors">Apply for Founding</a>
             </div>
             <button type="button" data-theme-toggle class="theme-toggle" aria-label="Toggle light and dark theme">
                 <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -246,7 +246,7 @@
 
     <main>
     <!-- Hero: Founding Round -->
-    <section class="pt-28 pb-16 px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+    <section id="hero" class="pt-28 pb-16 px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div>
             <div class="inline-flex items-center gap-2.5 border border-orange-500/30 rounded-full px-4 py-2 mb-6">
                 <span class="relative flex h-2 w-2">
@@ -265,6 +265,7 @@
                 Apply for a Founding Spot
             </a>
             <p class="text-sm text-zinc-500 mt-4">No charge to apply. We read every application personally and reply within two business days.</p>
+            <p class="fig-caption mt-6 hidden" data-founding-pill>Founding Cohort 01 · <span data-founding-remaining>—</span> of 10 spots remaining</p>
 
             <div class="hero-facts grid grid-cols-3 gap-6 mt-16 pt-8 border-t border-white/10">
                 <div>
@@ -326,7 +327,7 @@
     </section>
 
     <!-- Portfolio Scoreboard -->
-    <section class="py-20 px-6 max-w-7xl mx-auto">
+    <section id="demos" class="py-20 px-6 max-w-7xl mx-auto">
         <div class="text-center mb-16">
             <div class="fig-caption fig-caption--ruled after:mx-auto mb-4">FIG. 01 — DEMO SCOREBOARD</div>
             <div class="text-zinc-400 text-xs font-bold tracking-widest uppercase mb-6">Scoreboard</div>
@@ -337,8 +338,30 @@
             <div class="glass-panel p-8 hover:border-white/25 transition-colors">
                 <div class="text-zinc-500 text-[10px] tracking-widest uppercase mb-3 font-bold">DEMO 01 — Food Truck</div>
                 <h3 class="text-xl font-bold text-white mb-2">Smoke &amp; Steel</h3>
-                <p class="text-zinc-400 text-sm leading-relaxed mb-4">Mobile BBQ trailer → single-page site with live location tracking, menu, and online ordering links.</p>
-                <div class="flex items-center gap-3 text-xs text-zinc-500 font-mono">
+                <p class="text-zinc-400 text-sm leading-relaxed mb-5">Mobile BBQ trailer → single-page site with live location tracking, menu, and online ordering links.</p>
+                <div class="bg-[#17130f] border border-white/10 px-5 py-5 mb-4">
+                    <p class="font-display font-black text-2xl tracking-tight text-[#f3ebdd] leading-none">SMOKE <span class="text-[#ea580c]">&amp;</span> STEEL</p>
+                    <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-[#8a7f70] mt-2">Mobile BBQ Trailer</p>
+                </div>
+                <div class="flex gap-2 mb-5">
+                    <div class="flex-1"><div class="h-8 bg-[#17130f] border border-white/15"></div><p class="font-mono text-[9px] text-zinc-500 mt-1.5">#17130F CHAR</p></div>
+                    <div class="flex-1"><div class="h-8 bg-[#ea580c]"></div><p class="font-mono text-[9px] text-zinc-500 mt-1.5">#EA580C EMBER</p></div>
+                    <div class="flex-1"><div class="h-8 bg-[#f3ebdd]"></div><p class="font-mono text-[9px] text-zinc-500 mt-1.5">#F3EBDD BONE</p></div>
+                </div>
+                <div class="mx-auto w-[168px] border border-white/15 rounded-[1.4rem] p-2 mb-6 bg-black/40">
+                    <div class="rounded-[1rem] overflow-hidden bg-[#17130f]">
+                        <div class="px-3 pt-3 pb-2.5 border-b border-white/10">
+                            <p class="font-display font-black text-[13px] text-[#f3ebdd] leading-none">SMOKE <span class="text-[#ea580c]">&amp;</span> STEEL</p>
+                        </div>
+                        <div class="px-3 py-3">
+                            <p class="font-display font-bold text-[15px] leading-tight text-[#f3ebdd]">Brisket worth following.</p>
+                            <p class="font-mono text-[8px] uppercase tracking-[0.14em] text-[#ea580c] mt-2">Today — Kakaʻako · 11a–8p</p>
+                            <span class="inline-block mt-3 rounded-full bg-[#ea580c] text-white text-[9px] font-bold uppercase tracking-widest px-3 py-1.5">See the Menu</span>
+                        </div>
+                    </div>
+                </div>
+                <a href="/demos/smoke-and-steel" class="inline-flex items-center gap-2 text-sm font-bold text-orange-400 hover:text-orange-300 transition-colors">Inspect Live Demo <span aria-hidden="true">→</span></a>
+                <div class="flex items-center gap-3 text-xs text-zinc-500 font-mono mt-4">
                     <span>48H</span>
                     <span>·</span>
                     <span>SPRINT BLUEPRINT</span>
@@ -347,8 +370,30 @@
             <div class="glass-panel p-8 hover:border-white/25 transition-colors">
                 <div class="text-zinc-500 text-[10px] tracking-widest uppercase mb-3 font-bold">DEMO 02 — CPG</div>
                 <h3 class="text-xl font-bold text-white mb-2">Mama&#39;s Sofrito</h3>
-                <p class="text-zinc-400 text-sm leading-relaxed mb-4">Small-batch sauce brand → brand identity suite + storefront with wholesale inquiry flow and retail locator.</p>
-                <div class="flex items-center gap-3 text-xs text-zinc-500 font-mono">
+                <p class="text-zinc-400 text-sm leading-relaxed mb-5">Small-batch sauce brand → brand identity suite + storefront with wholesale inquiry flow and retail locator.</p>
+                <div class="bg-[#fbf3e4] border border-white/10 px-5 py-5 mb-4">
+                    <p class="font-display italic font-black text-2xl tracking-tight text-[#b3352b] leading-none">Mama&rsquo;s Sofrito</p>
+                    <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-[#47663b] mt-2">Small-Batch Sauce Co.</p>
+                </div>
+                <div class="flex gap-2 mb-5">
+                    <div class="flex-1"><div class="h-8 bg-[#b3352b]"></div><p class="font-mono text-[9px] text-zinc-500 mt-1.5">#B3352B TOMATO</p></div>
+                    <div class="flex-1"><div class="h-8 bg-[#d9a441]"></div><p class="font-mono text-[9px] text-zinc-500 mt-1.5">#D9A441 TURMERIC</p></div>
+                    <div class="flex-1"><div class="h-8 bg-[#47663b]"></div><p class="font-mono text-[9px] text-zinc-500 mt-1.5">#47663B HERB</p></div>
+                </div>
+                <div class="mx-auto w-[168px] border border-white/15 rounded-[1.4rem] p-2 mb-6 bg-black/40">
+                    <div class="rounded-[1rem] overflow-hidden bg-[#fbf3e4]">
+                        <div class="px-3 pt-3 pb-2.5 border-b border-[#221a15]/10">
+                            <p class="font-display italic font-black text-[13px] text-[#b3352b] leading-none">Mama&rsquo;s Sofrito</p>
+                        </div>
+                        <div class="px-3 py-3">
+                            <p class="font-display font-bold text-[15px] leading-tight text-[#221a15]">The base of every good dish.</p>
+                            <p class="font-mono text-[8px] uppercase tracking-[0.14em] text-[#47663b] mt-2">Original · Picante · The Trio</p>
+                            <span class="inline-block mt-3 rounded-full bg-[#b3352b] text-white text-[9px] font-bold uppercase tracking-widest px-3 py-1.5">Shop the Jars</span>
+                        </div>
+                    </div>
+                </div>
+                <a href="/demos/mamas-sofrito" class="inline-flex items-center gap-2 text-sm font-bold text-orange-400 hover:text-orange-300 transition-colors">Inspect Live Demo <span aria-hidden="true">→</span></a>
+                <div class="flex items-center gap-3 text-xs text-zinc-500 font-mono mt-4">
                     <span>48H</span>
                     <span>·</span>
                     <span>SPRINT BLUEPRINT</span>
@@ -357,8 +402,30 @@
             <div class="glass-panel p-8 hover:border-white/25 transition-colors">
                 <div class="text-zinc-500 text-[10px] tracking-widest uppercase mb-3 font-bold">DEMO 03 — Restaurant</div>
                 <h3 class="text-xl font-bold text-white mb-2">Cocina de Fuego</h3>
-                <p class="text-zinc-400 text-sm leading-relaxed mb-4">Island-cuisine restaurant → identity + site with reservations, catering inquiries, and full mobile speed.</p>
-                <div class="flex items-center gap-3 text-xs text-zinc-500 font-mono">
+                <p class="text-zinc-400 text-sm leading-relaxed mb-5">Island-cuisine restaurant → identity + site with reservations, catering inquiries, and full mobile speed.</p>
+                <div class="bg-[#0e1526] border border-white/10 px-5 py-5 mb-4">
+                    <p class="font-display font-black text-2xl tracking-tight text-[#e9dfc9] leading-none">COCINA <span class="text-[#e4572e]">DE FUEGO</span></p>
+                    <p class="font-mono text-[9px] uppercase tracking-[0.3em] text-[#7d8c6f] mt-2">Island Kitchen — Honolulu</p>
+                </div>
+                <div class="flex gap-2 mb-5">
+                    <div class="flex-1"><div class="h-8 bg-[#0e1526] border border-white/15"></div><p class="font-mono text-[9px] text-zinc-500 mt-1.5">#0E1526 MIDNIGHT</p></div>
+                    <div class="flex-1"><div class="h-8 bg-[#e4572e]"></div><p class="font-mono text-[9px] text-zinc-500 mt-1.5">#E4572E FUEGO</p></div>
+                    <div class="flex-1"><div class="h-8 bg-[#e9dfc9]"></div><p class="font-mono text-[9px] text-zinc-500 mt-1.5">#E9DFC9 SAND</p></div>
+                </div>
+                <div class="mx-auto w-[168px] border border-white/15 rounded-[1.4rem] p-2 mb-6 bg-black/40">
+                    <div class="rounded-[1rem] overflow-hidden bg-[#0e1526]">
+                        <div class="px-3 pt-3 pb-2.5 border-b border-white/10">
+                            <p class="font-display font-black text-[13px] text-[#e9dfc9] leading-none">COCINA <span class="text-[#e4572e]">DE FUEGO</span></p>
+                        </div>
+                        <div class="px-3 py-3">
+                            <p class="font-display font-bold text-[15px] leading-tight text-[#e9dfc9]">Cooked over fire. Served like family.</p>
+                            <p class="font-mono text-[8px] uppercase tracking-[0.14em] text-[#7d8c6f] mt-2">Kapahulu · Tue–Sun · 5–10p</p>
+                            <span class="inline-block mt-3 rounded-full bg-[#e4572e] text-white text-[9px] font-bold uppercase tracking-widest px-3 py-1.5">See the Menu</span>
+                        </div>
+                    </div>
+                </div>
+                <a href="/demos/cocina-de-fuego" class="inline-flex items-center gap-2 text-sm font-bold text-orange-400 hover:text-orange-300 transition-colors">Inspect Live Demo <span aria-hidden="true">→</span></a>
+                <div class="flex items-center gap-3 text-xs text-zinc-500 font-mono mt-4">
                     <span>48H</span>
                     <span>·</span>
                     <span>SPRINT BLUEPRINT</span>
@@ -393,10 +460,11 @@
         </div>
 
         <!-- What you get -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20">
-            <div class="glass-panel p-8">
+        <div class="fig-caption mb-4">Sprint Manifest — Contents of the Sprint</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="glass-panel p-8 md:col-span-2">
                 <div class="text-zinc-600 text-sm font-mono mb-4">01</div>
-                <h3 class="text-xl text-white font-bold mb-2 uppercase">Brand Identity</h3>
+                <h3 class="text-2xl text-white font-bold mb-2 uppercase">Brand Identity</h3>
                 <p class="text-zinc-400 text-sm leading-relaxed">Logo suite, color palette, typography, and voice — a complete identity built around your food and your story.</p>
             </div>
             <div class="glass-panel p-8">
@@ -409,10 +477,22 @@
                 <h3 class="text-xl text-white font-bold mb-2 uppercase">Launch Assets</h3>
                 <p class="text-zinc-400 text-sm leading-relaxed">Social profiles, print-ready files, and merch basics — everything you need to show up consistently from day one.</p>
             </div>
-            <div class="glass-panel p-8">
+            <div class="glass-panel p-8 md:col-span-2">
                 <div class="text-zinc-600 text-sm font-mono mb-4">04</div>
-                <h3 class="text-xl text-white font-bold mb-2 uppercase">Clear Handoff</h3>
+                <h3 class="text-2xl text-white font-bold mb-2 uppercase">Clear Handoff</h3>
                 <p class="text-zinc-400 text-sm leading-relaxed">Two refinement rounds, organized files, live site on your domain, and 30 days of post-launch support. You own everything outright.</p>
+            </div>
+        </div>
+
+        <!-- After the sprint: care plan vs self-hosted -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20">
+            <div class="glass-panel p-8 border-l-2 border-l-orange-500">
+                <p class="font-mono text-[11px] uppercase tracking-[0.14em] text-orange-400 mb-3">Engine Maintenance — $49/mo · Optional</p>
+                <p class="text-zinc-400 text-sm leading-relaxed">We run it: hosting, security, and small updates like menu changes and new hours — handled for you after launch.</p>
+            </div>
+            <div class="glass-panel p-8">
+                <p class="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-400 mb-3">Self-Hosted — $0</p>
+                <p class="text-zinc-400 text-sm leading-relaxed">You run it: every file handed over, ready to host anywhere. Your site is yours either way — no lock-in, ever.</p>
             </div>
         </div>
 
@@ -420,24 +500,36 @@
         <div class="max-w-3xl mx-auto mb-20">
             <h3 class="text-3xl font-bold tracking-tighter text-white text-center mb-12">How it works</h3>
             <div class="space-y-10">
-                <div class="flex gap-8">
-                    <div class="text-2xl font-mono text-orange-500 shrink-0">01</div>
-                    <div>
+                <div class="flex gap-5 md:gap-8">
+                    <div class="w-[84px] shrink-0 text-center">
+                        <span class="inline-block border border-orange-500/40 text-orange-400 font-mono text-sm font-bold px-3 py-2">T-00</span>
+                        <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500 mt-2">Session</p>
+                    </div>
+                    <div class="relative border-l border-white/10 pl-6 md:pl-8 pb-2">
+                        <span class="absolute -left-[5px] top-2.5 h-2.5 w-2.5 rounded-full bg-orange-500" aria-hidden="true"></span>
                         <h4 class="text-xl text-white font-bold mb-2 uppercase">Direction</h4>
                         <p class="text-zinc-400 leading-relaxed">A 45-minute Sofrito Session to lock your visual lane and the one action your page must drive. You approve the direction in writing — nothing builds without your sign-off.</p>
                         <p class="text-zinc-400 leading-relaxed mt-3"><span class="text-white font-semibold">How payment works:</span> the $400 session locks your date and is credited in full toward the $997 total when you start the sprint within 30 days of your session. The remaining $597 is due when you approve the direction in writing.</p>
                     </div>
                 </div>
-                <div class="flex gap-8">
-                    <div class="text-2xl font-mono text-orange-500 shrink-0">02</div>
-                    <div>
+                <div class="flex gap-5 md:gap-8">
+                    <div class="w-[84px] shrink-0 text-center">
+                        <span class="inline-block border border-orange-500/40 text-orange-400 font-mono text-sm font-bold px-3 py-2">T+24H</span>
+                        <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500 mt-2">Identity &amp; Page</p>
+                    </div>
+                    <div class="relative border-l border-white/10 pl-6 md:pl-8 pb-2">
+                        <span class="absolute -left-[5px] top-2.5 h-2.5 w-2.5 rounded-full bg-orange-500" aria-hidden="true"></span>
                         <h4 class="text-xl text-white font-bold mb-2 uppercase">Build</h4>
                         <p class="text-zinc-400 leading-relaxed">48 hours from direction lock. Identity first, then the page, then a video walkthrough of every choice — then your consolidated feedback and launch.</p>
                     </div>
                 </div>
-                <div class="flex gap-8">
-                    <div class="text-2xl font-mono text-orange-500 shrink-0">03</div>
-                    <div>
+                <div class="flex gap-5 md:gap-8">
+                    <div class="w-[84px] shrink-0 text-center">
+                        <span class="inline-block border border-orange-500/40 text-orange-400 font-mono text-sm font-bold px-3 py-2">T+48H</span>
+                        <p class="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500 mt-2">Launch</p>
+                    </div>
+                    <div class="relative border-l border-white/10 pl-6 md:pl-8 pb-2">
+                        <span class="absolute -left-[5px] top-2.5 h-2.5 w-2.5 rounded-full bg-orange-500" aria-hidden="true"></span>
                         <h4 class="text-xl text-white font-bold mb-2 uppercase">Launch</h4>
                         <p class="text-zinc-400 leading-relaxed">Live on your domain with all assets organized and handed over. 30 days of support for fixes and tweaks. The brand is yours — no lock-in, no platform trap.</p>
                     </div>
@@ -472,7 +564,7 @@
             <h2 class="text-5xl font-bold tracking-tighter text-white mb-4">Why a sprint beats the alternatives.</h2>
             <p class="text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">No strawmen. Every option below works for someone — here is what each one actually costs you.</p>
         </div>
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto hidden md:block">
             <table class="w-full min-w-[760px] border-collapse text-left">
                 <thead>
                     <tr>
@@ -522,6 +614,56 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Mobile comparison: Sofrito pinned, competitor swaps — no horizontal scroll -->
+        <div class="md:hidden">
+            <div class="flex rounded-full border border-white/15 p-1 mb-6" role="group" aria-label="Choose what to compare against">
+                <button type="button" data-cmp-btn="diy" aria-pressed="true" class="flex-1 rounded-full py-2.5 text-[11px] font-bold uppercase tracking-widest bg-orange-600 text-white transition-colors">vs DIY</button>
+                <button type="button" data-cmp-btn="agency" aria-pressed="false" class="flex-1 rounded-full py-2.5 text-[11px] font-bold uppercase tracking-widest text-zinc-400 transition-colors">vs Agency</button>
+                <button type="button" data-cmp-btn="pos" aria-pressed="false" class="flex-1 rounded-full py-2.5 text-[11px] font-bold uppercase tracking-widest text-zinc-400 transition-colors">vs POS</button>
+            </div>
+            <div class="border border-white/10">
+                <div class="grid grid-cols-2 border-b border-white/10">
+                    <p class="p-4 text-[11px] font-bold tracking-widest uppercase text-white bg-orange-600/5">Sofrito Studio</p>
+                    <p class="p-4 text-[11px] font-bold tracking-widest uppercase text-zinc-400" data-cmp-name>DIY Platforms</p>
+                </div>
+                <div class="p-4 border-b border-white/5">
+                    <p class="text-[10px] font-bold tracking-widest uppercase text-zinc-500 mb-2.5">Price</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <p class="text-sm text-zinc-300 leading-relaxed"><span class="text-white font-semibold">$997, flat.</span> No hourly billing.</p>
+                        <p class="text-sm text-zinc-400 leading-relaxed" data-cmp-cell="price">$0–$50/month, plus your time.</p>
+                    </div>
+                </div>
+                <div class="p-4 border-b border-white/5">
+                    <p class="text-[10px] font-bold tracking-widest uppercase text-zinc-500 mb-2.5">Timeline</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <p class="text-sm text-zinc-300 leading-relaxed"><span class="text-white font-semibold">48 hours</span> from direction lock.</p>
+                        <p class="text-sm text-zinc-400 leading-relaxed" data-cmp-cell="timeline">Whenever you get to it.</p>
+                    </div>
+                </div>
+                <div class="p-4 border-b border-white/5">
+                    <p class="text-[10px] font-bold tracking-widest uppercase text-zinc-500 mb-2.5">Design</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <p class="text-sm text-zinc-300 leading-relaxed"><span class="text-white font-semibold">Custom</span> — built for your food and your story.</p>
+                        <p class="text-sm text-zinc-400 leading-relaxed" data-cmp-cell="design">Templates you fill in yourself.</p>
+                    </div>
+                </div>
+                <div class="p-4 border-b border-white/5">
+                    <p class="text-[10px] font-bold tracking-widest uppercase text-zinc-500 mb-2.5">Who does the work</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <p class="text-sm text-zinc-300 leading-relaxed"><span class="text-white font-semibold">We do.</span> You just approve the direction.</p>
+                        <p class="text-sm text-zinc-400 leading-relaxed" data-cmp-cell="work">You do. All of it.</p>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <p class="text-[10px] font-bold tracking-widest uppercase text-zinc-500 mb-2.5">Lock-in</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <p class="text-sm text-zinc-300 leading-relaxed"><span class="text-white font-semibold">None.</span> You own everything outright.</p>
+                        <p class="text-sm text-zinc-400 leading-relaxed" data-cmp-cell="lockin">Stays on their platform.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- FAQ -->
@@ -568,6 +710,22 @@
             <h2 class="text-5xl font-bold tracking-tighter text-chrome mb-4">Claim one of 10 founding spots.</h2>
             <p class="text-xl text-zinc-400 leading-relaxed mb-6">The full Brand &amp; Web Sprint for $997. Founders pick their build slots first each week and get a direct line during the sprint.</p>
             <p class="text-xl text-zinc-400 leading-relaxed">In return, founding clients let us showcase their before-and-after story — a short written testimonial and a 30-minute conversation about the process. That's how we earn our proof: with real clients, not stock quotes.</p>
+            <p class="fig-caption fig-caption--ruled after:mx-auto mt-8 hidden" data-founding-pill>Founding Cohort 01 · <span data-founding-remaining>—</span> of 10 spots remaining</p>
+        </div>
+
+        <!-- The path, in one line: apply -> fit check -> credited session -->
+        <div class="flex flex-col md:flex-row items-stretch gap-2 mb-8 text-center">
+            <div class="flex-1 border border-white/10 px-4 py-3.5 flex items-center justify-center">
+                <p class="font-mono text-[11px] uppercase tracking-[0.14em] text-orange-400">Step 1 — Free 2-Min Application</p>
+            </div>
+            <div class="hidden md:flex items-center text-zinc-600" aria-hidden="true">→</div>
+            <div class="flex-1 border border-white/10 px-4 py-3.5 flex items-center justify-center">
+                <p class="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-300">Step 2 — Fit Check · Within 48H</p>
+            </div>
+            <div class="hidden md:flex items-center text-zinc-600" aria-hidden="true">→</div>
+            <div class="flex-1 border border-white/10 px-4 py-3.5 flex items-center justify-center">
+                <p class="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-300">Step 3 — $400 Session · Credited 100% to the $997 Sprint</p>
+            </div>
         </div>
 
         <div class="glass-panel p-8 md:p-12">
@@ -644,7 +802,6 @@
                 <h3 class="text-white font-bold tracking-widest uppercase text-lg mb-3 font-sans">SOFRITO STUDIO</h3>
                 <p class="text-zinc-400 text-sm leading-relaxed">Brand foundations for independent food businesses.</p>
                 <a href="mailto:hello@sofritostudio.com" class="text-zinc-500 text-sm hover:text-zinc-200 transition-colors mt-4 block">hello@sofritostudio.com</a>
-                <a href="mailto:support@sofritostudio.com" class="text-zinc-500 text-sm hover:text-zinc-200 transition-colors mt-1 block">support@sofritostudio.com</a>
             </div>
             <!-- Explore Column -->
             <div>
@@ -684,6 +841,14 @@
             <p class="text-zinc-600 text-xs font-sans">&copy; 2026 Sofrito Studio. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- Sticky mobile action bar: mobile only, revealed by the enhancements script -->
+    <div id="sticky-apply" class="fixed bottom-0 inset-x-0 z-40 md:hidden translate-y-full transition-transform duration-300 bg-zinc-950/95 backdrop-blur border-t border-white/10 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div class="flex items-center justify-between gap-4">
+            <p class="text-xs font-bold uppercase tracking-widest text-zinc-300">Founding Sprint · $997 Flat</p>
+            <a href="#apply" class="rounded-full bg-orange-600 text-white text-xs font-bold uppercase tracking-widest px-5 py-3 hover:bg-orange-700 transition-colors">Apply →</a>
+        </div>
+    </div>
 
     <!-- Founding Application Logic -->
     <script>
@@ -836,6 +1001,63 @@
         document.getElementById('sofrito-share')?.addEventListener('click', sharePage);
         document.getElementById('sofrito-share-nav')?.addEventListener('click', sharePage);
 
+    </script>
+
+    <script>
+    /* Homepage enhancements — all fail silent:
+       CV-3 founding availability pill reads the live D1 count (no number
+       is ever rendered from static markup); MB-2 sticky bar appears after
+       the hero and hides while the form is on screen; MB-1 mobile
+       comparison switcher swaps the competitor column in place. */
+    (function () {
+        fetch('/api/founding-status')
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (d) {
+                if (!d || typeof d.remaining !== 'number') return;
+                document.querySelectorAll('[data-founding-pill]').forEach(function (el) {
+                    el.querySelector('[data-founding-remaining]').textContent = d.remaining;
+                    el.classList.remove('hidden');
+                });
+            })
+            .catch(function () { /* pill stays hidden — never show an uncounted number */ });
+
+        var bar = document.getElementById('sticky-apply');
+        var hero = document.getElementById('hero');
+        var apply = document.getElementById('apply');
+        if (bar && hero && apply && 'IntersectionObserver' in window) {
+            var heroSeen = true, applySeen = false;
+            var sync = function () { bar.classList.toggle('translate-y-full', heroSeen || applySeen); };
+            new IntersectionObserver(function (e) { heroSeen = e[0].isIntersecting; sync(); }).observe(hero);
+            new IntersectionObserver(function (e) { applySeen = e[0].isIntersecting; sync(); }).observe(apply);
+        }
+
+        var CMP = {
+            diy: { name: 'DIY Platforms', price: '$0–$50/month, plus your time.', timeline: 'Whenever you get to it.', design: 'Templates you fill in yourself.', work: 'You do. All of it.', lockin: 'Stays on their platform.' },
+            agency: { name: 'Traditional Agency', price: '$5,000–$15,000+, billed by the hour.', timeline: '6–12 weeks, if the schedule holds.', design: 'Custom — if the budget holds.', work: 'Their team, on agency time.', lockin: 'None — but changes cost extra.' },
+            pos: { name: 'POS-Locked Platforms', price: 'Bundled with their POS contract.', timeline: 'On their rollout schedule.', design: 'Their templates, their layout.', work: 'Their team, their way.', lockin: 'Leave the POS, lose the site.' }
+        };
+        var cmpBtns = document.querySelectorAll('[data-cmp-btn]');
+        if (cmpBtns.length) {
+            cmpBtns.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var key = btn.getAttribute('data-cmp-btn');
+                    var data = CMP[key];
+                    if (!data) return;
+                    cmpBtns.forEach(function (b) {
+                        var active = b === btn;
+                        b.setAttribute('aria-pressed', active ? 'true' : 'false');
+                        b.classList.toggle('bg-orange-600', active);
+                        b.classList.toggle('text-white', active);
+                        b.classList.toggle('text-zinc-400', !active);
+                    });
+                    document.querySelector('[data-cmp-name]').textContent = data.name;
+                    document.querySelectorAll('[data-cmp-cell]').forEach(function (cell) {
+                        cell.textContent = data[cell.getAttribute('data-cmp-cell')] || '';
+                    });
+                });
+            });
+        }
+    })();
     </script>
 </body>
 </html>
