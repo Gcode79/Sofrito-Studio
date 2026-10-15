@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://sofritostudio.com/sitemap.xml

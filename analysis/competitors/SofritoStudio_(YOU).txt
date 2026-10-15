@@ -1,5 +1,0 @@
-URL: https://sofritostudio.com
-TITLE: Sofrito — Cocina Boricua: Puerto Rican Cooking Made Easy
-PRICES: ['$9', '$47', '$9', '$9', '$47', '$67', '$97', '$47', '$47', '$67']
-HAS_EMAIL: True
-HAS_CHECKOUT: True

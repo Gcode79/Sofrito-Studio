@@ -22,7 +22,6 @@
 # ============================================================
 
 name = "sofrito-studio"
-account_id = "b10d2ee39fa75abc3de1799de8903ebc"
 main = "src/worker.js"
 compatibility_date = "2026-08-25"
 compatibility_flags = ["nodejs_compat"]
@@ -47,17 +46,6 @@ html_handling = "none"
 # retail site: comment these lines and redeploy the old worker (../cloudflare).
 [[routes]]
 pattern = "sofritostudio.com"
-custom_domain = true
-enabled = true
-previews_enabled = false
-
-# www exists ONLY to 301 to the apex (the Worker redirects every www
-# request). Until 2026-10-14 www was a CNAME to domains.gumroad.com (the
-# legacy retail store) and never reached this Worker. Deploy prerequisite:
-# the Gumroad CNAME must be deleted first (Kilo, Cloudflare MCP) so this
-# custom-domain route can claim the host.
-[[routes]]
-pattern = "www.sofritostudio.com"
 custom_domain = true
 enabled = true
 previews_enabled = false

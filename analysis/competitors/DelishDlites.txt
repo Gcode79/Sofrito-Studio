@@ -1,5 +1,0 @@
-URL: https://www.delishdlites.com
-TITLE: Home - Delish D&#039;Lites
-PRICES: []
-HAS_EMAIL: True
-HAS_CHECKOUT: False

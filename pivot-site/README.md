@@ -15,7 +15,7 @@ automation stack. Recipe blog → brand studio.
 | Async       | Queues `EMAIL_QUEUE` + `WEBHOOK_QUEUE`     |
 | Email       | Resend (Worker → Queue → consumer)         |
 | Automation  | Make.com (webhook-triggered scenarios)     |
-| Payments    | Stripe (services + projects; Gumroad dormant) |
+| Payments    | Stripe (services + projects) |
 | Newsletter  | Buttondown                                 |
 | AI          | OpenRouter (content, copy)                 |
 | CI/CD       | GitHub Actions `deploy.yml`, main = prod   |

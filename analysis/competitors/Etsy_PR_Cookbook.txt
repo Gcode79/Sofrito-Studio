@@ -1,5 +1,0 @@
-URL: https://www.etsy.com/search?q=puerto+rican+cookbook+digital
-TITLE: No title
-PRICES: []
-HAS_EMAIL: False
-HAS_CHECKOUT: False
