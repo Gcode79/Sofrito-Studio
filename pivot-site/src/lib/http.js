@@ -228,6 +228,9 @@ const LEGACY_REDIRECTS = [
     { match: (p) => p.startsWith('/blog/'), to: '/' },
     { match: (p) => p.startsWith('/posts/'), to: '/' },
     { match: (p) => p === '/sprint.html', to: '/' },
+    // EDGE-01 (audit council 2026-10-14): the bare /demos path 404'd while
+    // /demos/* are first-class routes — send it to the homepage scoreboard.
+    { match: (p) => p === '/demos' || p === '/demos/', to: '/#demos' },
 ];
 
 function legacyRedirectFor(pathname) {

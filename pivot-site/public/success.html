@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>You're In — Sofrito Studio</title>
     <meta property="og:title" content="You're In — Sofrito Studio">
+    <meta name="description" content="Sofrito Session payment confirmation and scheduling next steps.">
+    <meta property="og:description" content="Sofrito Session payment confirmation and scheduling next steps.">
+    <meta property="og:image" content="https://sofritostudio.com/image-5.webp">
     <link rel="canonical" href="https://sofritostudio.com/success">
     <meta name="theme-color" content="#09090b">
     <link rel="preload" as="font" type="font/woff2" href="/fonts/fraunces-variable.woff2" crossorigin>
@@ -22,18 +25,14 @@
         <div class="max-w-2xl mx-auto text-center" aria-live="polite">
 
             <!-- Verifying state (shown first, fail-closed: the confirmation only appears after the API says "paid") -->
+            <h1 id="success-title" class="font-serif tracking-tight text-3xl sm:text-4xl text-white mb-6">Confirming your payment&hellip;</h1>
+
             <div id="state-verifying">
-                <h1 class="font-serif tracking-tight text-3xl sm:text-4xl text-white mb-6">
-                    Confirming your payment&hellip;
-                </h1>
                 <p class="text-zinc-400">One moment while we verify your session booking.</p>
             </div>
 
             <!-- Paid state -->
             <div id="state-paid" class="hidden">
-                <h1 class="font-serif tracking-tight text-3xl sm:text-4xl text-white mb-6">
-                    You're in. Check your email for your receipt and session scheduling link.
-                </h1>
                 <a href="https://calendly.com/sofrito-studio/sofrito-strategy-session"
                    id="calendly-btn"
                    class="inline-block bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-md transition-colors mb-6">
@@ -48,9 +47,6 @@
 
             <!-- Payment incomplete (3-D Secure abandoned, etc.) -->
             <div id="state-action" class="hidden">
-                <h1 class="font-serif tracking-tight text-3xl sm:text-4xl text-white mb-6">
-                    Your payment didn't complete.
-                </h1>
                 <p class="text-zinc-400 mb-6">Your card wasn't charged. Pick up where you left off to finish booking your Sofrito Session.</p>
                 <a href="#"
                    id="resume-btn"
@@ -61,9 +57,6 @@
 
             <!-- Unknown / could not verify -->
             <div id="state-unknown" class="hidden">
-                <h1 class="font-serif tracking-tight text-3xl sm:text-4xl text-white mb-6">
-                    We couldn't confirm your payment.
-                </h1>
                 <p class="text-zinc-400 mb-6">
                     If you just paid, check your email for the receipt &mdash; it can take a minute to arrive.
                     If you were charged and never got a receipt, email
@@ -82,10 +75,18 @@
             // they are editable by the payer. The verified identity comes
             // from /api/checkout-status, matched by session id in our DB.
 
+            var TITLES = {
+                'state-verifying': 'Confirming your payment\u2026',
+                'state-paid': "You're in. Check your email for your receipt and session scheduling link.",
+                'state-action': "Your payment didn't complete.",
+                'state-unknown': "We couldn't confirm your payment."
+            };
+
             function show(id) {
                 ['state-verifying', 'state-paid', 'state-action', 'state-unknown'].forEach(function(s) {
                     document.getElementById(s).classList.toggle('hidden', s !== id);
                 });
+                document.getElementById('success-title').textContent = TITLES[id];
             }
 
             function prefillCalendly(name, email) {
