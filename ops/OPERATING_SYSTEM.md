@@ -102,7 +102,6 @@ Each major project has its own folder with its own stack:
 
 - **`pivot-site/`** — Cloudflare Worker + D1 + KV + Stripe/Resend. See `pivot-site/README.md` for setup.
 - **`remotion-abuelas-ipad/`** — Video generation tool.
-- **`video-ads/`** — Ad production experiments.
 - **`legacy-site-v1/`** — Archive (read-only).
 
 See root `README.md` for which projects are active.
