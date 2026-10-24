@@ -5,10 +5,7 @@ Welcome to the Sofrito Studio repository.
 ## Structure
 
 ### 🤖 **Agent Layer**
-- .opencode/agents/ - Agent operating manuals and permissions
-  - README.md - This landing page
-  - PERMISSIONS.md - What may run autonomously vs requires approval
-  - REASONING.md - Reasoning protocols and evidence hierarchy
+- Retired 2026-10-23: the repo-resident OpenCode agent layer (.opencode/, opencode.json, repo AGENTS.md, the opencode workflow) was removed. Agent work runs through the founder's operating system, not repo-resident agents.
 
 ### ⚙️ **Operations**
 - ops/ - Operating procedures and frameworks
@@ -60,12 +57,9 @@ esearch/ and sources/ — Research materials and source documents
 
 ## Quick Start
 
-1. Read .opencode/agents/README.md to understand the agent layer.
-2. Refer to .opencode/agents/PERMISSIONS.md for what actions are allowed.
-3. Consult .opencode/agents/REASONING.md for reasoning protocols.
-4. Check ops/OPERATING_SYSTEM.md for decision flow and file organization.
-5. See ops/FRAMEWORKS.md for decision memo and experiment templates.
-6. See [pivot-site/README.md](pivot-site/README.md) to run the main brand studio application locally.
+1. Check ops/OPERATING_SYSTEM.md for decision flow and file organization.
+2. See ops/FRAMEWORKS.md for decision memo and experiment templates.
+3. See [pivot-site/README.md](pivot-site/README.md) to run the main brand studio application locally.
 
 ## Important Notes
 

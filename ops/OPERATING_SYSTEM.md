@@ -136,4 +136,4 @@ See root `README.md` for which projects are active.
 - **Local dev:** Create `.env` locally; never commit.
 - **Production:** Stored as Cloudflare Secrets or GitHub Secrets. Ask founder.
 - **Rule:** Never log, print, or transmit credentials.
-- **Reference:** See `.opencode/agents/PERMISSIONS.md` for full guardrails.
+- **Reference:** Agent guardrails are held in the founder's operating system (outside this repo). Standing rule: approval before anything publishes, deploys, spends, or sends.
