@@ -23,7 +23,8 @@ ow.md - Current operating state
 - pivot-site/ - The live site (Cloudflare Workers + static frontend)
 
 ### 📁 **Projects & Experiments**
-- emotion-abuelas-ipad/ — Video generation tool for client projects
+- 
+emotion-abuelas-ipad/ — Video generation tool for client projects
 - ideo-ads/ — Ad production experiments and templates
 - 	he-craft-kitchen/ — Experimental food-related projects
 - legacy-site-v1/ — Previous iteration of the brand studio site
@@ -37,13 +38,14 @@ ow.md - Current operating state
 
 ### 🔧 **Infrastructure & Shared Resources**
 - scripts/ — Data pipelines, deployment scripts, and maintenance tools
-  - maintenance/ — One-time fix and migration scripts
+  - maintenance/ — removed 2026-10-23 (one-off scripts deleted after audit; standing checks folded into verify_all.py)
 - schema/ — Shared data models, database schemas, and API contracts
 - config/ — Cross-project configuration templates and defaults
 
 ### 📊 **Business Functions**
 - growth/ — Marketing calendars, campaigns, content strategy, and acquisition tactics
-- esearch/ — Customer insights, survey results, interview transcripts, and trend analysis
+- 
+esearch/ — Customer insights, survey results, interview transcripts, and trend analysis
 - sales/ — Sales processes, qualification rubrics, outreach templates, and deal tracking
 - strategy/ — Business plans, market analysis, offer optimization, and long-term vision
 
@@ -53,7 +55,8 @@ ow.md - Current operating state
 ### 📚 **Additional Resources**
 - usiness-model.md — Overview of Sofrito Studio's business model
 - content-guidelines.md — Guidelines for content creation and brand voice
-- esearch/ and sources/ — Research materials and source documents
+- 
+esearch/ and sources/ — Research materials and source documents
 
 ## Quick Start
 

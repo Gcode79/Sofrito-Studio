@@ -11,6 +11,8 @@ Runs every check the project has before anything is committed or deployed:
   WORKFLOW  all .github/workflows referenced scripts exist, YAML parses
   WORKER    every JS import in cloudflare/src resolves locally
   AUTOMATION no unbounded loop/spike patterns in automation scripts
+  SEO       canonical present per page, noindex flags, sitemap URLs resolve (warnings)
+  FORMS     form fields carry autocomplete attributes (warnings)
 
 Exit 0 = all green (safe to commit/deploy). Exit 1 = at least one failure.
 
@@ -326,6 +328,72 @@ def check_spikes():
         ok("AUTOMATION")
 
 
+
+# ------------------------------------------------------------------
+# 10) SEO indexing hygiene (folded 2026-10-23 from
+#     scripts/maintenance/scan_indexing.py, deleted in the same change)
+#     Warning-level: surfaces drift without gating deploys.
+# ------------------------------------------------------------------
+def check_seo_indexing():
+    deploy = ROOT / "deploy"
+    issues = 0
+    for f in sorted(deploy.rglob("*.html")):
+        text = f.read_text(encoding="utf-8", errors="ignore")
+        rel = f.relative_to(deploy)
+        if not re.search(r'<link[^>]*rel=["\']canonical["\']', text):
+            warn("SEO", f"{rel}: no canonical link")
+            issues += 1
+        if re.search(r'<meta[^>]*name=["\']robots["\'][^>]*content=["\'][^"\']*noindex', text):
+            warn("SEO", f"{rel}: noindex (confirm intentional)")
+            issues += 1
+    sitemap = deploy / "sitemap.xml"
+    if sitemap.exists():
+        locs = re.findall(r"<loc>(https://sofritostudio\.com[^<]*)</loc>",
+                          sitemap.read_text(encoding="utf-8", errors="ignore"))
+        for loc in locs:
+            path = loc.replace("https://sofritostudio.com", "").split("?")[0]
+            if path in ("", "/"):
+                target = deploy / "index.html"
+                exists = target.exists()
+            elif path.endswith(".html"):
+                exists = (deploy / path.lstrip("/")).exists()
+            else:
+                exists = (deploy / (path.strip("/") + ".html")).exists() or \
+                         (deploy / path.strip("/") / "index.html").exists()
+            if not exists:
+                warn("SEO", f"sitemap URL resolves to no file: {loc}")
+                issues += 1
+    if not issues:
+        ok("SEO")
+
+
+# ------------------------------------------------------------------
+# 11) Form autocomplete hygiene (folded 2026-10-23 from
+#     scripts/maintenance/scan_autocomplete.py, deleted in the same change)
+#     Warning-level.
+# ------------------------------------------------------------------
+def check_forms_autocomplete():
+    deploy = ROOT / "deploy"
+    skip_types = ("hidden", "button", "submit", "image", "reset")
+    missing = []
+    for f in sorted(deploy.rglob("*.html")):
+        text = f.read_text(encoding="utf-8", errors="ignore")
+        for m in re.finditer(r"<(input|select|textarea)\b[^>]*>", text):
+            tag = m.group(0)
+            if "autocomplete" in tag:
+                continue
+            t = re.search(r'type=["\']([^"\']+)["\']', tag)
+            if t and t.group(1).lower() in skip_types:
+                continue
+            missing.append(f"{f.relative_to(deploy)}: {tag[:80]}")
+    for m in missing[:25]:
+        warn("FORMS", m)
+    if len(missing) > 25:
+        warn("FORMS", f"... and {len(missing) - 25} more fields without autocomplete")
+    if not missing:
+        ok("FORMS")
+
+
 # ------------------------------------------------------------------
 def main():
     print("Sofrito Studio verification —", datetime.datetime.now().isoformat(timespec="seconds"))
@@ -339,6 +407,8 @@ def main():
     check_worker_imports()
     check_worker_loads()
     check_spikes()
+    check_seo_indexing()
+    check_forms_autocomplete()
     print(f"\nchecks passed: {PASS}   failures: {len(FAILURES)}   warnings: {len(WARNINGS)}")
     for w in WARNINGS:
         print("  warn:", w)

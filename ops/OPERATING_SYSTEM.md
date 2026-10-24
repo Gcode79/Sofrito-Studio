@@ -117,11 +117,9 @@ See root `README.md` for which projects are active.
 - Active, maintained utilities (not one-time fixes)
 - Index: `scripts/scripts-docs.md`
 
-**Maintenance** (`scripts/maintenance/`):
-- One-off fixes and migrations
-- Site maintenance and validation
-- Should be archived or deleted after confirming no dependencies
-- Index: `scripts/maintenance/maintenance-docs.md`
+**Maintenance** (removed 2026-10-23):
+- The one-off `scripts/maintenance/` folder was deleted after a per-file audit confirmed no dependencies; the scripts remain in git history.
+- Standing checks that lived there (canonical / noindex / sitemap scan, form autocomplete scan) were folded into `scripts/verify_all.py` as the SEO and FORMS sections (warning-level).
 
 **Tools** (`tools/`):
 - JavaScript utilities for build, sync, convert
