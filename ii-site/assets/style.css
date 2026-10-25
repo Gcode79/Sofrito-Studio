@@ -1,5 +1,12 @@
 /* Impossible Interiors — ii.sofritostudio.com
-   Palette: deep ink, warm brass, ivory. System fonts only. No external requests. */
+   Palette: deep ink, warm brass, ivory. No external requests: the script
+   wordmark font (Great Vibes, SIL OFL 1.1) is self-hosted in assets/fonts/. */
+
+@font-face{
+  font-family:'Great Vibes';
+  src:url('fonts/great-vibes.woff2') format('woff2');
+  font-weight:400;font-style:normal;font-display:swap;
+}
 
 :root{
   --ink:#16181C;
@@ -14,6 +21,7 @@
   --text:#22252A;
   --muted:#5A5E66;
   --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
+  --script:'Great Vibes','Segoe Script',cursive;
   --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
 }
 
@@ -51,9 +59,11 @@ a:hover{color:var(--btn-hover)}
   padding-top:1rem;padding-bottom:1rem;
 }
 .wordmark{
-  font-family:var(--serif);font-size:1.3rem;letter-spacing:.14em;
-  color:var(--ivory);text-decoration:none;font-weight:700;white-space:nowrap;
+  font-family:var(--script);font-size:2.9rem;letter-spacing:0;
+  color:var(--ivory);text-decoration:none;font-weight:400;white-space:nowrap;
+  line-height:1;padding:.3rem 0 .45rem;
 }
+.wordmark span{color:var(--brass)}
 .wordmark span{color:var(--brass)}
 .site-nav{display:flex;flex-wrap:wrap;gap:.25rem 1.25rem;margin-left:auto;align-items:center}
 .site-nav a{
@@ -240,6 +250,11 @@ table{border-collapse:collapse;width:100%}
   padding:2.2rem 0 2rem;font-size:.97rem;
 }
 .site-footer .identity{color:var(--ivory);font-family:var(--serif);font-size:1.08rem;letter-spacing:.04em}
+.site-footer .identity .brand{font-family:var(--script);font-size:1.75rem;letter-spacing:0;color:var(--ivory)}
+.signoff{
+  font-family:var(--script);font-size:2.5rem;line-height:1.1;
+  color:#E7D9B8;margin:1.4rem 0 .2rem;font-weight:400;
+}
 .site-footer a{color:#E7D9B8}
 .site-footer a:hover{color:#fff}
 .site-footer ul{list-style:none;margin:.8rem 0;padding:0;display:flex;flex-wrap:wrap;gap:.4rem 1.4rem}
@@ -256,7 +271,7 @@ table{border-collapse:collapse;width:100%}
 }
 
 @media (max-width:480px){
-  .wordmark{font-size:1.02rem;letter-spacing:.09em}
+  .wordmark{font-size:2.35rem;letter-spacing:0}
   .hero{padding:2.4rem 0 2.2rem}
   .hero h1{font-size:1.95rem}
   .hero .promise{font-size:1.15rem}
@@ -265,3 +280,4 @@ table{border-collapse:collapse;width:100%}
   .btn.small{width:auto}
   .header-in{gap:.5rem 1rem}
 }
+.wordmark .cap{font-size:1.62em;line-height:.6}
