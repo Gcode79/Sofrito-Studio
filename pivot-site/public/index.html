@@ -108,6 +108,33 @@
             "email": "hello@sofritostudio.com"
         },
         {
+            "@type": "ProfessionalService",
+            "@id": "https://sofritostudio.com/#local",
+            "name": "Sofrito Studio",
+            "url": "https://sofritostudio.com/",
+            "email": "hello@sofritostudio.com",
+            "description": "Branding and one-page websites for independent food businesses in Hawaii.",
+            "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Honolulu",
+                "addressRegion": "HI",
+                "addressCountry": "US"
+            },
+            "areaServed": [
+                {
+                    "@type": "State",
+                    "name": "Hawaii"
+                },
+                {
+                    "@type": "City",
+                    "name": "Honolulu"
+                }
+            ],
+            "parentOrganization": {
+                "@id": "https://sofritostudio.com/#business"
+            }
+        },
+        {
             "@type": "WebSite",
             "@id": "https://sofritostudio.com/#website",
             "url": "https://sofritostudio.com/",
@@ -138,6 +165,7 @@
             "@id": "https://sofritostudio.com/#brand-web-sprint",
             "name": "Brand & Web Sprint",
             "serviceType": "One-page website design and branding for food businesses",
+            "areaServed": "Hawaii",
             "description": "A complete brand and one-page website for independent food businesses \u2014 food trucks, restaurants, and specialty food brands. Built and launched within 48 hours (two business days) from direction lock. You own the brand assets, files, and site outright.",
             "provider": {
                 "@id": "https://sofritostudio.com/#business"
