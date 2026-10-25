@@ -128,6 +128,12 @@ p.lede{font-size:1.14rem;max-width:62ch}
   border-left:4px solid var(--brass);background:var(--paper);
   padding:.9rem 1.1rem;font-size:.98rem;max-width:62ch;
 }
+.room{margin-top:2.6rem}
+.room h3{
+  font-family:Georgia,'Times New Roman',serif;font-weight:600;
+  font-size:1.45rem;margin:0 0 .2rem;color:var(--text);
+}
+.room .pair{margin-top:.8rem}
 
 /* ---------- steps ---------- */
 .steps{display:grid;grid-template-columns:1fr;gap:1.25rem;margin-top:1.5rem}
