@@ -1,0 +1,6 @@
+# Impossible Interiors — robots.txt
+# Sitemap: https://ii.sofritostudio.com/sitemap.xml
+User-agent: *
+Allow: /
+
+Sitemap: https://ii.sofritostudio.com/sitemap.xml
