@@ -11,13 +11,26 @@ const { handleCalendlyWebhook } = await import('../src/lib/booking.js');
 const { handleUnbilledFinalSweep } = await import('../src/lib/automations.js');
 const { persistPaymentEmails, dispatchEmailOutbox } = await import('../src/lib/outbox.js');
 const { processEmailMessage, tiktokTrack, updateLeadPaidState } = await import('../src/lib/email.js');
-const { default: scheduler, publishDue } = await import('../../post-scheduler/src/scheduler.js');
+// post-scheduler is a PC-side sibling project (../../post-scheduler), NOT part
+// of this repo. Load it guarded: where the folder exists (the studio PC) the
+// full suite runs unchanged; where it is absent (a clean CI checkout) the two
+// scheduler tests below skip LOUDLY and everything else still runs. Before
+// this guard, the bare import crashed the whole file on any clean checkout,
+// so CI was red on every run and the red meant nothing.
+let scheduler = null, publishDue = null, publicationsSql = null;
+try {
+  ({ default: scheduler, publishDue } = await import('../../post-scheduler/src/scheduler.js'));
+  publicationsSql = readFileSync(new URL('../../post-scheduler/migrations/0001_publications.sql', import.meta.url), 'utf8');
+} catch { /* absence is handled by the loud skip below */ }
+const SCHEDULER_SKIP = scheduler ? false
+  : 'post-scheduler sibling folder (../../post-scheduler) not present on this machine — scheduler tests run in full where it exists (studio PC)';
+if (!scheduler) console.warn('WARNING test-runtime: ../../post-scheduler NOT FOUND — the 2 scheduler tests in this file will be SKIPPED in this run. They run in full on machines that have the folder (studio PC).');
 
 function database() {
   const db = new DatabaseSync(':memory:');
   const dir = new URL('../migrations/', import.meta.url);
   for (const file of readdirSync(dir).filter(f => f.endsWith('.sql')).sort()) db.exec(readFileSync(new URL(file, dir), 'utf8'));
-  db.exec(readFileSync(new URL('../../post-scheduler/migrations/0001_publications.sql', import.meta.url), 'utf8'));
+  if (publicationsSql) db.exec(publicationsSql);
   const wrap = (sql, args = []) => ({
     bind: (...values) => wrap(sql, values),
     first: async () => db.prepare(sql).get(...args) || null,
@@ -143,7 +156,7 @@ test('outbox recovers partial dispatch with stable identities and suppresses sen
   assert.equal(calls, 1);
 });
 
-test('scheduler rejects unauthorized requests, future dates and drafts; claims once under concurrency', async t => {
+test('scheduler rejects unauthorized requests, future dates and drafts; claims once under concurrency', { skip: SCHEDULER_SKIP }, async t => {
   const env = environment(); let calls = 0;
   const calendar = [
     { id: 'future', date: '2099-01-01', approved: true, status: 'pending', platform: 'twitter' },
@@ -159,7 +172,7 @@ test('scheduler rejects unauthorized requests, future dates and drafts; claims o
   assert.equal(env.DB.raw.prepare("SELECT status FROM publications WHERE id='due'").get().status, 'sent');
 });
 
-test('scheduler retains claim after uncertain provider outcome', async t => {
+test('scheduler retains claim after uncertain provider outcome', { skip: SCHEDULER_SKIP }, async t => {
   const env = environment(); let calls = 0;
   Object.assign(env, { TWITTER_TOKEN: 'synthetic', POST_METRICS: { get: async () => JSON.stringify([{ id: 'uncertain', date: '2020-01-01', approved: true, status: 'pending', platform: 'twitter' }]), put: async () => {} } });
   t.mock.method(globalThis, 'fetch', async () => { calls++; throw new Error('synthetic timeout'); });
