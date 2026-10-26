@@ -766,40 +766,15 @@
                             <input type="email" id="email" autocomplete="email" inputmode="email" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors" required>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="business_name" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Business Name <span class="text-zinc-500">*</span></label>
-                            <input type="text" id="business_name" autocomplete="organization" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors" required>
-                        </div>
-                        <div>
-                            <label for="phone" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Cell Phone <span class="text-zinc-500 normal-case tracking-normal">(optional)</span></label>
-                            <input type="tel" id="phone" autocomplete="tel" inputmode="tel" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors">
-                        </div>
-                    </div>
-                    <div>
-                        <label for="business_type" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Business Type</label>
-                        <select id="business_type" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors appearance-none">
-                            <option value="" class="bg-zinc-900">Select...</option>
-                            <option value="food_truck" class="bg-zinc-900">Food Truck</option>
-                            <option value="restaurant" class="bg-zinc-900">Restaurant</option>
-                            <option value="cpg" class="bg-zinc-900">Specialty CPG / Goods</option>
-                            <option value="other" class="bg-zinc-900">Other</option>
-                        </select>
-                        <p id="business-type-pitch" class="text-sm text-zinc-400 mt-3 hidden"></p>
-                    </div>
+                    
+
                     <div>
                         <label for="showcase_link" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Where can we see your food? <span class="text-zinc-500">*</span></label>
                         <input type="text" id="showcase_link" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="@yourbusiness or https://…" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors" required>
                         <p class="text-xs text-zinc-500 mt-1.5">Instagram, website, or wherever your food lives online.</p>
                     </div>
-                    <div>
-                        <label for="fit_reason" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Why you&rsquo;re a fit <span class="text-zinc-500">(Optional)</span></label>
-                        <textarea id="fit_reason" rows="3" placeholder="Tell us about your business and why the timing is right." class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors"></textarea>
-                    </div>
-                    <div>
-                        <label for="message" class="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest">Anything else? (Optional)</label>
-                        <textarea id="message" rows="3" class="w-full px-4 py-3 bg-black/50 border border-white/10 text-white focus:outline-none focus:border-orange-500 transition-colors"></textarea>
-                    </div>
+
+
                     <div id="lead-turnstile"></div>
                     <div id="form-error" class="hidden text-red-500 text-sm mt-3 text-center" aria-live="polite"></div>
                     <button type="submit" id="submit-btn" class="rounded-full w-full bg-orange-600 text-white font-bold text-sm py-5 uppercase tracking-widest hover:bg-orange-700 transition-colors disabled:opacity-50 mt-6 shadow-[0_0_20px_rgba(234,88,12,0.2)]">
@@ -938,24 +913,6 @@
             });
         })();
 
-        const TYPE_PITCHES = {
-            food_truck: 'Keep your menu, location, hours, and ordering links in one place.',
-            restaurant: 'Put reservations, catering inquiries, and menu details where customers can find them.',
-            cpg: 'Build a clear brand and a direct path for shoppers to learn more or buy.',
-            other: 'Tell us what you make. We will help you build a clear brand and website.'
-        };
-        const typeSelect = document.getElementById('business_type');
-        const pitchEl = document.getElementById('business-type-pitch');
-        typeSelect.addEventListener('change', () => {
-            const pitch = TYPE_PITCHES[typeSelect.value];
-            if (pitch) {
-                pitchEl.textContent = pitch;
-                pitchEl.classList.remove('hidden');
-            } else {
-                pitchEl.classList.add('hidden');
-            }
-        });
-
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             hideError();
@@ -963,7 +920,6 @@
             const originalText = submitBtn.innerText;
 
             const showcase_link = document.getElementById('showcase_link').value.trim();
-            const fit_reason = document.getElementById('fit_reason').value.trim();
             if (!showcase_link) { showError('Add a link so we can see your business.'); return; }
 
             const token = turnstileToken || document.querySelector('#lead-form textarea[name="cf-turnstile-response"]')?.value;
@@ -987,12 +943,7 @@
             const payload = {
                 name: document.getElementById('name').value.trim(),
                 email: document.getElementById('email').value.trim(),
-                phone: document.getElementById('phone').value.trim(),
-                business_name: document.getElementById('business_name').value.trim(),
-                business_type: document.getElementById('business_type').value,
                 showcase_link,
-                fit_reason,
-                message: document.getElementById('message').value.trim(),
                 turnstile_token: token,
                 ref_code: (window.sofritoRefCode ? window.sofritoRefCode() : ''),
             };
