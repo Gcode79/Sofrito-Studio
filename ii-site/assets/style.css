@@ -281,3 +281,16 @@ table{border-collapse:collapse;width:100%}
   .header-in{gap:.5rem 1rem}
 }
 .wordmark .cap{font-size:1.4em;line-height:.6}
+
+/* Free-photo upload form (staged 2026-10-25, replication I-C6) */
+.speed-line{margin-top:1.4rem;font-size:1.05rem}
+.free-form{max-width:560px;margin-top:1.2rem}
+.free-form label{display:block;font-weight:600;margin:1rem 0 .35rem}
+.free-form input[type="text"],.free-form input[type="email"],.free-form input[type="url"]{width:100%;padding:.65rem .75rem;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--text);font:inherit}
+.free-form input[type="file"]{width:100%;padding:.55rem 0;font:inherit}
+.free-form .btn{margin-top:1.3rem;cursor:pointer}
+.form-note{color:var(--muted);margin-top:1rem}
+
+.guarantee-line{margin-top:.4rem;font-size:1.05rem}
+
+.sheet-line{margin-top:.4rem;font-size:1.05rem}
