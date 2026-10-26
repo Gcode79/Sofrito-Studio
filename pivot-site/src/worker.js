@@ -412,9 +412,9 @@ async function handleFoundingApplication(request, env, ctx) {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !name) {
     return fail('Please include a valid email and your name.', 422);
   }
-  if (!business_name) {
-    return fail('Please include your business name.', 422);
-  }
+  // Form-field audit cut (2026-10-25): the application asks name + email +
+  // one qualifying question (the showcase link). business_name is still
+  // accepted when sent, but it is no longer required or asked for.
   // We need to see the business: a public link is required.
   if (!showcase_link) {
     return fail('Please include a link so we can see your business.', 422);

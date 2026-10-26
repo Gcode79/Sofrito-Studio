@@ -94,11 +94,7 @@
                         <option value="other">Other</option>
                     </select>
                 </div>
-                <div>
-                    <label for="p-details" class="mb-1 block text-sm font-bold text-zinc-200">Payment details <span class="font-normal text-zinc-500">(your $Cashtag, Venmo handle, Zelle email…)</span></label>
-                    <input id="p-details" name="payout_details" type="text" autocomplete="off" placeholder="$mariaeats"
-                        class="w-full rounded-lg border border-white/10 bg-zinc-900 px-4 py-3 text-white placeholder-zinc-600 focus:border-orange-500 focus:outline-none">
-                </div>
+
                 <div id="partner-turnstile"></div>
                 <p id="partner-error" class="hidden text-sm text-red-400"></p>
                 <button type="submit" id="partner-submit"
@@ -226,7 +222,6 @@
                     name: document.getElementById('p-name').value.trim(),
                     email: document.getElementById('p-email').value.trim(),
                     payout_method: document.getElementById('p-method').value,
-                    payout_details: document.getElementById('p-details').value.trim(),
                     turnstile_token: turnstileToken
                 })
             }).then(function (res) { return res.json().catch(function () { return {}; }).then(function (data) { return { res: res, data: data }; }); })
