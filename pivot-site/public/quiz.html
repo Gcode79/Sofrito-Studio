@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Front-Door Check — Sofrito Studio</title>
+<meta name="description" content="Five quick questions that show whether your website and profiles are sending customers to you — or to the place down the street. Free audit from Sofrito Studio.">
+<script defer src="https://umami-jet-alpha.vercel.app/script.js" data-website-id="e7837927-b8d0-4df9-b4e3-2a4f63500408"></script>
+<style>
+  :root{
+    --green:#2E5B34; --green-deep:#1E3D23; --achiote:#E4572E; --cream:#FBF3E4; --paper:#FFFDF7;
+    --ink:#23201B; --muted:#6E675C; --line:#E7DCC6;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:Georgia,'Times New Roman',serif;background:var(--cream);color:var(--ink);min-height:100vh}
+  a{color:var(--green)}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 18px 48px}
+  header.site{display:flex;justify-content:space-between;align-items:center;padding:6px 0 18px}
+  .brand{font-weight:bold;letter-spacing:.14em;font-size:13px;color:var(--green-deep);text-transform:uppercase}
+  .brand span{color:var(--achiote)}
+  .home-link{font-size:13px;letter-spacing:.06em}
+  main.stage{display:block}
+  .brand-panel{display:none}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:26px 22px 30px;box-shadow:0 10px 30px rgba(30,61,35,.08)}
+  .progress{display:flex;gap:6px;margin-bottom:22px}
+  .progress i{flex:1;height:6px;border-radius:3px;background:#EFE6D2}
+  .progress i.on{background:#7BC47F}
+  .kicker{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--achiote);font-weight:bold;margin-bottom:10px}
+  h1{font-size:30px;line-height:1.15;color:var(--green-deep);margin-bottom:12px}
+  h2.q{font-size:24px;line-height:1.25;color:var(--green-deep);margin-bottom:18px}
+  p.lede{font-size:16.5px;line-height:1.55;color:var(--muted);margin-bottom:20px}
+  .answers{display:grid;gap:10px}
+  button.answer{font-family:inherit;text-align:left;font-size:16.5px;line-height:1.4;padding:14px 16px;border:1.5px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;color:var(--ink)}
+  button.answer:active{border-color:var(--green);background:#F2F7EC}
+  .insight{display:none;margin-top:16px;background:#F2F7EC;border-left:4px solid var(--green);border-radius:0 12px 12px 0;padding:14px 16px;font-size:15.5px;line-height:1.55}
+  .insight b{color:var(--green-deep)}
+  .next{display:none;margin-top:18px;width:100%;font-family:inherit;font-size:17px;font-weight:bold;padding:15px;border:none;border-radius:12px;background:var(--achiote);color:#fff;cursor:pointer}
+  .start-btn{width:100%;font-family:inherit;font-size:17px;font-weight:bold;padding:15px;border:none;border-radius:12px;background:var(--achiote);color:#fff;cursor:pointer}
+  .fineprint{font-size:13px;color:var(--muted);margin-top:14px;line-height:1.5}
+  .score{font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--achiote);font-weight:bold;margin-bottom:8px}
+  .verdict{font-size:27px;line-height:1.2;color:var(--green-deep);margin-bottom:12px}
+  label.fl{display:block;font-size:14px;font-weight:bold;margin:14px 0 6px;color:var(--green-deep)}
+  input.fi{width:100%;font-family:inherit;font-size:16px;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+  .send{margin-top:18px;width:100%;font-family:inherit;font-size:17px;font-weight:bold;padding:15px;border:none;border-radius:12px;background:var(--green);color:#fff;cursor:pointer}
+  .alt{display:block;text-align:center;margin-top:14px;font-size:15px}
+  .screen{display:none}
+  .screen.active{display:block}
+  @media (min-width:1000px){
+    main.stage{display:grid;grid-template-columns:1fr 1.15fr;gap:44px;align-items:stretch;padding-top:22px}
+    .brand-panel{display:flex;flex-direction:column;justify-content:center;padding:10px 6px}
+    .brand-panel .big{font-size:44px;line-height:1.12;color:var(--green-deep);margin-bottom:16px}
+    .brand-panel .big em{color:var(--achiote);font-style:normal}
+    .brand-panel p{font-size:17px;line-height:1.6;color:var(--muted);max-width:44ch}
+    .card{padding:36px 34px 38px}
+    h1{font-size:34px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="site">
+    <div class="brand">Sofrito <span>Studio</span></div>
+    <a class="home-link" href="/">sofritostudio.com</a>
+  </header>
+
+  <main class="stage">
+    <aside class="brand-panel">
+      <div class="big">Your next customer is looking at your website <em>right now.</em></div>
+      <p>What they find in the first ten seconds decides whether they order from you — or from the place down the street. Five honest questions show you what they see.</p>
+    </aside>
+
+    <section class="card">
+      <div class="progress" id="progress"></div>
+
+      <!-- INTRO -->
+      <div class="screen active" id="scr-intro">
+        <div class="kicker">The Front-Door Check · 60 seconds</div>
+        <h1>Is your online front door costing you customers?</h1>
+        <p class="lede">Answer like a customer, not like the owner. At the end you'll get a straight score — and if there's a leak, the full audit that finds it is free.</p>
+        <button class="start-btn" id="btn-start">Start the check</button>
+        <p class="fineprint">No phone number, no spam, no sales call. Your answers and the audit travel by email only.</p>
+      </div>
+
+      <!-- QUESTIONS get injected here -->
+      <div class="screen" id="scr-q">
+        <div class="kicker" id="q-kicker"></div>
+        <h2 class="q" id="q-text"></h2>
+        <div class="answers" id="q-answers"></div>
+        <div class="insight" id="q-insight"></div>
+        <button class="next" id="btn-next">Next question</button>
+      </div>
+
+      <!-- RESULT -->
+      <div class="screen" id="scr-result">
+        <div class="score" id="r-score"></div>
+        <div class="verdict" id="r-verdict"></div>
+        <p class="lede" id="r-body"></p>
+        <label class="fl" for="f-name">Your name</label>
+        <input class="fi" id="f-name" type="text" autocomplete="name" placeholder="e.g. Maria Delgado">
+        <label class="fl" for="f-biz">Business name</label>
+        <input class="fi" id="f-biz" type="text" placeholder="e.g. Delgado's Kitchen">
+        <label class="fl" for="f-email">Email — where the audit goes</label>
+        <input class="fi" id="f-email" type="email" autocomplete="email" placeholder="you@yourbusiness.com">
+        <button class="send" id="btn-send">Send my answers — get the free audit</button>
+        <p class="fineprint">This opens your email app with your answers addressed to hello@sofritostudio.com. Nothing is sent until you press send there. We reply by email — that's the only channel we use.</p>
+        <a class="alt" href="/">Or see what Sofrito Studio does first</a>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+var QUESTIONS = [
+  { q:"A hungry customer taps your website link from Google or Instagram. What happens?",
+    a:[["It loads fast and looks like us",2],["It loads — but it's old",1],["It doesn't load, or I don't have a website",0]],
+    fact:"<b>The hard truth:</b> a dead or stale link is a closed sign on your door. Most customers never try a second time — they order from whoever loaded." },
+  { q:"Do the hours posted online match the hours you actually keep?",
+    a:[["Yes — exact",2],["Close enough, probably",1],["No idea — or they're definitely wrong",0]],
+    fact:"<b>The hard truth:</b> wrong hours are the quietest leak there is. A customer who finds you 'closed' at lunch doesn't call to check — they just go elsewhere." },
+  { q:"Can a customer see your current menu on their phone — and act on it?",
+    a:[["Yes — current menu, easy to order or call",2],["There's a menu, but it's old or a blurry photo",1],["No menu online",0]],
+    fact:"<b>The hard truth:</b> the menu is the sale. If it can't be read on a phone, it isn't selling — it's decoration." },
+  { q:"A customer finds you online and wants food. How fast can they reach you?",
+    a:[["One tap — message or email is right there",2],["They have to hunt around a bit",1],["There's no clear way to reach us",0]],
+    fact:"<b>The hard truth:</b> every extra tap between 'I'm hungry' and you is money leaking out of the funnel. Hunger doesn't wait." },
+  { q:"When did you last update anything on your website or profiles?",
+    a:[["This month",2],["Sometime this year",1],["Honestly can't remember",0]],
+    fact:"<b>The hard truth:</b> search engines rank businesses that look alive. A profile that hasn't moved in a year sinks — quietly, every week." }
+];
+var idx = 0, total = 0, picked = [];
+var $ = function(id){ return document.getElementById(id); };
+var prog = $("progress");
+for (var i=0;i<QUESTIONS.length;i++){ var s=document.createElement("i"); prog.appendChild(s); }
+function markProgress(done){ var bars=prog.children; for (var j=0;j<bars.length;j++){ bars[j].className = j<done ? "on":""; } }
+function show(id){ var sc=document.querySelectorAll(".screen"); for (var j=0;j<sc.length;j++) sc[j].classList.remove("active"); $(id).classList.add("active"); }
+function renderQ(){
+  var item = QUESTIONS[idx];
+  $("q-kicker").textContent = "Question " + (idx+1) + " of " + QUESTIONS.length;
+  $("q-text").textContent = item.q;
+  var box = $("q-answers"); box.innerHTML = "";
+  $("q-insight").style.display = "none"; $("btn-next").style.display = "none";
+  item.a.forEach(function(pair){
+    var b = document.createElement("button"); b.className="answer"; b.textContent = pair[0];
+    b.onclick = function(){
+      total += pair[1]; picked.push(pair[0]);
+      var all = box.children; for (var k=0;k<all.length;k++) all[k].disabled = true;
+      b.style.borderColor = "var(--green)"; b.style.background = "#F2F7EC";
+      $("q-insight").innerHTML = item.fact; $("q-insight").style.display = "block";
+      $("btn-next").textContent = idx === QUESTIONS.length-1 ? "See my score" : "Next question";
+      $("btn-next").style.display = "block";
+      markProgress(idx+1);
+    };
+    box.appendChild(b);
+  });
+}
+$("btn-start").onclick = function(){ show("scr-q"); renderQ(); };
+$("btn-next").onclick = function(){
+  idx++;
+  if (idx < QUESTIONS.length){ renderQ(); }
+  else {
+    markProgress(QUESTIONS.length);
+    var v, body;
+    if (total >= 8){ v = "Your front door is in good shape."; body = "Most of the basics are working — which means the leaks left are the sneaky ones: the details a customer feels but never reports. The free audit checks all of it, line by line, against your live site and profiles."; }
+    else if (total >= 4){ v = "You're leaking customers — quietly."; body = "Nothing here is broken beyond repair, but every 'close enough' above is a customer who almost ordered from you. The free audit names each leak and what fixing it takes — in plain words, with your actual pages as the evidence."; }
+    else { v = "Your front door is costing you every day."; body = "Right now, a customer who finds you online meets a dead end more often than a dinner. The good news: these are the fastest fixes in the business. The free audit shows you exactly where you stand and what to fix first."; }
+    $("r-score").textContent = "Your score: " + total + " of 10";
+    $("r-verdict").textContent = v;
+    $("r-body").textContent = body;
+    show("scr-result");
+  }
+};
+$("btn-send").onclick = function(){
+  var name = $("f-name").value.trim(), biz = $("f-biz").value.trim(), email = $("f-email").value.trim();
+  var lines = QUESTIONS.map(function(it,i){ return (i+1) + ". " + it.q + "\n   -> " + (picked[i]||"(skipped)"); }).join("\n");
+  var subject = encodeURIComponent("Free audit request — " + (biz || name || "Front-Door Check"));
+  var body = encodeURIComponent(
+    "Name: " + name + "\nBusiness: " + biz + "\nReply email: " + email + "\nScore: " + total + " of 10\n\nMy Front-Door Check answers:\n" + lines + "\n\nPlease send the free audit to the reply email above. — via sofritostudio.com/quiz");
+  window.location.href = "mailto:hello@sofritostudio.com?subject=" + subject + "&body=" + body;
+};
+</script>
+</body>
+</html>
