@@ -244,6 +244,31 @@
 }
     </script>
   <script defer src="https://umami-jet-alpha.vercel.app/script.js" data-website-id="e7837927-b8d0-4df9-b4e3-2a4f63500408"></script>
+
+<style>
+/* Front-Door Check quiz (embedded in the audit section) */
+.fq-progress{display:flex;gap:6px;margin-bottom:22px}
+.fq-progress i{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.08)}
+.fq-progress i.on{background:#7BC47F}
+.fq-screen{display:none}.fq-screen.active{display:block}
+.fq-lede{color:#a1a1aa;line-height:1.6;font-size:16.5px;margin-bottom:20px}
+.fq-kicker{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#fb923c;font-weight:700;margin-bottom:10px}
+.fq-h{font-family:Georgia,serif;font-size:26px;line-height:1.25;color:#fff;margin-bottom:18px}
+.fq-answers{display:grid;gap:10px}
+button.fq-answer{text-align:left;font-size:16.5px;line-height:1.4;padding:14px 16px;border:1.5px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.4);cursor:pointer;color:#e4e4e7;width:100%}
+button.fq-answer:hover{border-color:rgba(251,146,60,.6)}
+.fq-insight{display:none;margin-top:16px;background:rgba(123,196,127,.08);border-left:4px solid #7BC47F;border-radius:0 12px 12px 0;padding:14px 16px;font-size:15.5px;line-height:1.55;color:#d4d4d8}
+.fq-insight b{color:#fff}
+.fq-next{display:none;margin-top:18px;width:100%;font-size:16px;font-weight:700;padding:15px;border:none;border-radius:12px;background:#ea580c;color:#fff;cursor:pointer}
+.fq-start,.fq-send{width:100%;font-size:16px;font-weight:700;padding:15px;border:none;border-radius:12px;background:#ea580c;color:#fff;cursor:pointer}
+.fq-send{background:#2E5B34}
+.fq-back{display:none;margin-top:10px;width:100%;font-size:15px;padding:11px;border:1.5px solid rgba(255,255,255,.12);border-radius:12px;background:transparent;color:#a1a1aa;cursor:pointer}
+.fq-score{font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#fb923c;font-weight:700;margin-bottom:8px}
+.fq-verdict{font-family:Georgia,serif;font-size:27px;line-height:1.2;color:#fff;margin-bottom:12px}
+.fq-label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px;color:#d4d4d8}
+.fq-input{width:100%;font-size:16px;padding:12px 14px;border:1.5px solid rgba(255,255,255,.12);border-radius:10px;background:rgba(0,0,0,.5);color:#fff}
+.fq-fine{font-size:13px;color:#71717a;margin-top:14px;line-height:1.5}
+</style>
 </head>
 <body class="bg-zinc-950 text-zinc-50 antialiased">
     <!-- Global Navigation -->
@@ -330,28 +355,40 @@
     <section aria-label="The problem" class="py-12 md:py-16 px-6 max-w-7xl mx-auto">
         <div class="max-w-3xl">
             <div class="text-zinc-400 text-xs font-bold tracking-widest uppercase mb-6">The 30-second audit</div>
-            <h2 class="text-5xl font-bold tracking-tighter text-white font-serif mb-8">Three checks. Be honest.</h2>
+            <h2 class="text-5xl font-bold tracking-tighter text-white font-serif mb-8">Five questions. Be honest.</h2>
         </div>
         <div class="glass-panel max-w-3xl p-6 md:p-8">
             <div class="flex items-center justify-between mb-8">
                 <span class="text-xs font-bold tracking-widest uppercase text-zinc-400">Site audit — be honest</span>
-                <span class="text-xs font-mono text-zinc-500">3 checks</span>
+                <span class="text-xs font-mono text-zinc-500">5 questions &middot; 60 seconds</span>
             </div>
-            <ul class="space-y-6">
-                <li class="flex gap-4">
-                    <span class="text-orange-500 font-bold text-lg leading-snug" aria-hidden="true">&#10005;</span>
-                    <p class="text-zinc-400 leading-relaxed"><span class="text-white font-semibold">Your menu takes three clicks to find.</span> Hungry customers don&rsquo;t click three times.</p>
-                </li>
-                <li class="flex gap-4">
-                    <span class="text-orange-500 font-bold text-lg leading-snug" aria-hidden="true">&#10005;</span>
-                    <p class="text-zinc-400 leading-relaxed"><span class="text-white font-semibold">Your site breaks on phones.</span> That&rsquo;s where the orders come from.</p>
-                </li>
-                <li class="flex gap-4">
-                    <span class="text-orange-500 font-bold text-lg leading-snug" aria-hidden="true">&#10005;</span>
-                    <p class="text-zinc-400 leading-relaxed"><span class="text-white font-semibold">Google shows your competitor first.</span> &ldquo;Near me&rdquo; goes to whoever looks ready.</p>
-                </li>
-            </ul>
-            <p class="mt-6 pt-5 border-t border-white/10 text-zinc-400 leading-relaxed">If two of these are true, your food is carrying your website. <span class="text-white font-semibold">It shouldn&rsquo;t have to.</span></p>
+            <div class="fq-progress" id="fq-progress"></div>
+            <div class="fq-screen active" id="fq-intro">
+                <p class="fq-lede">Answer like a customer, not like the owner. Five questions &rarr; your score &rarr; the free audit that finds the leaks. No phone number, no sales call — email only.</p>
+                <button class="fq-start" id="fq-start-btn">Start the check</button>
+            </div>
+            <div class="fq-screen" id="fq-q">
+                <div class="fq-kicker" id="fq-kicker"></div>
+                <div class="fq-h" id="fq-text"></div>
+                <div class="fq-answers" id="fq-answers"></div>
+                <div class="fq-insight" id="fq-insight"></div>
+                <button class="fq-next" id="fq-next-btn">Next question</button>
+                <button class="fq-back" id="fq-back-btn">&larr; Back</button>
+            </div>
+            <div class="fq-screen" id="fq-result">
+                <div class="fq-score" id="fq-r-score"></div>
+                <div class="fq-verdict" id="fq-r-verdict"></div>
+                <p class="fq-lede" id="fq-r-body"></p>
+                <label class="fq-label" for="fq-name">Your name</label>
+                <input class="fq-input" id="fq-name" type="text" autocomplete="name" placeholder="e.g. Maria Delgado">
+                <label class="fq-label" for="fq-biz">Business name</label>
+                <input class="fq-input" id="fq-biz" type="text" placeholder="e.g. Delgado's Kitchen">
+                <label class="fq-label" for="fq-email">Email — where the audit goes</label>
+                <input class="fq-input" id="fq-email" type="email" autocomplete="email" placeholder="you@yourbusiness.com">
+                <button class="fq-send" id="fq-send-btn">Send my answers — get the free audit</button>
+                <p class="fq-fine">This opens your email app with your answers addressed to hello@sofritostudio.com. Nothing is sent until you press send there. We reply by email — that's the only channel we use.</p>
+                <button class="fq-back" id="fq-restart-btn" style="display:block">&#8635; Start over</button>
+            </div>
         </div>
     </section>
 
@@ -1086,5 +1123,88 @@
         }
     })();
     </script>
+
+<script>
+(function(){
+var QUESTIONS = [
+  { q:"A hungry customer taps your website link from Google or Instagram. What happens?",
+    a:[["It loads fast and looks like us",2],["It loads \u2014 but it's old",1],["It doesn't load, or I don't have a website",0]],
+    fact:"<b>The hard truth:</b> a dead or stale link is a closed sign on your door. Most customers never try a second time \u2014 they order from whoever loaded." },
+  { q:"Do the hours posted online match the hours you actually keep?",
+    a:[["Yes \u2014 exact",2],["Close enough, probably",1],["No idea \u2014 or they're definitely wrong",0]],
+    fact:"<b>The hard truth:</b> wrong hours are the quietest leak there is. A customer who finds you 'closed' at lunch doesn't call to check \u2014 they just go elsewhere." },
+  { q:"Can a customer see your current menu on their phone \u2014 and act on it?",
+    a:[["Yes \u2014 current menu, easy to order or call",2],["There's a menu, but it's old or a blurry photo",1],["No menu online",0]],
+    fact:"<b>The hard truth:</b> the menu is the sale. If it can't be read on a phone, it isn't selling \u2014 it's decoration." },
+  { q:"A customer finds you online and wants food. How fast can they reach you?",
+    a:[["One tap \u2014 message or email is right there",2],["They have to hunt around a bit",1],["There's no clear way to reach us",0]],
+    fact:"<b>The hard truth:</b> every extra tap between 'I'm hungry' and you is money leaking out of the funnel. Hunger doesn't wait." },
+  { q:"When did you last update anything on your website or profiles?",
+    a:[["This month",2],["Sometime this year",1],["Honestly can't remember",0]],
+    fact:"<b>The hard truth:</b> search engines rank businesses that look alive. A profile that hasn't moved in a year sinks \u2014 quietly, every week." }
+];
+var idx=0, picks=[];
+var $=function(id){return document.getElementById(id);};
+var prog=$("fq-progress");
+for(var i=0;i<QUESTIONS.length;i++){var s=document.createElement("i");prog.appendChild(s);}
+function mark(n){var b=prog.children;for(var j=0;j<b.length;j++)b[j].className=j<n?"on":"";}
+function show(id){var sc=document.querySelectorAll(".fq-screen");for(var j=0;j<sc.length;j++)sc[j].classList.remove("active");$(id).classList.add("active");}
+function answered(){return picks.length>idx;}
+function renderQ(){
+  var item=QUESTIONS[idx];
+  $("fq-kicker").textContent="Question "+(idx+1)+" of "+QUESTIONS.length;
+  $("fq-text").textContent=item.q;
+  var box=$("fq-answers");box.innerHTML="";
+  $("fq-insight").style.display="none";$("fq-next-btn").style.display="none";
+  $("fq-back-btn").style.display=idx>0?"block":"none";
+  item.a.forEach(function(pair,ai){
+    var b=document.createElement("button");b.className="fq-answer";b.textContent=pair[0];
+    if(picks[idx]===ai){b.style.borderColor="#fb923c";b.style.background="rgba(251,146,60,.12)";}
+    b.onclick=function(){
+      picks[idx]=ai; picks.length=idx+1;
+      var all=box.children;for(var k=0;k<all.length;k++){all[k].disabled=true;all[k].style.borderColor="";all[k].style.background="";}
+      b.style.borderColor="#fb923c";b.style.background="rgba(251,146,60,.12)";
+      $("fq-insight").innerHTML=item.fact;$("fq-insight").style.display="block";
+      $("fq-next-btn").textContent=idx===QUESTIONS.length-1?"See my score":"Next question";
+      $("fq-next-btn").style.display="block"; mark(idx+1);
+    };
+    box.appendChild(b);
+  });
+  if(answered()){
+    var all=box.children;for(var k=0;k<all.length;k++)all[k].disabled=false;
+    $("fq-insight").innerHTML=item.fact;$("fq-insight").style.display="block";
+    $("fq-next-btn").textContent=idx===QUESTIONS.length-1?"See my score":"Next question";
+    $("fq-next-btn").style.display="block"; mark(idx+1);
+  } else { mark(idx); }
+}
+$("fq-start-btn").onclick=function(){show("fq-q");renderQ();};
+$("fq-back-btn").onclick=function(){ if(idx>0){idx--; renderQ();} };
+$("fq-next-btn").onclick=function(){
+  idx++;
+  if(idx<QUESTIONS.length){renderQ();}
+  else{
+    mark(QUESTIONS.length);
+    var total=picks.reduce(function(sum,ai,i){return sum+QUESTIONS[i].a[ai][1];},0);
+    window.__fqTotal=total; window.__fqPicks=picks.slice();
+    var v,body;
+    if(total>=8){v="Your front door is in good shape.";body="Most of the basics are working \u2014 which means the leaks left are the sneaky ones: the details a customer feels but never reports. The free audit checks all of it, line by line, against your live site and profiles.";}
+    else if(total>=4){v="You're leaking customers \u2014 quietly.";body="Nothing here is broken beyond repair, but every 'close enough' above is a customer who almost ordered from you. The free audit names each leak and what fixing it takes \u2014 in plain words, with your actual pages as the evidence.";}
+    else{v="Your front door is costing you every day.";body="Right now, a customer who finds you online meets a dead end more often than a dinner. The good news: these are the fastest fixes in the business. The free audit shows you exactly where you stand and what to fix first.";}
+    $("fq-r-score").textContent="Your score: "+total+" of 10";
+    $("fq-r-verdict").textContent=v; $("fq-r-body").textContent=body;
+    show("fq-result");
+  }
+};
+$("fq-send-btn").onclick=function(){
+  var name=$("fq-name").value.trim(), biz=$("fq-biz").value.trim(), email=$("fq-email").value.trim();
+  var total=window.__fqTotal||0, pk=window.__fqPicks||[];
+  var lines=QUESTIONS.map(function(it,i){var ai=pk[i];return (i+1)+". "+it.q+"\n   -> "+(ai!=null?it.a[ai][0]:"(skipped)");}).join("\n");
+  var subject=encodeURIComponent("Free audit request \u2014 "+(biz||name||"Front-Door Check"));
+  var body=encodeURIComponent("Name: "+name+"\nBusiness: "+biz+"\nReply email: "+email+"\nScore: "+total+" of 10\n\nMy Front-Door Check answers:\n"+lines+"\n\nPlease send the free audit to the reply email above. \u2014 via the sofritostudio.com homepage check");
+  window.location.href="mailto:hello@sofritostudio.com?subject="+subject+"&body="+body;
+};
+$("fq-restart-btn").onclick=function(){idx=0;picks=[];mark(0);show("fq-intro");};
+})();
+</script>
 </body>
 </html>
